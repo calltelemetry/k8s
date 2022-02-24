@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: call-telemetry-self-signed
+spec:
+  secretName: call-telemetry-self-signed
+  commonName: {{ .Values.ssl_hostname }}
+  duration: 8760h
+  dnsNames:
+    - {{ .Values.ssl_hostname }}
+  issuerRef:
+    name: call-telemetry-issuer

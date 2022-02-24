@@ -1,0 +1,10 @@
+apiVersion: v1
+name: stable
+version: 0.5.0
+appVersion: 0.5.0
+description: Stable K3S Single Node
+home: https://www.calltelemetry.com/
+maintainers:
+  - name: Jason @ Call Telemetry
+    email: jason@calltelemetry.com
+icon: https://www.calltelemetry.com/images/logo.png

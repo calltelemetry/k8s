@@ -1,0 +1,15 @@
+dependencies:
+  - name: metallb
+    version: 2.4.4
+    repository: https://charts.bitnami.com/bitnami
+  # - name: cert-manager
+  #   version: v1.7.1
+  #   repository: https://charts.jetstack.io
+  # --set installCRDs=true
+  # - name: postgresql
+  #   version: 9.1.1
+  #   repository: https://charts.bitnami.com/bitnami
+  # - name: traefik
+  #   version: 9.14.2
+  #   repository: https://helm.traefik.io/traefik
+    

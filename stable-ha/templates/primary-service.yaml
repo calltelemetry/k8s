@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-primary-web
+  labels:
+    app: {{ .Release.Name  }}-primary-web
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    traefik.ingress.kubernetes.io/affinity: "true"
+    traefik.ingress.kubernetes.io/session-cookie-name: "sticky"
+    metallb.universe.tf/address-pool: primary-pool
+spec:
+  type: LoadBalancer  
+  externalTrafficPolicy: Cluster
+  selector:
+    app: {{ .Release.Name  }}-web
+  ports:
+    - port: {{ .Values.web.primary_port  }}
+      targetPort: 4000
+      protocol: TCP
+      name: web
+    - port: 22
+      targetPort: 3022
+      protocol: TCP
+      name: sftp

@@ -1,0 +1,38 @@
+hostname:
+image: calltelemetry/web:0.5.1
+  # repository: calltelemetry/web
+  # tag: 0.4.1
+resources: {}
+metallb:
+  existingConfigMap: metallb-config
+  speaker:
+    secretKey: metallb-secretkey
+# traefik:
+  # service.annotations."metallb\.universe\.tf\/address-pool": default
+cert-manager:
+  installCRDs: true
+web:
+  cpus: 1
+  imagePullPolicy: Always
+  replicas: 3
+  primary_port: 80
+  secondary_port: 80
+cdr_root_path: "/tmp"
+db_name: calltelemetry_prod
+db_hostname: ctsql.pgo.svc.cluster.local
+db_username: postgres
+db_password: calltelemetry
+db_port: "5432"
+global:
+  postgresql:
+    postgresqlDatabase: calltelemetry_prod
+    postgresqlUsername: postgres
+    # database: calltelemetry_db
+    # username: calltelemetry
+    postgresqlPassword: calltelemetry
+primary_ip: 192.168.0.235
+secondary_ip: 192.168.0.236
+cluster_ip_start: 192.168.0.237
+cluster_ip_end: 192.168.123.0.237
+logging_level: debug
+ssl_hostname: ctadmin.calltelemetry.local

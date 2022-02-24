@@ -1,0 +1,10 @@
+apiVersion: v1
+appVersion: 0.5.1
+description: Stable K3S Deployment 2-20-2022
+home: https://www.calltelemetry.com/
+icon: https://www.calltelemetry.com/images/logo.png
+maintainers:
+- email: jason@calltelemetry.com
+  name: Jason @ CallTelemetry
+name: stable-ha
+version: 0.5.6
