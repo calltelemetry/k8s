@@ -1,0 +1,18 @@
+apiVersion: v1
+entries:
+  echo:
+  - apiVersion: v1
+    appVersion: 0.1.1
+    created: "2024-10-05T03:45:02.767498938Z"
+    description: Echo Service
+    digest: 7e9eb1cdb3c4787373040b20f233f04582354e3598adadebdf4372484b1ec5b0
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: echo
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/echo-0.1.1/echo-0.1.1.tgz
+    version: 0.1.1
+generated: "2024-10-05T03:45:02.767504308Z"
