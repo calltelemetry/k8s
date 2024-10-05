@@ -48,4 +48,3 @@ jobs:
           config: helm/cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          DEBUG: "true"
