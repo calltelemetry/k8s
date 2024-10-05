@@ -1,3 +1,6 @@
 pages-branch: gh-pages
 pages-index-path: helm/charts/index.yaml
 skip-existing: true
+owner: calltelemetry
+git-repo: k8s
+charts-repo: https://calltelemetry.github.io/k8s
