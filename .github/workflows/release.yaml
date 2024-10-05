@@ -34,6 +34,12 @@ jobs:
           helm repo add cert-manager https://charts.jetstack.io
           helm repo update
 
+      - name: Lint Charts
+        run: |
+          for dir in helm/charts/*/; do
+            helm lint "$dir"
+          done
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
@@ -41,3 +47,4 @@ jobs:
           config: helm/cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          debug: true
