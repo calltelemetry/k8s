@@ -1,0 +1,95 @@
+name: Bump Chart Versions
+
+on:
+  pull_request:
+    paths:
+      - 'helm/charts/**'
+
+permissions:
+  contents: write
+
+jobs:
+  bump-chart-versions:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git checkout -b "$GITHUB_HEAD_REF"
+
+      - name: Dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v2
+
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install semver
+        run: npm install -g semver
+
+      - name: Bump Chart Versions
+        run: |
+          set -e
+          push=0
+
+          deps='${{ steps.dependabot-metadata.outputs.updated-dependencies-json }}'
+
+          for dir in helm/charts/*/; do
+            directory=$(basename "$dir")
+            match=$(echo "$deps" | jq ".[] | select(.directory == \"/helm/charts/$directory\")")
+
+            if [ -z "$match" ]; then
+              continue
+            fi
+
+            updateType=$(echo "$match" | jq -r ".updateType")
+            prevVersion=$(echo "$match" | jq -r ".prevVersion")
+            newVersion=$(echo "$match" | jq -r ".newVersion")
+
+            echo "Processing $directory"
+            echo "Update type: $updateType"
+            echo "Previous version: $prevVersion"
+            echo "New version: $newVersion"
+
+            prevChartVersion=$(sed -rn 's/^version:\s+([0-9]+\.[0-9]+\.[0-9]+)/\1/p' "$dir/Chart.yaml")
+            echo "Previous chart version: $prevChartVersion"
+
+            semverIncr="patch"
+            if [ "$updateType" = "version-update:semver-major" ]; then
+              semverIncr="major"
+              if echo "$prevChartVersion" | grep -q "^0\."; then
+                semverIncr="minor"
+              fi
+            elif [ "$updateType" = "version-update:semver-minor" ]; then
+              semverIncr="minor"
+            fi
+
+            newChartVersion=$(semver -i "$semverIncr" "$prevChartVersion")
+            echo "New chart version: $newChartVersion"
+
+            sed -i "s|^appVersion:\s.*|appVersion: $newVersion|;s|^version:\s.*|version: $newChartVersion|" "$dir/Chart.yaml"
+
+            git add "$dir/Chart.yaml"
+            if git commit -m "[$directory helm] bump chart to version: $newChartVersion appVersion: $newVersion"; then
+              push=1
+            fi
+          done
+
+          if [ "$push" = "1" ]; then
+            git push -u origin "$GITHUB_HEAD_REF"
+          fi
+
+      - name: Debug - Show Git Status
+        if: failure()
+        run: |
+          git status
+          git diff
