@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-echo-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.primary_hostname }}
+      http:
+        paths:
+        - path: /echo
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Release.Name }}-echo-service
+              port:
+                number: 80
+    - host: {{ .Values.secondary_hostname }}
+      http:
+        paths:
+        - path: /echo
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Release.Name }}-echo-service
+              port:
+                number: 80
+    - host: {{ .Values.admin_hostname }}
+      http:
+        paths:
+        - path: /echo
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Release.Name }}-echo-service
+              port:
+                number: 80

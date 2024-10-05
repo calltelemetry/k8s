@@ -1,0 +1,27 @@
+environment: "production"
+loadBalancerType: "onprem"
+primary_ip: "192.168.123.205"
+secondary_ip: "192.168.123.206"
+admin_ip: "192.168.123.207"
+primary_hostname: "primary.calltelemetry.local"
+secondary_hostname: "secondary.calltelemetry.local"
+admin_hostname: "admin.calltelemetry.local"
+networking:
+  api_port: 80
+  web_port: 443
+  sftp_port: 22
+ingress-nginx:
+  controller:
+    replicaCount: 3
+    service:
+      enabled: false
+    serviceAccount:
+      create: true
+      name: nginx-ingress-serviceaccount
+    rbac:
+      create: true
+    labels:
+      app: nginx-ingress-controller
+    podLabels:
+      app: nginx-ingress-controller
+

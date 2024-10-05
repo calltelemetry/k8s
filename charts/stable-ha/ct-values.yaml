@@ -1,7 +1,0 @@
-db_hostname: ctsql.pgo.svc.cluster.local
-db_username: postgres
-db_password: calltelemetry
-primary_ip: 192.168.123.135
-secondary_ip: 192.168.123.136
-cluster_ip_start: 192.168.123.138
-cluster_ip_end: 192.168.123.140

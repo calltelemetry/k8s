@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traceroute
+  labels:
+    app: {{ .Release.Name }}-traceroute-service
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Release.Name  }}-traceroute-service
+  ports:
+    - port: 4100
+      targetPort: 4100
+      protocol: TCP
+      name: api

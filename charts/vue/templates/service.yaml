@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.vue_web.port }}
+      targetPort: {{ .Values.vue_web.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-app

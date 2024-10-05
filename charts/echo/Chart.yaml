@@ -1,0 +1,10 @@
+apiVersion: v1
+version: 0.1.0
+appVersion: 0.1.0
+name: echo
+description: Echo Service
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC

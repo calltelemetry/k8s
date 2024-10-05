@@ -1,0 +1,10 @@
+apiVersion: v1
+version: 0.11.4
+appVersion: 0.8.0
+name: ct-ingress
+description: Call Telemetry for Cisco Callmanager
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC

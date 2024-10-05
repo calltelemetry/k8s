@@ -1,0 +1,111 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name  }}-admin-service
+  labels:
+    app: {{ .Release.Name  }}-admin-service
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name  }}-admin-service
+  replicas: 1
+  strategy:
+    # type: Recreate
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 70%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name  }}-admin-service
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.userid }}
+      tolerations:
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 2
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 2
+      terminationGracePeriodSeconds: 5
+      affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - {{ .Release.Name  }}-admin-service
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: admin-service
+          image: {{ .Values.admin.image }}
+          imagePullPolicy: {{ .Values.admin.imagePullPolicy }}
+          ports:
+            - containerPort: 4001
+            - containerPort: 4080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              # memory: "1024Mi"
+              cpu: {{ .Values.admin.cpus }}
+          # livenessProbe:
+          #   httpsGet:
+          #     path: /
+          #     port: 4001
+          #   initialDelaySeconds: 15
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 4000
+            initialDelaySeconds: 15
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 4000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: EXTERNAL_IP
+              value: {{ .Values.hostname}}
+            - name: DB_USER
+              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: user} }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: password } }
+            - name: DB_NAME
+              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: dbname } }
+            - name: DB_HOSTNAME
+              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: host} }
+            - name: CDR_ROOT_PATH
+              value: {{ .Values.cdr_root_path }}
+            - name: DB_PORT
+              value: {{ quote .Values.db_port }}
+            - name: DB_SSL_ENABLED
+              value: {{ quote .Values.db_ssl_enabled }}
+            - name: LOGGING_LEVEL
+              value: {{ .Values.admin.logging_level }}
+            - name: LOCAL_NATS
+              value: {{ .Release.Name  }}-nats
+            - name: WORKER_NODE
+              value: "TRUE"
+            - name: ADMIN_NODE
+              value: "TRUE"
+            - name: HTTP_ADAPTER
+              value: "HACKNEY"
+            - name: CERT_KEY
+              value: /home/app/cert/appliance_key.pem
+            - name: CERT_PUBLIC
+              value: /home/app/cert/appliance.pem

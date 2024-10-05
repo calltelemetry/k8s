@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ .Values.environment }}-primary-ip
+  namespace: metallb-system
+spec:
+  addresses:
+  - {{ .Values.primary_ip }}/32
+  autoAssign: false
+status: {}

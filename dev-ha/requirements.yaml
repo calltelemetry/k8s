@@ -1,8 +1,0 @@
-dependencies:
-  - name: metallb
-    version: 2.3.0
-    repository: https://charts.bitnami.com/bitnami
-  # - name: traefik
-  #   version: 9.14.2
-  #   repository: https://helm.traefik.io/traefik
-    
