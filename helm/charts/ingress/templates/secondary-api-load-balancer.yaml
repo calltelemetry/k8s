@@ -1,3 +1,4 @@
+{{- if .Values.secondary_api.createLoadBalancer }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,8 +8,8 @@ metadata:
     app: {{ .Release.Name }}-secondary-api
   annotations:
     kubernetes.io/ingress.class: nginx
-    {{- if eq .Values.loadBalancerType "onprem" }}
-    metallb.universe.tf/address-pool: {{ .Values.environment }}-secondary-ip
+    {{- if .Values.secondary_api.advertiseL2MetalLb }}
+    metallb.universe.tf/address-pool: secondary-ip
     {{- end }}
 spec:
   type: LoadBalancer
@@ -16,11 +17,12 @@ spec:
   selector:
     app: nginx-ingress-controller
   ports:
-    - port: {{ .Values.networking.api_port }}
+    - port: {{ .Values.secondary_api.port }}
       targetPort: 80
       protocol: TCP
       name: web
-    - port: 443
+    - port: {{ .Values.secondary_api.https_port }}
       targetPort: 443
       protocol: TCP
       name: https
+{{- end }}

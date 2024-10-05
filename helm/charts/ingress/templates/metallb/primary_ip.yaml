@@ -1,10 +1,21 @@
+{{- if and .Values.primary_api.createLoadBalancer .Values.primary_api.advertiseL2MetalLb }}
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: {{ .Values.environment }}-primary-ip
-  namespace: metallb-system
+  name: primary-ip
+  namespace: {{ .Release.Namespace }}
 spec:
   addresses:
-  - {{ .Values.primary_ip }}/32
+  - {{ .Values.primary_api.ip }}/32
   autoAssign: false
 status: {}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: primary-l2-advert
+  namespace: {{ .Release.Namespace }}
+spec:
+  ipAddressPools:
+  - primary-ip
+{{- end }}

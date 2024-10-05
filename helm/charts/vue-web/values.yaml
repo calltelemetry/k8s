@@ -2,10 +2,10 @@ replicaCount: 1
 environment: prod
 vue_web:
   image:
-    repository: calltelemetry/ct-vue
+    repository: calltelemetry/vue
     tag: 0.8.3-rc26
     pullPolicy: Always
-  port: 9000
+  port: 80
 
 service:
   type: ClusterIP
@@ -15,6 +15,7 @@ ingress:
   enabled: true
   annotations:
     cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    kubernetes.io/ingress.class: nginx
   hosts:
     - host: dev.calltelemetry.com
       paths: ['/', '/#']

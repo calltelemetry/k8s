@@ -1,22 +1,24 @@
+{{- if .Values.admin_api.createLoadBalancer }}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-admin-lb
   namespace: {{ .Release.Namespace }}
   annotations:
-    {{- if eq .Values.loadBalancerType "onprem" }}
-    metallb.universe.tf/address-pool: {{ .Values.environment }}-admin-ip
+    {{- if .Values.admin_api.advertiseL2MetalLb }}
+    metallb.universe.tf/address-pool: admin-ip
     {{- end }}
 spec:
   type: LoadBalancer
   selector:
     app: nginx-ingress-controller
   ports:
-    - port: 80
+    - port: {{ .Values.admin_api.port }}
       targetPort: 80
       protocol: TCP
       name: http
-    - port: 443
+    - port: {{ .Values.admin_api.https_port }}
       targetPort: 443
       protocol: TCP
       name: https
+{{- end }}

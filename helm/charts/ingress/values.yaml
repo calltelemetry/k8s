@@ -1,15 +1,8 @@
-environment: "production"
-loadBalancerType: "onprem"
-primary_ip: "192.168.123.205"
-secondary_ip: "192.168.123.206"
-admin_ip: "192.168.123.207"
-primary_hostname: "primary.calltelemetry.local"
-secondary_hostname: "secondary.calltelemetry.local"
-admin_hostname: "admin.calltelemetry.local"
+# kubectl delete -A ValidatingWebhookConfiguration ingress-ingress-nginx-admission
 networking:
-  api_port: 80
-  web_port: 443
   sftp_port: 22
+metallb:
+  enabled: false
 ingress-nginx:
   controller:
     replicaCount: 3
@@ -20,8 +13,36 @@ ingress-nginx:
       name: nginx-ingress-serviceaccount
     rbac:
       create: true
+      scope: namespaced
+    clusterRole:
+      create: true
+      name: "{{ .Release.Name }}-{{ .Release.Namespace }}-ingress-nginx"
     labels:
       app: nginx-ingress-controller
     podLabels:
       app: nginx-ingress-controller
+
+# Primary API Load Balancer
+primary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+  ip: "192.168.123.205"
+  port: 80
+  https_port: 443
+
+# Secondary API Load Balancer
+secondary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+  ip: "192.168.123.206"
+  port: 80
+  https_port: 443
+
+# Admin API Load Balancer
+admin_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: false
+  ip: "192.168.123.207"
+  port: 80
+  https_port: 443
 
