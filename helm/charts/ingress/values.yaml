@@ -5,22 +5,24 @@ metallb:
   enabled: false
 ingress-nginx:
   controller:
-    replicaCount: 3
+    replicaCount: 1
     service:
       enabled: false
+      create: false
     serviceAccount:
       create: true
-      name: nginx-ingress-serviceaccount
+      # name: nginx-ingress-serviceaccount
+      name: nginx-ingress-serviceaccount-{{ .Release.Namespace }}
     rbac:
       create: true
       scope: namespaced
     clusterRole:
       create: true
       name: "{{ .Release.Name }}-{{ .Release.Namespace }}-ingress-nginx"
-    labels:
-      app: nginx-ingress-controller
-    podLabels:
-      app: nginx-ingress-controller
+    # labels:
+    #   app: nginx-ingress-controller-{{ .Release.Namespace }}
+    # podLabels:
+    #   app: nginx-ingress-controller-{{ .Release.Namespace }}
 
 # Primary API Load Balancer
 primary_api:
@@ -29,6 +31,7 @@ primary_api:
   ip: "192.168.123.205"
   port: 80
   https_port: 443
+  addressPool: "primary-api-ip"
 
 # Secondary API Load Balancer
 secondary_api:
@@ -37,7 +40,7 @@ secondary_api:
   ip: "192.168.123.206"
   port: 80
   https_port: 443
-
+  addressPool: "secondary-api-ip"
 # Admin API Load Balancer
 admin_api:
   createLoadBalancer: true
@@ -45,4 +48,5 @@ admin_api:
   ip: "192.168.123.207"
   port: 80
   https_port: 443
+  addressPool: "admin-ip"
 

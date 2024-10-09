@@ -1,72 +1,72 @@
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Release.Name  }}-sftp-service
-  labels:
-    app: {{ .Release.Name  }}-sftp-service
-    deployment: {{ .Release.Name  }}-sftp-service
-spec:
-  selector:
-    matchLabels:
-      app: {{ .Release.Name  }}-sftp-service
-      deployment: {{ .Release.Name  }}-sftp-service
-  replicas: 1
-  strategy:
-    # type: Recreate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 2
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        app: {{ .Release.Name  }}-sftp-service
-        deployment: {{ .Release.Name  }}-sftp-service
-    spec:
-      tolerations:
-        - effect: NoExecute
-          key: node.kubernetes.io/unreachable
-          operator: Exists
-          tolerationSeconds: 2
-        - effect: NoExecute
-          key: node.kubernetes.io/not-ready
-          operator: Exists
-          tolerationSeconds: 2
-      terminationGracePeriodSeconds: 5
-      # affinity:
-      #     podAntiAffinity:
-      #       preferredDuringSchedulingIgnoredDuringExecution:
-      #       - weight: 100
-      #         podAffinityTerm:
-      #           labelSelector:
-      #             matchExpressions:
-      #             - key: app
-      #               operator: In
-      #               values:
-      #               - {{ .Release.Name  }}-primary-web
-      #               - {{ .Release.Name  }}-secondary-web
-      #           topologyKey: "kubernetes.io/hostname"
-      containers:
-        - name: sftp-service
-          image: {{ .Values.sftp.image }}
-          imagePullPolicy: {{ .Values.sftp.imagePullPolicy }}
-          ports:
-            - containerPort: 4000
-          resources:
-            requests:
-              # memory: "512Mi"
-              cpu: "100m"
-            limits:
-            #   # memory: "1024Mi"
-              cpu: {{ .Values.sftp.cpus }}
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: 8080
-          #   initialDelaySeconds: 120
-          env:
-            - name: NATS_HOSTNAME
-              value: {{ .Release.Name  }}-nats
-            # - name: LOGGING_LEVEL
-              # value: {{ .Values.sftp.logging_level }}
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: {{ .Release.Name  }}-sftp-service
+#   labels:
+#     app: {{ .Release.Name  }}-sftp-service
+#     deployment: {{ .Release.Name  }}-sftp-service
+# spec:
+#   selector:
+#     matchLabels:
+#       app: {{ .Release.Name  }}-sftp-service
+#       deployment: {{ .Release.Name  }}-sftp-service
+#   replicas: 1
+#   strategy:
+#     # type: Recreate
+#     rollingUpdate:
+#       maxSurge: 1
+#       maxUnavailable: 2
+#     type: RollingUpdate
+#   template:
+#     metadata:
+#       labels:
+#         app: {{ .Release.Name  }}-sftp-service
+#         deployment: {{ .Release.Name  }}-sftp-service
+#     spec:
+#       tolerations:
+#         - effect: NoExecute
+#           key: node.kubernetes.io/unreachable
+#           operator: Exists
+#           tolerationSeconds: 2
+#         - effect: NoExecute
+#           key: node.kubernetes.io/not-ready
+#           operator: Exists
+#           tolerationSeconds: 2
+#       terminationGracePeriodSeconds: 5
+#       # affinity:
+#       #     podAntiAffinity:
+#       #       preferredDuringSchedulingIgnoredDuringExecution:
+#       #       - weight: 100
+#       #         podAffinityTerm:
+#       #           labelSelector:
+#       #             matchExpressions:
+#       #             - key: app
+#       #               operator: In
+#       #               values:
+#       #               - {{ .Release.Name  }}-primary-web
+#       #               - {{ .Release.Name  }}-secondary-web
+#       #           topologyKey: "kubernetes.io/hostname"
+#       containers:
+#         - name: sftp-service
+#           image: {{ .Values.sftp.image }}
+#           imagePullPolicy: {{ .Values.sftp.imagePullPolicy }}
+#           ports:
+#             - containerPort: 4000
+#           resources:
+#             requests:
+#               # memory: "512Mi"
+#               cpu: "100m"
+#             limits:
+#             #   # memory: "1024Mi"
+#               cpu: {{ .Values.sftp.cpus }}
+#           # livenessProbe:
+#           #   httpGet:
+#           #     path: /
+#           #     port: 8080
+#           #   initialDelaySeconds: 120
+#           env:
+#             - name: NATS_HOSTNAME
+#               value: {{ .Release.Name  }}-nats
+#             # - name: LOGGING_LEVEL
+#               # value: {{ .Values.sftp.logging_level }}

@@ -9,7 +9,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     {{- if .Values.secondary_api.advertiseL2MetalLb }}
-    metallb.universe.tf/address-pool: secondary-ip
+    metallb.universe.tf/address-pool: {{ .Values.secondary_api.addressPool }}
     {{- end }}
 spec:
   type: LoadBalancer

@@ -2,16 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name  }}-admin-service
+  name: admin-service
   labels:
-    app: {{ .Release.Name  }}-admin-service
+    app: admin-service
 spec:
   selector:
     matchLabels:
-      app: {{ .Release.Name  }}-admin-service
-  replicas: 1
+      app: admin-service
+  replicas: {{ .Values.admin.replicas }}
   strategy:
-    # type: Recreate
     rollingUpdate:
       maxSurge: 50%
       maxUnavailable: 70%
@@ -19,7 +18,8 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Release.Name  }}-admin-service
+        app: admin-service
+        role_curri_api: {{ .Values.admin.api_worker | quote }}
     spec:
       securityContext:
         runAsUser: {{ .Values.userid }}
@@ -34,78 +34,92 @@ spec:
           tolerationSeconds: 2
       terminationGracePeriodSeconds: 5
       affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                    - {{ .Release.Name  }}-admin-service
-                topologyKey: "kubernetes.io/hostname"
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Release.Name }}-admin-service
+              topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: admin-service
+        - name: {{ .Release.Name }}-admin
           image: {{ .Values.admin.image }}
           imagePullPolicy: {{ .Values.admin.imagePullPolicy }}
           ports:
-            - containerPort: 4001
-            - containerPort: 4080
+            {{- range .Values.admin.container_ports }}
+            - containerPort: {{ .port }}
+              name: {{ .name }}
+            {{- end }}
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              # memory: "1024Mi"
               cpu: {{ .Values.admin.cpus }}
-          # livenessProbe:
-          #   httpsGet:
-          #     path: /
-          #     port: 4001
-          #   initialDelaySeconds: 15
           livenessProbe:
             httpGet:
               scheme: HTTP
-              path: /health
-              port: 4000
+              path: /healthz
+              port: 4080
             initialDelaySeconds: 15
             periodSeconds: 3
           readinessProbe:
             httpGet:
               scheme: HTTP
-              path: /health
-              port: 4000
+              path: /healthz
+              port: 4080
             initialDelaySeconds: 3
             periodSeconds: 3
           env:
             - name: EXTERNAL_IP
-              value: {{ .Values.hostname}}
+              value: {{ .Values.hostname | quote }}
             - name: DB_USER
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: user} }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_user
             - name: DB_PASSWORD
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: password } }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_password
             - name: DB_NAME
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: dbname } }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_name
             - name: DB_HOSTNAME
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: host} }
-            - name: CDR_ROOT_PATH
-              value: {{ .Values.cdr_root_path }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_hostname
             - name: DB_PORT
-              value: {{ quote .Values.db_port }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_port
             - name: DB_SSL_ENABLED
-              value: {{ quote .Values.db_ssl_enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_ssl_enabled
+            - name: CDR_ROOT_PATH
+              value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL
-              value: {{ .Values.admin.logging_level }}
+              value: {{ .Values.admin.logging_level | quote }}
             - name: LOCAL_NATS
-              value: {{ .Release.Name  }}-nats
+              value: {{ .Values.nats_server | quote }}
             - name: WORKER_NODE
-              value: "TRUE"
+              value: {{ .Values.admin.api_worker | quote }}
             - name: ADMIN_NODE
               value: "TRUE"
             - name: HTTP_ADAPTER
               value: "HACKNEY"
             - name: CERT_KEY
-              value: /home/app/cert/appliance_key.pem
+              value: "/home/app/cert/appliance_key.pem"
             - name: CERT_PUBLIC
-              value: /home/app/cert/appliance.pem
+              value: "/home/app/cert/appliance.pem"

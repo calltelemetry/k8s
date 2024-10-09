@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.admin.hostname }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-internal-service
+                port:
+                  number: {{ range .Values.admin.container_ports }}{{ if eq .name "web-api" }}{{ .port }}{{ end }}{{ end }}  # Reference the web-api port

@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name  }}-traceroute-service
-  replicas: 1
+  replicas: {{ .Values.traceroute.replicas }}  # Update this line to use the replicas value from values.yaml
   strategy:
     rollingUpdate:
       maxSurge: 50%
@@ -64,4 +64,4 @@ spec:
               cpu: {{ .Values.traceroute.cpus }}
           env:
             - name: NATS_HOSTNAME
-              value: {{ .Release.Name  }}-nats
+              value: {{ .Values.nats_server }}

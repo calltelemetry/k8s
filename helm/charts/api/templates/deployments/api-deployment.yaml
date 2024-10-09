@@ -2,13 +2,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name  }}-api
+  name: api-worker
   labels:
-    app: {{ .Release.Name  }}-api
+    app: api-worker
+    role_curri_api: "true"
 spec:
   selector:
     matchLabels:
-      app: {{ .Release.Name  }}-api
+      app: api-worker
   replicas: {{ .Values.api.replicas }}
   strategy:
     rollingUpdate:
@@ -18,7 +19,8 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Release.Name  }}-api
+        app: api-worker
+        role_curri_api: "true"
     spec:
       securityContext:
         runAsUser: {{ .Values.userid }}
@@ -49,9 +51,10 @@ spec:
           image: {{ .Values.api.image }}
           imagePullPolicy: {{ .Values.api.imagePullPolicy }}
           ports:
-            - containerPort: 4080
-            - containerPort: 4000
-            - containerPort: 3022
+            {{- range .Values.api.container_ports }}
+            - containerPort: {{ .port }}
+              name: {{ .name }}
+            {{- end }}
           resources:
             requests:
               memory: "256Mi"
@@ -75,17 +78,35 @@ spec:
             - name: EXTERNAL_IP
               value: {{ .Values.hostname }}
             - name: DB_USER
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: user} }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_user
             - name: DB_PASSWORD
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: password } }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_password
             - name: DB_NAME
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: dbname } }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_name
             - name: DB_HOSTNAME
-              valueFrom: { secretKeyRef: { name: {{ .Values.db_secret }}, key: host} }
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_hostname
             - name: DB_PORT
-              value: {{ quote .Values.db_port }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_port
             - name: DB_SSL_ENABLED
-              value: {{ quote .Values.db_ssl_enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: db_ssl_enabled
             - name: CDR_ROOT_PATH
               value: {{ .Values.cdr_root_path }}
             - name: LOGGING_LEVEL
@@ -93,7 +114,7 @@ spec:
             - name: TRACEROUTE_SERVICE
               value: {{ .Release.Name  }}-traceroute-service
             - name: LOCAL_NATS
-              value: {{ .Release.Name  }}-nats
+              value: {{ .Values.nats_server }}
             - name: ADMIN_NODE
               value: "FALSE"
             - name: WORKER_NODE

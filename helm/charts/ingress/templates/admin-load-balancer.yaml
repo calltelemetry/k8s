@@ -6,12 +6,12 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- if .Values.admin_api.advertiseL2MetalLb }}
-    metallb.universe.tf/address-pool: admin-ip
+    metallb.universe.tf/address-pool: {{ .Values.admin_api.addressPool }}
     {{- end }}
 spec:
   type: LoadBalancer
   selector:
-    app: nginx-ingress-controller
+    app.kubernetes.io/name: ingress-nginx
   ports:
     - port: {{ .Values.admin_api.port }}
       targetPort: 80

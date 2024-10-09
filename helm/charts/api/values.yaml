@@ -6,103 +6,57 @@ hostname: 192.168.123.205
 environment: dev
 resources: {}
 userid: 1001
-networking:
-  external_api_port: 80
-  external_sftp_port: 22
-  external_admin_port: 443
+# networking:
+#   external_api_port: 80
+#   external_sftp_port: 22
+#   external_admin_port: 443
 api:
   image: calltelemetry/web:0.8.3-rc26
   imagePullPolicy: IfNotPresent
   cpus: 2
-  replicas: 3
+  replicas: 0
   logging_level: warning
+  container_ports:
+    - name: curri-api
+      port: 4080
+  hostname: dev.calltelemetry.com
+
+admin:
+  image: calltelemetry/web:0.8.2-rc68
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  cpus: 2
+  logging_level: warning
+  container_ports:
+    - name: web-api
+      port: 4000
+    - name: curri-api
+      port: 4080
+  hostname: dev.calltelemetry.com
+  api_worker: true 
+
 traceroute:
   image: calltelemetry/traceroute:0.7.2
   imagePullPolicy: IfNotPresent
   cpus: 1
   logging_level: info
-admin:
-  image: calltelemetry/web:0.8.3-rc26
-  imagePullPolicy: IfNotPresent
-  replicas: 1
-  cpus: 2
-  logging_level: warning
+  replicas: 0
+
 sftp:
   image: calltelemetry/sftp:0.6.8
   pullPolicy: IfNotPresent
   cpus: 1
   logging_level: info
-vue:
-  image: calltelemetry/vue:0.8.3-rc26
-  imagePullPolicy: Always
-  cpus: 1
-  logging_level: info
-  port: 80
-metallb:
-  existingConfigMap: metallb-config
 cdr_root_path: "/tmp"
-db_secret: hippo-pguser-calltelemetry
-# db_name: calltelemetry_prod
-# db_hostname: ctsql.pgo.svc.cluster.local
-# db_username: postgres
-# db_password: calltelemetry
-db_port: "5432"
-db_ssl_enabled: "true"
+db:
+  useSecret: false  # Set to false to use direct values
+  secretName: calltelemetry-db-secret
+  values:
+    db_username: postgres
+    db_password: calltelemetry
+    db_name: calltelemetry_prod
+    db_hostname: ctsql.pgo.svc.cluster.local
+    db_port: "5432"
+    db_ssl_enabled: "true"
 logging_level: debug
-nats:
-  container:
-    env:
-      # different from k8s units, suffix must be B, KiB, MiB, GiB, or TiB
-      # should be ~90% of memory limit
-      GOMEMLIMIT: 1GiB
-    merge:
-      # recommended limit is at least 2 CPU cores and 8Gi Memory for production JetStream clusters
-      resources:
-        requests:
-          cpu: "1"
-          memory: 1Gi
-        limits:
-          cpu: "1"
-          memory: 1Gi
-
-    podTemplate:
-    topologySpreadConstraints:
-      kubernetes.io/hostname:
-        maxSkew: 1
-        whenUnsatisfiable: DoNotSchedule
-
-    config:
-      merge:
-        debug: false
-        trace: false
-        logtime: true
-        max_payload: << 5mb >>
-      cluster:
-        enabled: true
-        port: 6222
-        replicas: 3
-
-      jetstream:
-        enabled: true
-
-        memoryStore:
-          enabled: false
-          # ensure that container has a sufficient memory limit greater than maxSize
-          maxSize: 1Gi
-
-        fileStore:
-          enabled: true
-          pvc:
-            storageClassName: local-path
-            size: 10Gi
-        merge:
-          max_memory_store: 1000000
-
-  natsbox:
-    enabled: true
-nack:
-  namespaced: true
-  nameOverride: "ct-nack"
-  jetstream:
-    nats:
-      url: "nats://ct-nats:4222"
+nats_server: "nats"
