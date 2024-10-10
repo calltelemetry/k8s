@@ -15,6 +15,17 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/api-0.11.4/api-0.11.4.tgz
     version: 0.11.4
+  azure-msal-service:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-10-10T22:01:47.063935019Z"
+    description: A Helm chart for the Azure MSAL Service
+    digest: 9b9173c0f454108a29d621a62913347230600e3b17ea36dd099145a481224129
+    name: azure-msal-service
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/azure-msal-service-0.1.0/azure-msal-service-0.1.0.tgz
+    version: 0.1.0
   ct-ingress:
   - apiVersion: v1
     appVersion: 0.8.0
@@ -63,4 +74,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/echo-0.1.1/echo-0.1.1.tgz
     version: 0.1.1
-generated: "2024-10-10T00:08:47.516513315Z"
+generated: "2024-10-10T22:01:47.063947382Z"
