@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: yourimage
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: dev.calltelemetry.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: dev.calltelemetry.com
+      hosts:
+        - dev.calltelemetry.com
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+clientId: ""
+clientSecret: ""
+tenantId: ""
+
+redirectUri: "https://example.com/auth/callback"
+debugLevel: "info"
