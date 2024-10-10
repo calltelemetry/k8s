@@ -80,32 +80,32 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_password
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_name
             - name: DB_HOSTNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_hostname
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_port
             - name: DB_SSL_ENABLED
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_ssl_enabled
             - name: CDR_ROOT_PATH
               value: {{ .Values.cdr_root_path | quote }}
@@ -114,7 +114,7 @@ spec:
             - name: LOCAL_NATS
               value: {{ .Values.nats_server | quote }}
             - name: WORKER_NODE
-              value: {{ .Values.admin.api_worker | quote }}
+              value: "{{ if .Values.admin.api_worker }}TRUE{{ else }}FALSE{{ end }}"
             - name: ADMIN_NODE
               value: "TRUE"
             - name: HTTP_ADAPTER

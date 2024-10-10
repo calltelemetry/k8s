@@ -33,7 +33,7 @@ admin:
     - name: curri-api
       port: 4080
   hostname: dev.calltelemetry.com
-  api_worker: true 
+  api_worker: false
 
 traceroute:
   image: calltelemetry/traceroute:0.7.2
