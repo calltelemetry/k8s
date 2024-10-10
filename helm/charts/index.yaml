@@ -1,5 +1,53 @@
 apiVersion: v1
 entries:
+  api:
+  - apiVersion: v1
+    appVersion: 0.8.3
+    created: "2024-10-10T00:08:47.14420854Z"
+    description: Call Telemetry for Cisco Callmanager
+    digest: 1384f8114c9234709fa4aee027a13bcfe7a0514205646d9619012b2d4e036514
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: api
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/api-0.11.4/api-0.11.4.tgz
+    version: 0.11.4
+  ct-ingress:
+  - apiVersion: v1
+    appVersion: 0.8.0
+    created: "2024-10-10T00:08:47.291021772Z"
+    dependencies:
+    - name: ingress-nginx
+      repository: https://kubernetes.github.io/ingress-nginx
+      version: 4.11.2
+    - condition: metallb.enabled
+      name: metallb
+      repository: https://metallb.github.io/metallb
+      version: 0.14.8
+    description: Call Telemetry for Cisco Callmanager
+    digest: 60ff6858e57b6c9e0f73ec72d02649610ae084e943ebecda6ccf7b0e975bedf3
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: ct-ingress
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-ingress-0.11.5/ct-ingress-0.11.5.tgz
+    version: 0.11.5
+  ct-web:
+  - apiVersion: v2
+    appVersion: 0.8.3
+    created: "2024-10-10T00:08:47.397391613Z"
+    description: Call Telemetry Web Portal
+    digest: d3666f891a14453775c3be41dcf92a891b3feb2687e1b623fe9ed59fb1ab9141
+    name: ct-web
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-web-0.1.0/ct-web-0.1.0.tgz
+    version: 0.1.0
   echo:
   - apiVersion: v1
     appVersion: 0.1.1
@@ -15,4 +63,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/echo-0.1.1/echo-0.1.1.tgz
     version: 0.1.1
-generated: "2024-10-05T03:45:02.767504308Z"
+generated: "2024-10-10T00:08:47.516513315Z"
