@@ -10,6 +10,7 @@ vue_web:
 service:
   type: ClusterIP
   port: 80
+  targetPort: 9000
 
 ingress:
   enabled: true
