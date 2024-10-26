@@ -74,4 +74,15 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/echo-0.1.1/echo-0.1.1.tgz
     version: 0.1.1
-generated: "2024-10-10T22:01:47.063947382Z"
+  teams-auth-service:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-10-26T21:44:16.007569706Z"
+    description: A Helm chart for the Azure MSAL Service
+    digest: 3ccb9a169f837715ab05644136032cf02c8f48622c4e2f9bfbbcf7581926e0ab
+    name: teams-auth-service
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.1.0/teams-auth-service-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-10-26T21:44:16.007580316Z"
