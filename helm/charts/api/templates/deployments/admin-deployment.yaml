@@ -123,5 +123,5 @@ spec:
               value: "/home/app/cert/appliance_key.pem"
             - name: CERT_PUBLIC
               value: "/home/app/cert/appliance.pem"
-            - name: TEAMS_SERVICE_NAME
+            - name: TEAMS_AUTH_SERVICE
               value: {{ .Values.teams_service_name | quote }}
