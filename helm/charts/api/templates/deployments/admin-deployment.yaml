@@ -124,4 +124,4 @@ spec:
             - name: CERT_PUBLIC
               value: "/home/app/cert/appliance.pem"
             - name: TEAMS_AUTH_SERVICE
-              value: {{ .Values.teams_service_name | quote }}
+              value: {{ .Values.teams_auth_service | quote }}
