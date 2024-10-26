@@ -60,3 +60,4 @@ db:
     db_ssl_enabled: "true"
 logging_level: debug
 nats_server: "nats"
+teams_service_name: "teams-auth-service"
