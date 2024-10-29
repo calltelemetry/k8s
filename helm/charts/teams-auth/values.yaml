@@ -36,5 +36,5 @@ clientId: ""
 clientSecret: ""
 tenantId: ""
 
-redirectUri: "https://example.com/auth/callback"
+redirectUri: "https://dev.calltelemetry.com/ms-teams/auth/callback"
 debugLevel: "info"
