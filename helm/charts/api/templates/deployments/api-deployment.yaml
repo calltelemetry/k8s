@@ -48,8 +48,7 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
       containers:
         - name: primary-api
-          image: {{ .Values.api.image }}
-          tag: {{ .Values.api.tag }}
+          image: {{ .Values.api.image }}:{{ .Values.api.tag }}
           imagePullPolicy: {{ .Values.api.imagePullPolicy }}
           ports:
             {{- range .Values.api.container_ports }}

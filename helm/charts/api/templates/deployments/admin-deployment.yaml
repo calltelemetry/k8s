@@ -47,8 +47,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Release.Name }}-admin
-          image: {{ .Values.admin.image }}
-          tag: {{ .Values.admin.tag }}
+          image: {{ .Values.admin.image }}:{{ .Values.admin.tag }}
           imagePullPolicy: {{ .Values.admin.imagePullPolicy }}
           ports:
             {{- range .Values.admin.container_ports }}
