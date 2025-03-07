@@ -11,7 +11,8 @@ userid: 1001
 #   external_sftp_port: 22
 #   external_admin_port: 443
 api:
-  image: calltelemetry/web:0.8.3-rc26
+  image: calltelemetry/web
+  tag: 0.8.3-rc26
   imagePullPolicy: IfNotPresent
   cpus: 2
   replicas: 0
