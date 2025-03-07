@@ -23,7 +23,8 @@ api:
   hostname: dev.calltelemetry.com
 
 admin:
-  image: calltelemetry/web:0.8.2-rc68
+  image: calltelemetry/web
+  tag: 0.8.3-rc26
   imagePullPolicy: IfNotPresent
   replicas: 1
   cpus: 2
