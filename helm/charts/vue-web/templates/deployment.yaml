@@ -20,3 +20,6 @@ spec:
           ports:
             - containerPort: {{ .Values.vue_web.port }}
           resources: {{ .Values.resources | toYaml | nindent 12 }}
+      env:
+        - name: CADDY_LOG_LEVEL
+          value: "DEBUG"
