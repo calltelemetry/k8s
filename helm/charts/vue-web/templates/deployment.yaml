@@ -22,4 +22,4 @@ spec:
           resources: {{ .Values.resources | toYaml | nindent 12 }}
           env:
             - name: CADDY_LOG_LEVEL
-              value: "DEBUG"
+              value: "{{ .Values.vue_web.LogLevel }}"

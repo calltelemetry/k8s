@@ -3,9 +3,10 @@ environment: prod
 vue_web:
   image:
     repository: calltelemetry/vue
-    tag: 0.8.3-rc26
+    tag: 0.8.3
     pullPolicy: Always
   port: 80
+  LogLevel: "INFO"  # Can be set to INFO, DEBUG, etc.
 
 service:
   type: ClusterIP
