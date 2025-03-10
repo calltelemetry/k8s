@@ -1,0 +1,43 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'helm/charts/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bump Chart Versions
+        # Use a pre-built semver bump action to increment chart versions automatically.
+        # (Replace "phan/semver-bump-action@v1" with your preferred semver bump action if needed.)
+        uses: phan/semver-bump-action@v1
+        with:
+          charts-dir: helm/charts
+          bump: patch
+          commit: true
+          push: true
+
+      - name: Package and Publish Charts
+        uses: helm/chart-releaser-action@v1.7.0
+        with:
+          charts_dir: helm/charts
+          config: helm/cr.yaml
+        env:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: "true"
