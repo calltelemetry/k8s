@@ -9,7 +9,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 3000
+      targetPort: {{ .Values.port | default 3000 }}
   selector:
     app.kubernetes.io/name: {{ include "azure-msal-service.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

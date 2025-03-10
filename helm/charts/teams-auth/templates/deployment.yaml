@@ -22,24 +22,16 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.port | default 3000 }}
           env:
-            - name: CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: azure-msal-service-secret
-                  key: client-id
-            - name: CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: azure-msal-service-secret
-                  key: client-secret
-            - name: TENANT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: azure-msal-service-secret
-                  key: tenant-id
-            - name: REDIRECT_URI
-              value: "{{ .Values.redirectUri }}"
+            # NATS Configuration
+            - name: NATS_URL
+              value: "{{ .Values.nats.url }}"
+            - name: CREDENTIALS_BUCKET
+              value: "{{ .Values.nats.credentialsBucket }}"
+
+            # Server Configuration
+            - name: PORT
+              value: "{{ .Values.port | default 3000 }}"
             - name: DEBUG_LEVEL
               value: "{{ .Values.debugLevel }}"

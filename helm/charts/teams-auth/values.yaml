@@ -32,9 +32,11 @@ tolerations: []
 
 affinity: {}
 
-clientId: ""
-clientSecret: ""
-tenantId: ""
+# NATS Configuration
+nats:
+  url: "nats://nats-server:4222"
+  credentialsBucket: "credentials"
 
-redirectUri: "https://dev.calltelemetry.com/ms-teams/auth/callback"
+# Server configuration
+port: 3000
 debugLevel: "info"

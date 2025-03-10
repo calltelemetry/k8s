@@ -1,6 +1,6 @@
 apiVersion: v2
 name: teams-auth-service
-description: A Helm chart for the Azure MSAL Service
+description: A Helm chart for the Teams Azure Auth Service with dynamic credential management
 type: application
-version: 0.1.0
-appVersion: "1.0.0"
+version: 0.2.0
+appVersion: "1.1.0"
