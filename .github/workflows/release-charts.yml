@@ -25,7 +25,7 @@ jobs:
 
       - name: Create Semver Tag
         id: tag
-        uses: anothrNick/github-tag-action@v1.40.0
+        uses: anothrNick/github-tag-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: patch
