@@ -1,41 +1,41 @@
-name: Release Charts
+# name: Release Charts
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'helm/charts/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'helm/charts/**'
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
 
-      - name: Create Semver Tag
-        id: tag
-        uses: anothrNick/github-tag-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: patch
-          tag_prefix: ""  # Adjust prefix as needed (empty means no prefix)
+#       - name: Create Semver Tag
+#         id: tag
+#         uses: anothrNick/github-tag-action@v1
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           default_bump: patch
+#           tag_prefix: ""  # Adjust prefix as needed (empty means no prefix)
 
-      - name: Package and Publish Charts
-        uses: helm/chart-releaser-action@v1.7.0
-        with:
-          charts_dir: helm/charts
-          config: helm/cr.yaml
-        env:
-          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEBUG: "true"
+#       - name: Package and Publish Charts
+#         uses: helm/chart-releaser-action@v1.7.0
+#         with:
+#           charts_dir: helm/charts
+#           config: helm/cr.yaml
+#         env:
+#           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           DEBUG: "true"
