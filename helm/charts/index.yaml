@@ -76,6 +76,17 @@ entries:
     version: 0.1.1
   teams-auth-service:
   - apiVersion: v2
+    appVersion: 1.1.0
+    created: "2025-03-10T12:46:45.987015683Z"
+    description: A Helm chart for the Teams Azure Auth Service with dynamic credential
+      management
+    digest: e71c626e94aea8e346ff5a17a73d8d3877b8545272a7734ff4e0abc01f0aeef4
+    name: teams-auth-service
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.2.0/teams-auth-service-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 1.0.0
     created: "2024-10-26T21:44:16.007569706Z"
     description: A Helm chart for the Azure MSAL Service
@@ -85,4 +96,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.1.0/teams-auth-service-0.1.0.tgz
     version: 0.1.0
-generated: "2024-10-26T21:44:16.007580316Z"
+generated: "2025-03-10T12:46:45.98702496Z"
