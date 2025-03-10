@@ -23,15 +23,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Bump Chart Versions
-        # Use a pre-built semver bump action to increment chart versions automatically.
-        # (Replace "phan/semver-bump-action@v1" with your preferred semver bump action if needed.)
-        uses: phan/semver-bump-action@v1
+      - name: Create Semver Tag
+        id: tag
+        uses: anothrNick/github-tag-action@v1.40.0
         with:
-          charts-dir: helm/charts
-          bump: patch
-          commit: true
-          push: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          tag_prefix: ""  # Adjust prefix as needed (empty means no prefix)
 
       - name: Package and Publish Charts
         uses: helm/chart-releaser-action@v1.7.0
