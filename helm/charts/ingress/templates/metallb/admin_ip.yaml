@@ -2,7 +2,7 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: admin-ip
+  name: admin-ip-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
 spec:
   addresses:
@@ -13,9 +13,9 @@ status: {}
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: admin-l2-advert
+  name: admin-l2-advert-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
 spec:
   ipAddressPools:
-  - admin-ip
+  - admin-ip-{{ .Release.Namespace }}
 {{- end }}

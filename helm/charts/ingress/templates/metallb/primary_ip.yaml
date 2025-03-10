@@ -2,7 +2,7 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: primary-ip
+  name: primary-ip-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
 spec:
   addresses:
@@ -13,9 +13,9 @@ status: {}
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: primary-l2-advert
+  name: primary-l2-advert-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
 spec:
   ipAddressPools:
-  - primary-ip
+  - primary-ip-{{ .Release.Namespace }}
 {{- end }}

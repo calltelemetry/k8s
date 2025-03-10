@@ -3,26 +3,34 @@ networking:
   sftp_port: 22
 metallb:
   enabled: false
+
+# Ingress Nginx Configuration
 ingress-nginx:
   controller:
     replicaCount: 1
     service:
       enabled: false
       create: false
+    # Pod labels and selectors - used by load balancers
+    podLabels:
+      app: nginx-ingress-controller
+    labels:
+      app: nginx-ingress-controller
+    # Service account configuration
     serviceAccount:
       create: true
-      # name: nginx-ingress-serviceaccount
-      name: nginx-ingress-serviceaccount-{{ .Release.Namespace }}
+      # The name will automatically include the namespace
+      name: nginx-ingress-serviceaccount
+    # RBAC configuration
     rbac:
       create: true
       scope: namespaced
+    # ClusterRole configuration - make it unique per environment
     clusterRole:
+      # Always create a ClusterRole - it will be unique per environment
       create: true
-      name: "{{ .Release.Name }}-{{ .Release.Namespace }}-ingress-nginx"
-    # labels:
-    #   app: nginx-ingress-controller-{{ .Release.Namespace }}
-    # podLabels:
-    #   app: nginx-ingress-controller-{{ .Release.Namespace }}
+      # Use a unique name that includes the namespace to avoid conflicts
+      name: "ingress-nginx-{{ .Release.Namespace }}"
 
 # Primary API Load Balancer
 primary_api:
@@ -41,6 +49,7 @@ secondary_api:
   port: 80
   https_port: 443
   addressPool: "secondary-api-ip"
+
 # Admin API Load Balancer
 admin_api:
   createLoadBalancer: true
