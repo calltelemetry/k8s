@@ -3,8 +3,10 @@ kind: Ingress
 metadata:
   name: api-ingress
   namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:
     - host: {{ .Values.api.hostname }}
       http:

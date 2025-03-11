@@ -4,8 +4,19 @@ networking:
 metallb:
   enabled: false
 
-# Ingress Nginx Configuration
-ingress-nginx:
+# Ingress Controller Configuration
+ingress-controller:
+  # Type of ingress controller to use
+  type: nginx
+  # Class name for the ingress controller
+  class: nginx-{{ .Release.Namespace }}
+  # Controller value for the ingress class
+  controllerValue: "k8s.io/ingress-{{ .Release.Namespace }}"
+  # Selector labels for the ingress controller
+  selector:
+    component: controller
+    instance: "{{ .Release.Name }}"
+    name: ingress-controller
   controller:
     replicaCount: 1
     service:
@@ -31,6 +42,26 @@ ingress-nginx:
       create: true
       # Use a unique name that includes the namespace to avoid conflicts
       name: "ingress-nginx-{{ .Release.Namespace }}"
+    # IngressClass configuration
+    ingressClassResource:
+      name: nginx-{{ .Release.Namespace }}
+      enabled: true
+      default: false
+      controllerValue: "k8s.io/ingress-nginx-{{ .Release.Namespace }}"
+
+# Load Balancer Common Configuration
+loadBalancer:
+  # Ingress class annotation - used by all load balancers
+  ingressClass: "{{ index .Values \"ingress-controller\" \"class\" }}"
+  # Common annotations for all load balancers
+  annotations:
+    # The selector is specified as annotations for more flexibility
+    kubernetes.io/ingress.class: "{{ index .Values \"ingress-controller\" \"class\" }}"
+    # Selector for the ingress controller pods - these can be customized based on your ingress controller
+    ingress.kubernetes.io/selector-component: "{{ index .Values \"ingress-controller\" \"selector\" \"component\" }}"
+    ingress.kubernetes.io/selector-instance: "{{ .Release.Name }}"
+    # This can be customized based on your ingress controller
+    ingress.kubernetes.io/selector-name: "{{ index .Values \"ingress-controller\" \"selector\" \"name\" }}"
 
 # Primary API Load Balancer
 primary_api:
@@ -40,6 +71,16 @@ primary_api:
   port: 80
   https_port: 443
   addressPool: "primary-api-ip"
+  # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
+  annotations: {}
+  # Example of overriding annotations:
+  # annotations:
+  #   custom.annotation/key: value
+  #   ingress.kubernetes.io/selector-component: custom-controller
+  # Override common load balancer settings if needed
+  # ingressClass: custom-ingress-class
+  # selector:
+  #   custom: selector
 
 # Secondary API Load Balancer
 secondary_api:
@@ -49,6 +90,12 @@ secondary_api:
   port: 80
   https_port: 443
   addressPool: "secondary-api-ip"
+  # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
+  annotations: {}
+  # Example of overriding annotations:
+  # annotations:
+  #   custom.annotation/key: value
+  #   ingress.kubernetes.io/selector-component: custom-controller
 
 # Admin API Load Balancer
 admin_api:
@@ -58,4 +105,12 @@ admin_api:
   port: 80
   https_port: 443
   addressPool: "admin-ip"
+  # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
+  annotations: {}
+  # Example of overriding annotations:
+  # annotations:
+  #   custom.annotation/key: value
+  #   ingress.kubernetes.io/selector-component: custom-controller
+  # selector:
+  #   custom: selector
 

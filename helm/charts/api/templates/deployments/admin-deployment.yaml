@@ -81,32 +81,29 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_user
+                  key: user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_password
+                  key: password
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_name
+                  key: dbname
             - name: DB_HOSTNAME
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_hostname
+                  key: host
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_port
+                  key: port
             - name: DB_SSL_ENABLED
-              valueFrom:
-                secretKeyRef:
-                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_ssl_enabled
+              value: "true"
             - name: CDR_ROOT_PATH
               value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL

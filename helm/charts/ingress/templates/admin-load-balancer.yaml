@@ -20,9 +20,7 @@ spec:
   type: LoadBalancer
   externalTrafficPolicy: Cluster
   selector:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/name: ingress-nginx
+    {{- include "ingress.controllerSelector" . | nindent 4 }}
   ports:
     - port: {{ .Values.admin_api.port }}
       targetPort: 80

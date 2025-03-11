@@ -12,7 +12,7 @@ userid: 1001
 #   external_admin_port: 443
 api:
   image: calltelemetry/web
-  tag: 0.8.3-rc26
+  tag: 0.8.3-rc63
   imagePullPolicy: IfNotPresent
   cpus: 2
   replicas: 0
@@ -24,7 +24,7 @@ api:
 
 admin:
   image: calltelemetry/web
-  tag: 0.8.3-rc26
+  tag: 0.8.3-rc63
   imagePullPolicy: IfNotPresent
   replicas: 1
   cpus: 2
@@ -52,14 +52,17 @@ sftp:
 cdr_root_path: "/tmp"
 db:
   useSecret: false  # Set to false to use direct values
-  secretName: calltelemetry-db-secret
+  secretName: api-db-secret # Name of the secret containing DB credentials
   values:
     db_username: postgres
     db_password: calltelemetry
     db_name: calltelemetry_prod
-    db_hostname: ctsql.pgo.svc.cluster.local
+    db_hostname: hippo-ha.postgres-operator.svc.cluster.local
     db_port: "5432"
-    db_ssl_enabled: "true"
+    db_ssl_enabled: true
 logging_level: debug
 nats_server: "nats"
 teams_auth_service: "teams-auth-service"
+
+# Ingress configuration
+ingressClassName: nginx

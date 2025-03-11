@@ -4,9 +4,9 @@ metadata:
   name: admin-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:
     - host: {{ .Values.admin.hostname }}
       http:
