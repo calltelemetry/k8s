@@ -4,13 +4,24 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-admin-lb
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-admin
   annotations:
     {{- if .Values.admin_api.advertiseL2MetalLb }}
-    metallb.universe.tf/address-pool: {{ .Values.admin_api.addressPool }}
+    metallb.universe.tf/address-pool: admin-ip-{{ .Release.Namespace }}
+    {{- end }}
+    {{- with .Values.loadBalancer.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.admin_api.annotations }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   type: LoadBalancer
+  externalTrafficPolicy: Cluster
   selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/name: ingress-nginx
   ports:
     - port: {{ .Values.admin_api.port }}

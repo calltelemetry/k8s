@@ -7,15 +7,22 @@ metadata:
   labels:
     app: {{ .Release.Name }}-secondary-api
   annotations:
-    kubernetes.io/ingress.class: nginx
     {{- if .Values.secondary_api.advertiseL2MetalLb }}
-    metallb.universe.tf/address-pool: {{ .Values.secondary_api.addressPool }}
+    metallb.universe.tf/address-pool: secondary-ip-{{ .Release.Namespace }}
+    {{- end }}
+    {{- with .Values.loadBalancer.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.secondary_api.annotations }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Cluster
   selector:
-    app: nginx-ingress-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: ingress-nginx
   ports:
     - port: {{ .Values.secondary_api.port }}
       targetPort: 80
