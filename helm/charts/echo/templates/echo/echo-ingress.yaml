@@ -4,10 +4,9 @@ metadata:
   name: {{ .Release.Name }}-echo-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
     nginx.ingress.kubernetes.io/load-balance: "round_robin"
 spec:
-  ingressClassName: nginx
   rules:
     - host: {{ .Values.primary_hostname }}
       http:
