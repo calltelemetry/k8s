@@ -11,5 +11,15 @@ spec:
       targetPort: 2222
       protocol: TCP
       name: sftp
+    {{- if .Values.syslog.enabled }}
+    - port: 514
+      targetPort: 514
+      protocol: TCP
+      name: syslog-tcp
+    - port: 514
+      targetPort: 514
+      protocol: UDP
+      name: syslog-udp
+    {{- end }}
   type: ClusterIP
 {{- end }}

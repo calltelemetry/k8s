@@ -28,6 +28,13 @@ spec:
           ports:
             - containerPort: 2222
               name: sftp
+            {{- if .Values.syslog.enabled }}
+            - containerPort: 514
+              name: syslog-tcp
+            - containerPort: 514
+              protocol: UDP
+              name: syslog-udp
+            {{- end }}
           env:
             - name: PUID
               value: "1000"
