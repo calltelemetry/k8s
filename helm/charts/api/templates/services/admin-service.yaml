@@ -13,3 +13,7 @@ spec:
       targetPort: 4000
       protocol: TCP
       name: http
+    - port: 3022
+      targetPort: 3022
+      protocol: TCP
+      name: ssh

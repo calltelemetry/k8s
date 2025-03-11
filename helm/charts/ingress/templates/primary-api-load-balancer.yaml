@@ -30,4 +30,10 @@ spec:
       targetPort: 443
       protocol: TCP
       name: https
+    {{- if .Values.sftp.enabled }}
+    - port: {{ .Values.sftp.port }}
+      targetPort: {{ .Values.sftp.targetPort }}
+      protocol: TCP
+      name: sftp
+    {{- end }}
 {{- end }}

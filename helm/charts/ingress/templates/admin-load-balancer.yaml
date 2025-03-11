@@ -30,4 +30,20 @@ spec:
       targetPort: 443
       protocol: TCP
       name: https
+    {{- if .Values.sftp.enabled }}
+    - port: {{ .Values.sftp.port }}
+      targetPort: {{ .Values.sftp.targetPort }}
+      protocol: TCP
+      name: sftp
+    {{- end }}
+    {{- if .Values.syslog.enabled }}
+    - port: {{ .Values.syslog.tcp_port }}
+      targetPort: {{ .Values.syslog.targetPort }}
+      protocol: TCP
+      name: syslog-tcp
+    - port: {{ .Values.syslog.udp_port }}
+      targetPort: {{ .Values.syslog.targetPort }}
+      protocol: UDP
+      name: syslog-udp
+    {{- end }}
 {{- end }}

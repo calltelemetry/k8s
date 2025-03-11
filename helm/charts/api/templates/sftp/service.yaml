@@ -1,0 +1,15 @@
+{{- if .Values.sftp.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-service
+spec:
+  selector:
+    app: sftp-service
+  ports:
+    - port: 22
+      targetPort: 2222
+      protocol: TCP
+      name: sftp
+  type: ClusterIP
+{{- end }}

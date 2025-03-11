@@ -34,6 +34,8 @@ admin:
       port: 4000
     - name: curri-api
       port: 4080
+    - name: ssh
+      port: 3022
   hostname: dev.calltelemetry.com
   api_worker: false
 
@@ -43,10 +45,11 @@ traceroute:
   cpus: 1
   logging_level: info
   replicas: 0
-
 sftp:
-  image: calltelemetry/sftp:0.6.8
-  pullPolicy: IfNotPresent
+  enabled: true
+  image: lscr.io/linuxserver/openssh-server
+  tag: latest
+  imagePullPolicy: IfNotPresent
   cpus: 1
   logging_level: info
 cdr_root_path: "/tmp"

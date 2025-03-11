@@ -4,7 +4,8 @@ metadata:
   name: admin-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
+    # Using ingressClassName in spec instead of this annotation
+    # kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
 spec:
   ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:

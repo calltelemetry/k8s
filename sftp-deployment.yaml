@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-service
+  namespace: test-haproxy
+  labels:
+    app: sftp-service
+spec:
+  selector:
+    matchLabels:
+      app: sftp-service
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sftp-service
+    spec:
+      containers:
+        - name: sftp-service
+          image: lscr.io/linuxserver/openssh-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2222
+              name: sftp
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Chicago"
+            - name: PASSWORD_ACCESS
+              value: "true"
+            - name: USER_NAME
+              value: "sftpuser"
+            - name: USER_PASSWORD
+              value: "calltelemetry"
+            - name: SUDO_ACCESS
+              value: "true"
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "1"
+          volumeMounts:
+            - name: sftp-data
+              mountPath: /home/sftpuser/upload
+      volumes:
+        - name: sftp-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-service
+  namespace: test-haproxy
+spec:
+  selector:
+    app: sftp-service
+  ports:
+    - port: 22
+      targetPort: 2222
+      protocol: TCP
+      name: sftp
+  type: ClusterIP
