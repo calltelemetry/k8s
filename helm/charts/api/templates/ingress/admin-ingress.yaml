@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
+    haproxy.org/load-balance: "roundrobin"
 spec:
   rules:
     - host: {{ .Values.admin.hostname }}
