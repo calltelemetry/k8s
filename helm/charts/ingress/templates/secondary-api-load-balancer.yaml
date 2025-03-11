@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-secondary-api-external
+  name: {{ .Release.Name }}-secondary-api-external-lb
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Release.Name }}-secondary-api
@@ -35,5 +35,15 @@ spec:
       targetPort: {{ .Values.sftp.targetPort }}
       protocol: TCP
       name: sftp
+    {{- end }}
+    {{- if .Values.syslog.enabled }}
+    - port: {{ .Values.syslog.tcp_port }}
+      targetPort: {{ .Values.syslog.targetPort }}
+      protocol: TCP
+      name: syslog-tcp
+    - port: {{ .Values.syslog.udp_port }}
+      targetPort: {{ .Values.syslog.targetPort }}
+      protocol: UDP
+      name: syslog-udp
     {{- end }}
 {{- end }}
