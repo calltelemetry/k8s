@@ -1,6 +1,4 @@
 # kubectl delete -A ValidatingWebhookConfiguration ingress-ingress-nginx-admission
-networking:
-  sftp_port: 22
 metallb:
   enabled: false
 
@@ -67,10 +65,11 @@ loadBalancer:
 primary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  ip: "192.168.123.205"
+  metal_ip_address: "192.168.123.205"
   port: 80
   https_port: 443
-  addressPool: "primary-api-ip"
+  # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/primary_ip.yaml
+  addressPool: "primary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
   annotations: {}
   # Example of overriding annotations:
@@ -86,10 +85,11 @@ primary_api:
 secondary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  ip: "192.168.123.206"
+  metal_ip_address: "192.168.123.206"
   port: 80
   https_port: 443
-  addressPool: "secondary-api-ip"
+  # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/secondary_ip.yaml
+  addressPool: "secondary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
   annotations: {}
   # Example of overriding annotations:
@@ -101,10 +101,11 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: false
-  ip: "192.168.123.207"
+  metal_ip_address: "192.168.123.207"
   port: 80
   https_port: 443
-  addressPool: "admin-ip"
+  # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/admin_ip.yaml
+  addressPool: "admin-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
   annotations: {}
   # Example of overriding annotations:
@@ -114,3 +115,15 @@ admin_api:
   # selector:
   #   custom: selector
 
+# SFTP Configuration - Always defined but only enabled when needed
+sftp:
+  enabled: false
+  port: 22
+  targetPort: 2222
+
+# Syslog Configuration - Always defined but only enabled when needed
+syslog:
+  enabled: false
+  tcp_port: 514
+  udp_port: 514
+  targetPort: 514

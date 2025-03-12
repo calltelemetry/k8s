@@ -6,7 +6,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - {{ .Values.secondary_api.ip }}/32
+  - {{ .Values.secondary_api.metal_ip_address }}/32
   autoAssign: false
 status: {}
 ---

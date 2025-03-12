@@ -41,9 +41,5 @@ spec:
       targetPort: {{ .Values.syslog.targetPort }}
       protocol: TCP
       name: syslog-tcp
-    - port: {{ .Values.syslog.udp_port }}
-      targetPort: {{ .Values.syslog.targetPort }}
-      protocol: UDP
-      name: syslog-udp
     {{- end }}
 {{- end }}

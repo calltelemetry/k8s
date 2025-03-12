@@ -52,6 +52,11 @@ sftp:
   imagePullPolicy: IfNotPresent
   cpus: 1
   logging_level: info
+syslog:
+  enabled: false
+  tcp_port: 514
+  udp_port: 514
+  targetPort: 514
 cdr_root_path: "/tmp"
 db:
   useSecret: false  # Set to false to use direct values

@@ -1,0 +1,18 @@
+# HAProxy Ingress Controller values
+controller:
+  name: haproxy-ingress-controller
+  image:
+    repository: haproxytech/kubernetes-ingress
+    tag: latest
+  ingressClass: haproxy-test-haproxy
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  podLabels:
+    app: haproxy-ingress
+    app.kubernetes.io/name: haproxy-ingress-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-haproxy
