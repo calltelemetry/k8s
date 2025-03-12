@@ -9,7 +9,7 @@ metadata:
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/name: haproxy-ingress
+    app.kubernetes.io/name: {{ index .Values "ingress-controller" "selector" "name" }}
     app.kubernetes.io/namespace: {{ .Release.Namespace }}
 spec:
   controller: haproxy.io/ingress-{{ .Release.Namespace }}

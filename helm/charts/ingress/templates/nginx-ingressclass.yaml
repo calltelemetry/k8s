@@ -9,7 +9,7 @@ metadata:
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/name: nginx-ingress
+    app.kubernetes.io/name: {{ index .Values "ingress-controller" "selector" "name" }}
 spec:
   controller: k8s.io/ingress-nginx
 {{- end }}
