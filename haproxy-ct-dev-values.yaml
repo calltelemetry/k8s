@@ -1,0 +1,18 @@
+# HAProxy Ingress
+
+# Disable RBAC creation - using shared RBAC resources
+rbac:
+  create: false
+
+# Use existing ServiceAccount
+serviceAccount:
+  create: false
+  name: "haproxy-ingress"
+
+# Controller configuration
+controller:
+  # Enable IngressClass creation with a namespace-specific name
+  ingressClassResource:
+    name: haproxy-ct-dev
+  # Use the namespace-specific IngressClass
+  ingressClass: haproxy-ct-dev
