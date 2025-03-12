@@ -1,0 +1,44 @@
+# Ingress Controller Configuration for load balancer selectors
+ingress-controller:
+  # Type of ingress controller to use
+  type: haproxy
+  # Selector labels for the ingress controller - must match the actual HAProxy pod labels
+  selector:
+    name: "haproxy-ingress"
+
+### Load Balancer Configuration ###
+# Primary API Load Balancer
+primary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.245"
+  # Custom annotations for this load balancer
+  annotations:
+    haproxy.org/service: primary-api
+
+# Secondary API Load Balancer
+secondary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.246"
+  # Custom annotations for this load balancer
+  annotations:
+    haproxy.org/service: secondary-api
+
+# Admin API Load Balancer - Management API
+admin_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.247"
+  # Custom annotations for this load balancer
+  annotations:
+    haproxy.org/service: admin-api
+### /Load Balancer Configuration ###
+
+# Enable SFTP ports on load balancer
+sftp:
+  enabled: true
+
+# Enable Syslog ports on load balancer
+syslog:
+  enabled: true

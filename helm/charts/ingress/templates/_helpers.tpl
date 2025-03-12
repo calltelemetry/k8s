@@ -5,6 +5,5 @@
 
 {{/* Generate ingress controller selector */}}
 {{- define "ingress.controllerSelector" -}}
-app.kubernetes.io/instance: {{ index .Values "ingress-controller" "selector" "instance" }}
 app.kubernetes.io/name: {{ index .Values "ingress-controller" "selector" "name" }}
 {{- end -}}
