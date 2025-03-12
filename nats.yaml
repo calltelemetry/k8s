@@ -1,0 +1,12 @@
+config:
+  merge: {
+    debug: false,
+    trace: false,
+    logtime: true,
+    max_payload: 5242880,  # 5MB in bytes
+    jetstream: {
+      store_dir: "/data/jetstream",
+      max_memory_store: 1G,
+      max_file_store: 1G
+    }
+  }
