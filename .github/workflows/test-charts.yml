@@ -1,0 +1,112 @@
+name: Test Helm Charts
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'helm/**'
+      - 'tests/**'
+      - '.github/workflows/test-charts.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'helm/**'
+      - 'tests/**'
+      - '.github/workflows/test-charts.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.12.0'
+    - name: Lint Helm charts
+      run: |
+        for chart in helm/charts/*; do
+          if [ -d "$chart" ]; then
+            echo "Linting chart: $chart"
+            helm lint "$chart"
+          fi
+        done
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.12.0'
+    - name: Run unit tests
+      run: |
+        if [ -d "tests/unit" ]; then
+          for test in tests/unit/*.sh; do
+            if [ -x "$test" ]; then
+              echo "Running unit test: $test"
+              $test
+            fi
+          done
+        else
+          echo "No unit tests found"
+        fi
+
+  template-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.12.0'
+    - name: Test template rendering
+      run: |
+        for chart in helm/charts/*; do
+          if [ -d "$chart" ]; then
+            echo "Testing template rendering for chart: $chart"
+            helm template test-release "$chart" --namespace test
+          fi
+        done
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, template-tests]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.12.0'
+    - name: Set up kind
+      uses: helm/kind-action@v1.5.0
+      with:
+        cluster_name: chart-testing
+    - name: Run integration tests
+      run: |
+        if [ -d "tests/integration" ]; then
+          for test in tests/integration/*.sh; do
+            if [ -x "$test" ]; then
+              echo "Running integration test: $test"
+              $test
+            fi
+          done
+        else
+          echo "No integration tests found"
+        fi
+    - name: Test chart installation (dry-run)
+      run: |
+        for chart in helm/charts/*; do
+          if [ -d "$chart" ]; then
+            echo "Testing installation (dry-run) for chart: $chart"
+            # Skip ingress chart due to CRD ownership issues
+            if [[ "$chart" != *"ingress"* ]]; then
+              helm install test-release "$chart" --namespace test --create-namespace --dry-run
+            else
+              echo "Skipping dry-run installation for ingress chart due to CRD ownership issues"
+            fi
+          fi
+        done

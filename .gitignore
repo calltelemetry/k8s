@@ -25,3 +25,5 @@ vendor/
 # Build directories
 dist/
 build/
+private/
+output/
