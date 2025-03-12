@@ -1,4 +1,4 @@
-# Test values for ingress chart with HAProxy
+#  Deploying Call Telemetry with HAProxy Ingress
 
 # Ingress Controller Configuration
 ingress-controller:
@@ -10,7 +10,6 @@ ingress-controller:
   controllerValue: "haproxy.io/ingress-{{ .Release.Namespace }}"
   # Selector labels for the ingress controller
   selector:
-    component: ""
     instance: "haproxy-ingress"
     name: haproxy-ingress
   controller:
@@ -39,10 +38,8 @@ loadBalancer:
   ingressClass: haproxy-{{ .Release.Namespace }}
   # Common annotations for all load balancers
   annotations:
-    # The selector is specified as annotations for more flexibility
     kubernetes.io/ingress.class: haproxy-{{ .Release.Namespace }}
     # Selector for the ingress controller pods
-    ingress.kubernetes.io/selector-component: ""
     ingress.kubernetes.io/selector-instance: "haproxy-ingress"
     ingress.kubernetes.io/selector-name: haproxy-ingress
 
@@ -59,26 +56,18 @@ secondary_api:
   advertiseL2MetalLb: true
   metal_ip_address: "192.168.123.216"
 
-# Admin API Load Balancer
+# Admin API Load Balancer - Management API
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
   metal_ip_address: "192.168.123.217"
 ### /Load Balancer Configuration ###
 
-# Vue Web Load Balancer
-vue_web:
-  port: 80
-  https_port: 443
-
-# SFTP Configuration
+# Enable SFTP ports on load balancer
 sftp:
   enabled: true
-  port: 22
-  targetPort: 22
 
-# Syslog Configuration
+# Enable Syslog ports on load balancer
 syslog:
   enabled: true
-  tcp_port: 514
-  targetPort: 514
+
