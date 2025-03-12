@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-  name: haproxy
+  name: haproxy-{{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-5"
@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/name: haproxy-ingress
+    app.kubernetes.io/namespace: {{ .Release.Namespace }}
 spec:
-  controller: haproxy.io/ingress-controller
+  controller: haproxy.io/ingress-{{ .Release.Namespace }}
 {{- end }}
