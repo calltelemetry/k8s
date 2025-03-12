@@ -1,0 +1,7 @@
+# Values for echo chart with HAProxy ingress in ct-dev namespace
+ingressClassName: haproxy-ct-dev
+
+# Hostnames for the ingress rules
+primary_hostname: dev.calltelemetry.com
+secondary_hostname: dev.calltelemetry.com
+admin_hostname: dev.calltelemetry.com

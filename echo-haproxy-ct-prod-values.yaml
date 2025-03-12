@@ -1,0 +1,7 @@
+# Values for echo chart with HAProxy ingress in ct-prod namespace
+ingressClassName: haproxy-ct-prod
+
+# Hostnames for the ingress rules
+primary_hostname: prod.calltelemetry.com
+secondary_hostname: prod.calltelemetry.com
+admin_hostname: prod.calltelemetry.com
