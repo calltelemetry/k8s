@@ -1,0 +1,115 @@
+# Shared RBAC resources for HAProxy ingress controllers across multiple namespaces
+# Apply with: kubectl apply -f haproxy-shared-rbac.yaml
+
+---
+# Shared ClusterRole with permissions needed by HAProxy ingress controller
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: haproxy-cluster-role-devops
+rules:
+- apiGroups: [""]
+  resources:
+  - configmaps
+  - secrets
+  - endpoints
+  - nodes
+  - pods
+  - services
+  - namespaces
+  - events
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - patch
+  - update
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - ingresses
+  - ingressclasses
+  - ingresses/status
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - patch
+- apiGroups: ["extensions"]
+  resources:
+  - ingresses
+  - ingresses/status
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - patch
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: ["coordination.k8s.io"]
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+
+---
+# ServiceAccount for ct-dev namespace
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: haproxy-ingress
+  namespace: ct-dev
+
+---
+# RoleBinding for ct-dev namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: haproxy-ingress-crb-ct-dev
+subjects:
+- kind: ServiceAccount
+  name: haproxy-ingress
+  namespace: ct-dev
+roleRef:
+  kind: ClusterRole
+  name: haproxy-cluster-role-devops
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ServiceAccount for ct-prod namespace
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: haproxy-ingress
+  namespace: ct-prod
+
+---
+# RoleBinding for ct-prod namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: haproxy-ingress-crb-ct-prod
+subjects:
+- kind: ServiceAccount
+  name: haproxy-ingress
+  namespace: ct-prod
+roleRef:
+  kind: ClusterRole
+  name: haproxy-cluster-role-devops
+  apiGroup: rbac.authorization.k8s.io

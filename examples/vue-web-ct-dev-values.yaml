@@ -1,0 +1,26 @@
+replicaCount: 1
+environment: prod
+vue_web:
+  image:
+    pullPolicy: Always
+  port: 80
+  LogLevel: "INFO"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  ingressClassName: haproxy
+  annotations:
+    kubernetes.io/ingress.class: haproxy
+    haproxy.org/cookie-strategy: "insert"
+    haproxy.org/cookie-name: "CTSESSIONID"
+  hosts:
+    - host: dev.calltelemetry.com
+      paths: ['/', '/#']
+  tls: []  # Disabled TLS for testing
+
+resources: {}

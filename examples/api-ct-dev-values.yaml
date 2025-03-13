@@ -1,0 +1,33 @@
+# Values for API chart with HAProxy ingress
+ingressClassName: haproxy
+
+# Database configuration
+db:
+  useExistingSecret: true  # Set to true to use an existing secret
+  existingSecretName: hippo-pguser-calltelemetry # Name of the secret containing DB credentials
+
+# Admin configuration
+admin:
+  api_worker: true
+  container_ports:
+    - name: web-api
+      port: 4000
+    - name: curri-api
+      port: 4080
+    - name: ssh
+      port: 3022
+
+# SFTP Configuration
+sftp:
+ enabled: true
+ image: lscr.io/linuxserver/openssh-server
+ tag: latest
+ imagePullPolicy: IfNotPresent
+ cpus: 1
+
+# Syslog Configuration
+syslog:
+ enabled: true
+ tcp_port: 514
+ udp_port: 514
+ targetPort: 514
