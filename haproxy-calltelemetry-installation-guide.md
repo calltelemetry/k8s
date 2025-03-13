@@ -13,7 +13,133 @@ sudo cat /etc/rancher/k3s/k3s.yaml > ~/.kube/config
 ```
 
 ## Architecture Overview
-# K8S Diagram
+
+The following diagram illustrates the high-level architecture of the Call Telemetry deployment with HAProxy in a Kubernetes cluster:
+
+```mermaid
+graph TD
+    classDef centerClass text-align:center;
+
+    Client[External Client]:::centerClass -->|HTTP/HTTPS/SSH| PhysicalNetwork[Physical Network]:::centerClass
+    PhysicalNetwork -->|Layer 2 Traffic| MetalLB[MetalLB Load Balancer]
+
+    subgraph "Kubernetes Cluster"
+        subgraph "metallb-system Namespace"
+            MetalLB
+            IPPoolDev1[IPAddressPool: primary-ip-ct-dev]
+            IPPoolDev2[IPAddressPool: secondary-ip-ct-dev]
+            IPPoolDev3[IPAddressPool: admin-ip-ct-dev]
+
+            IPPoolProd1[IPAddressPool: primary-ip-ct-prod]
+            IPPoolProd2[IPAddressPool: secondary-ip-ct-prod]
+            IPPoolProd3[IPAddressPool: admin-ip-ct-prod]
+        end
+
+        subgraph "ct-dev Namespace"
+            LB1[Primary API LoadBalancer 192.168.123.235]
+            LB2[Secondary API LoadBalancer 192.168.123.236]
+            LB3[Admin API LoadBalancer 192.168.123.237]
+
+            HAProxyDev[HAProxy Ingress Controller]
+
+            subgraph "Helm Charts - ct-dev"
+                APIDev[API Chart]
+                EchoDev[Echo Chart]
+                VueWebDev[Vue Web Chart]
+            end
+
+            LB1 -->|Routes Traffic| HAProxyDev
+            LB2 -->|Routes Traffic| HAProxyDev
+            LB3 -->|Routes Traffic| HAProxyDev
+
+            HAProxyDev -->|Routes Based on Rules| APIDev
+            HAProxyDev -->|Routes Based on Rules| EchoDev
+            HAProxyDev -->|Routes Based on Rules| VueWebDev
+        end
+
+        subgraph "ct-prod Namespace"
+            LB4[Primary API LoadBalancer 192.168.123.225]
+            LB5[Secondary API LoadBalancer 192.168.123.226]
+            LB6[Admin API LoadBalancer 192.168.123.227]
+
+            HAProxyProd[HAProxy Ingress Controller]
+
+            subgraph "Helm Charts - ct-prod"
+                APIProd[API Chart]
+                EchoProd[Echo Chart]
+                VueWebProd[Vue Web Chart]
+            end
+
+            LB4 -->|Routes Traffic| HAProxyProd
+            LB5 -->|Routes Traffic| HAProxyProd
+            LB6 -->|Routes Traffic| HAProxyProd
+
+            HAProxyProd -->|Routes Based on Rules| APIProd
+            HAProxyProd -->|Routes Based on Rules| EchoProd
+            HAProxyProd -->|Routes Based on Rules| VueWebProd
+        end
+
+        IPPoolDev1 -->|Routes Traffic| LB1
+        IPPoolDev2 -->|Routes Traffic| LB2
+        IPPoolDev3 -->|Routes Traffic| LB3
+
+        IPPoolProd1 -->|Routes Traffic| LB4
+        IPPoolProd2 -->|Routes Traffic| LB5
+        IPPoolProd3 -->|Routes Traffic| LB6
+    end
+```
+
+### Port Mapping Diagram
+
+The following diagram illustrates how external ports on the load balancers map to internal services and pods:
+
+```mermaid
+graph LR
+    classDef externalClass fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef serviceClass fill:#bbf,stroke:#333,stroke-width:1px;
+    classDef podClass fill:#bfb,stroke:#333,stroke-width:1px;
+
+    %% External Load Balancers
+    LB1[Admin LB 192.168.123.237]:::externalClass
+    LB2[Primary LB 192.168.123.235]:::externalClass
+    LB3[Secondary LB 192.168.123.236]:::externalClass
+
+    %% HAProxy Service
+    HAProxy[HAProxy Service]:::serviceClass
+
+    %% Internal Services
+    API[API Service]:::serviceClass
+    SFTP[SFTP Service]:::serviceClass
+    VueWeb[Vue Web Service]:::serviceClass
+
+    %% Pods
+    APIPod[API Pod Port: 4000]:::podClass
+    SFTPPod[SFTP Pod Port: 2222]:::podClass
+    VueWebPod[Vue Web Pod Port: 80]:::podClass
+
+    %% External to HAProxy connections
+    LB1 -->|Port 80| HAProxy
+    LB1 -->|Port 443| HAProxy
+    LB1 -->|Port 22| HAProxy
+    LB1 -->|Port 514| HAProxy
+
+    LB2 -->|Port 80| HAProxy
+    LB2 -->|Port 443| HAProxy
+
+    LB3 -->|Port 80| HAProxy
+    LB3 -->|Port 443| HAProxy
+
+    %% HAProxy to Services connections
+    HAProxy -->|HTTP Routes| API
+    HAProxy -->|HTTP Routes| VueWeb
+    HAProxy -->|TCP Port 22| SFTP
+    HAProxy -->|TCP Port 514| SFTP
+
+    %% Services to Pods connections
+    API -->|Port 4000| APIPod
+    SFTP -->|Port 2222| SFTPPod
+    VueWeb -->|Port 80| VueWebPod
+```
 
 The deployment consists of the following components:
 
