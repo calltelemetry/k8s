@@ -7,9 +7,13 @@ This guide walks through the complete installation of Call Telemetry using HAPro
 - Kubernetes cluster (v1.30+)
 - Helm 3 installed
 - `kubectl` configured to communicate with your cluster
-- Persistent storage for PostgreSQL (if not using an external database)
+``` bash
+mkdir -p ~/.kube
+sudo cat /etc/rancher/k3s/k3s.yaml > ~/.kube/config
+```
 
 ## Architecture Overview
+# K8S Diagram
 
 The deployment consists of the following components:
 
