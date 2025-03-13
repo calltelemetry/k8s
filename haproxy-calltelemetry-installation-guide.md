@@ -234,10 +234,10 @@ The example values files (`examples/ingress-ct-dev-values.yaml` and `examples/in
 
 ```bash
 # Install in ct-dev namespace
-helm install ingress-haproxy helm/charts/ingress -n ct-dev -f examples/ingress-ct-dev-values.yaml
+helm install ingress-haproxy calltelemetry/ingress -n ct-dev -f examples/ingress-ct-dev-values.yaml
 
 # Install in ct-prod namespace
-helm install ingress-haproxy helm/charts/ingress -n ct-prod -f examples/ingress-ct-prod-values.yaml
+helm install ingress-haproxy calltelemetry/ingress -n ct-prod -f examples/ingress-ct-prod-values.yaml
 ```
 
 ## Install NATS Server
@@ -269,10 +269,10 @@ This chart deploys the Call Telemetry API and its immediate dependencies. The ex
 
 ```bash
 # Install in ct-dev namespace
-helm install api helm/charts/api -n ct-dev -f examples/api-ct-dev-values.yaml
+helm install api calltelemetry/api -n ct-dev -f examples/api-ct-dev-values.yaml
 
 # Install in ct-prod namespace
-helm install api helm/charts/api -n ct-prod -f examples/api-ct-prod-values.yaml
+helm install api calltelemetry/api -n ct-prod -f examples/api-ct-prod-values.yaml
 ```
 
 ## Install Vue Web Frontend
@@ -284,10 +284,10 @@ The Vue Web frontend provides the user interface for Call Telemetry. The example
 
 ```bash
 # Install in ct-dev namespace
-helm install vue-web helm/charts/vue-web -n ct-dev -f examples/vue-web-ct-dev-values.yaml
+helm install vue-web calltelemetry/vue-web -n ct-dev -f examples/vue-web-ct-dev-values.yaml
 
 # Install in ct-prod namespace
-helm install vue-web helm/charts/vue-web -n ct-prod -f examples/vue-web-ct-prod-values.yaml
+helm install vue-web calltelemetry/vue-web -n ct-prod -f examples/vue-web-ct-prod-values.yaml
 ```
 
 ## Verify the Installation
