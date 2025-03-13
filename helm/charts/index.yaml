@@ -29,6 +29,20 @@ entries:
   ct-ingress:
   - apiVersion: v1
     appVersion: 0.8.0
+    created: "2025-03-13T15:57:52.443331767Z"
+    description: Call Telemetry for Cisco Callmanager
+    digest: 7429331030a60b5a8fc6e543649d87fcda0eb72bf76e1960b6d52cb41d50102b
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: ct-ingress
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-ingress-0.14.0/ct-ingress-0.14.0.tgz
+    version: 0.14.0
+  - apiVersion: v1
+    appVersion: 0.8.0
     created: "2024-10-10T00:08:47.291021772Z"
     dependencies:
     - name: ingress-nginx
@@ -110,4 +124,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.1.0/teams-auth-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-10T21:14:55.249210172Z"
+generated: "2025-03-13T15:57:52.696084191Z"
