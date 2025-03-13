@@ -1,0 +1,52 @@
+replicaCount: 1
+
+image:
+  repository: calltelemetry/azure-msal-service
+  tag: 0.8.3-rc63-test5
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "haproxy-ingress"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: prod.calltelemetry.com
+      paths:
+        - path: /ms-teams-auth(/|$)(.*)
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: prod.calltelemetry.com
+      hosts:
+        - prod.calltelemetry.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - teams-auth
+        topologyKey: "kubernetes.io/hostname"
+
+debugLevel: "info"

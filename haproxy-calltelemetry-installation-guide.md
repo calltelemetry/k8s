@@ -156,7 +156,7 @@ The deployment consists of the following components:
 4. **PostgreSQL Database** - Data storage
 5. **Call Telemetry API** - Core application services
 6. **Vue Web Frontend** - User interface for Call Telemetry
-
+7. **Microsoft Teams Authentication Service** - Provides authentication for Microsoft Teams integration
 ## Add Required Helm Repositories
 
 First, add all the necessary Helm repositories:
@@ -288,6 +288,21 @@ helm install vue-web calltelemetry/vue-web -n ct-dev -f examples/vue-web-ct-dev-
 
 # Install in ct-prod namespace
 helm install vue-web calltelemetry/vue-web -n ct-prod -f examples/vue-web-ct-prod-values.yaml
+```
+
+## Install Microsoft Teams Authentication Service
+
+The Teams Authentication service provides Microsoft Teams authentication for Call Telemetry. The example values files (`examples/teams-auth-ct-dev-values.yaml` and `examples/teams-auth-ct-prod-values.yaml`) include:
+- Ingress configuration with path-based routing
+- TLS configuration with Let's Encrypt
+- Resource limits and anti-affinity rules (production)
+
+```bash
+# Install in ct-dev namespace
+helm install teams-auth calltelemetry/teams-auth -n ct-dev -f examples/teams-auth-ct-dev-values.yaml
+
+# Install in ct-prod namespace
+helm install teams-auth calltelemetry/teams-auth -n ct-prod -f examples/teams-auth-ct-prod-values.yaml
 ```
 
 ## Verify the Installation
