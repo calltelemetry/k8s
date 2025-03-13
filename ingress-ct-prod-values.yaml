@@ -38,7 +38,11 @@ admin_api:
 # Enable SFTP ports on load balancer
 sftp:
   enabled: true
+  port: 22
+  targetPort: 22
 
 # Enable Syslog ports on load balancer
 syslog:
   enabled: true
+  port: 514
+  targetPort: 514

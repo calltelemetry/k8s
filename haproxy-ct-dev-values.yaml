@@ -16,3 +16,6 @@ controller:
     name: haproxy-ct-dev
   # Use the namespace-specific IngressClass
   ingressClass: haproxy-ct-dev
+  # Configure TCP services
+  extraArgs:
+    tcp-services-configmap: ct-dev/haproxy-tcp-services
