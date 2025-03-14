@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: calltelemetry/azure-msal-service
-  tag: 0.8.3-rc63-test5
+  tag: 0.8.3-rc64
 
 service:
   type: ClusterIP
