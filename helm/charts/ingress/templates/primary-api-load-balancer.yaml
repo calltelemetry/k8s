@@ -22,24 +22,20 @@ spec:
   selector:
     {{- include "ingress.controllerSelector" . | nindent 4 }}
   ports:
-    - port: {{ .Values.primary_api.port }}
+    # Standard HTTP/HTTPS ports
+    - port: {{ .Values.ports.http }}
       targetPort: 80
       protocol: TCP
-      name: web
-    - port: {{ .Values.primary_api.https_port }}
+      name: http
+    - port: {{ .Values.ports.https }}
       targetPort: 443
       protocol: TCP
       name: https
-    {{- if .Values.syslog.enabled }}
-    - port: {{ .Values.syslog.tcp_port }}
-      targetPort: {{ .Values.syslog.targetPort }}
+    # TCP services (SFTP, Syslog, etc.)
+    {{- range $port, $service := .Values.tcpServices }}
+    - port: {{ $port | int }}
+      targetPort: {{ $service.targetPort }}
       protocol: TCP
-      name: syslog-tcp
-    {{- end }}
-    {{- if .Values.sftp.enabled }}
-    - port: {{ .Values.sftp.port }}
-      targetPort: {{ .Values.sftp.targetPort }}
-      protocol: TCP
-      name: sftp
+      name: {{ $service.serviceName | replace "-service" "" }}
     {{- end }}
 {{- end }}

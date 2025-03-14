@@ -35,14 +35,18 @@ admin_api:
     haproxy.org/service: admin-api
 ### /Load Balancer Configuration ###
 
-# Enable SFTP ports on load balancer
-sftp:
-  enabled: true
-  port: 22
-  targetPort: 22
+# Standard HTTP/HTTPS ports
+ports:
+  http: 80
+  https: 443
 
-# Enable Syslog ports on load balancer
-syslog:
-  enabled: true
-  port: 514
-  targetPort: 514
+# TCP Services Configuration (for non-HTTP protocols)
+tcpServices:
+  # SFTP service
+  "22":
+    serviceName: sftp-service
+    targetPort: 22
+  # Syslog service
+  "514":
+    serviceName: syslog-service
+    targetPort: 514
