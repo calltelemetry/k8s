@@ -1,0 +1,16 @@
+{{- if or .Values.sftp.enabled .Values.syslog.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-tcp-services
+  labels:
+    app.kubernetes.io/name: haproxy-{{ .Release.Namespace }}
+    role: tcp-services
+data:
+  {{- if .Values.sftp.enabled }}
+  "22": "{{ .Release.Namespace }}/sftp-service:{{ .Values.sftp.targetPort }}"
+  {{- end }}
+  {{- if .Values.syslog.enabled }}
+  "514": "{{ .Release.Namespace }}/sftp-service:{{ .Values.syslog.targetPort }}"
+  {{- end }}
+{{- end }}

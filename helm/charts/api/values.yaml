@@ -1,5 +1,3 @@
-# Install MetalLB first 0.13.7
-# kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
 # Dev Password export
 # kubectl -n postgres-operator get secret hippo-dev-pguser-calltelemetry -o json  | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences", "managedFields"])'  | kubectl apply -n ct-dev -f -
 hostname: 192.168.123.205
@@ -13,7 +11,7 @@ userid: 1001
 api:
   image: calltelemetry/web
   tag: 0.8.3-rc63
-  imagePullPolicy: IfNotPresent
+  imagePullPolicy: Always
   cpus: 2
   replicas: 0
   logging_level: warning
@@ -25,7 +23,7 @@ api:
 admin:
   image: calltelemetry/web
   tag: 0.8.3-rc63
-  imagePullPolicy: IfNotPresent
+  imagePullPolicy: Always
   replicas: 1
   cpus: 2
   logging_level: warning
@@ -39,17 +37,11 @@ admin:
   hostname: dev.calltelemetry.com
   api_worker: false
 
-traceroute:
-  image: calltelemetry/traceroute:0.7.2
-  imagePullPolicy: IfNotPresent
-  cpus: 1
-  logging_level: info
-  replicas: 0
 sftp:
   enabled: true
   image: lscr.io/linuxserver/openssh-server
   tag: latest
-  imagePullPolicy: IfNotPresent
+  imagePullPolicy: Always
   cpus: 1
   logging_level: info
 syslog:

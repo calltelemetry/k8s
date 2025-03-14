@@ -1,0 +1,30 @@
+# Values for Traceroute chart in production environment
+replicaCount: 2
+
+image:
+  repository: calltelemetry/traceroute
+  tag: 0.8.3
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "256m"
+  limits:
+    cpu: 1
+
+# NATS server configuration
+nats:
+  server: "nats"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 4100
+  targetPort: 4100
+
+# Security context
+securityContext:
+  runAsUser: 0
+
+# Termination grace period
+terminationGracePeriodSeconds: 5

@@ -112,7 +112,7 @@ spec:
             - name: LOGGING_LEVEL
               value: {{ .Values.api.logging_level }}
             - name: TRACEROUTE_SERVICE
-              value: {{ .Release.Name  }}-traceroute-service
+              value: traceroute
             - name: LOCAL_NATS
               value: {{ .Values.nats_server }}
             - name: ADMIN_NODE
