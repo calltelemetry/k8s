@@ -41,6 +41,7 @@ ports:
   https: 443
 
 # TCP Services Configuration (for non-HTTP protocols)
+# Potential to explore CRDs later, but this config ensures namespace isolation.
 tcpServices:
   # SFTP service
   "22":
