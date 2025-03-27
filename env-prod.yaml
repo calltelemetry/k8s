@@ -1,0 +1,41 @@
+# Production environment values for CallTelemetry deployment
+
+# Environment information
+env:
+  namespace: ct-prod
+  environment: prod
+  domain: prod.calltelemetry.com
+
+# HAProxy configuration
+haproxy:
+  values_file: examples/haproxy-ct-prod-values.yaml
+
+# Ingress configuration
+ingress:
+  values_file: examples/ingress-ct-prod-values.yaml
+
+# API configuration
+api:
+  values_file: examples/api-ct-prod-values.yaml
+
+# Vue Web configuration
+vue_web:
+  values_file: examples/vue-web-ct-prod-values.yaml
+
+# Teams Auth configuration
+teams_auth:
+  values_file: examples/teams-auth-ct-prod-values.yaml
+
+# Traceroute configuration
+traceroute:
+  values_file: examples/traceroute-ct-prod-values.yaml
+
+# Echo configuration
+echo:
+  values_file: examples/echo-haproxy-ct-prod-values.yaml
+
+# MetalLB IP addresses
+metallb:
+  primary_ip: "192.168.123.225"
+  secondary_ip: "192.168.123.226"
+  admin_ip: "192.168.123.227"

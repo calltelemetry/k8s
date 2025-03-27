@@ -1,0 +1,41 @@
+# Development environment values for CallTelemetry deployment
+
+# Environment information
+env:
+  namespace: ct-dev
+  environment: dev
+  domain: dev.calltelemetry.com
+
+# HAProxy configuration
+haproxy:
+  values_file: examples/haproxy-ct-dev-values.yaml
+
+# Ingress configuration
+ingress:
+  values_file: examples/ingress-ct-dev-values.yaml
+
+# API configuration
+api:
+  values_file: examples/api-ct-dev-values.yaml
+
+# Vue Web configuration
+vue_web:
+  values_file: examples/vue-web-ct-dev-values.yaml
+
+# Teams Auth configuration
+teams_auth:
+  values_file: examples/teams-auth-ct-dev-values.yaml
+
+# Traceroute configuration
+traceroute:
+  values_file: examples/traceroute-ct-dev-values.yaml
+
+# Echo configuration
+echo:
+  values_file: examples/echo-haproxy-ct-dev-values.yaml
+
+# MetalLB IP addresses
+metallb:
+  primary_ip: "192.168.123.235"
+  secondary_ip: "192.168.123.236"
+  admin_ip: "192.168.123.237"

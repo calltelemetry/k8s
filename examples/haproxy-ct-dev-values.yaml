@@ -19,3 +19,6 @@ controller:
   # Configure TCP services
   extraArgs:
     tcp-services-configmap: ct-dev/haproxy-tcp-services
+  # Change service type to ClusterIP to avoid waiting for LoadBalancer
+  service:
+    type: ClusterIP

@@ -1,0 +1,18 @@
+# Common environment values for all CallTelemetry deployments
+
+# Repository configurations
+repositories:
+  haproxy_ingress: https://haproxy-ingress.github.io/charts
+  metallb: https://metallb.github.io/metallb
+  nats: https://nats-io.github.io/k8s/helm/charts
+  calltelemetry: https://calltelemetry.github.io/k8s/helm/charts
+
+# Helm defaults
+helm_defaults:
+  wait: true
+  timeout: 600
+  atomic: true
+
+# NATS configuration (shared between environments)
+nats:
+  values_file: examples/nats-values.yaml

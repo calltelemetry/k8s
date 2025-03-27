@@ -1,0 +1,169 @@
+# CallTelemetry Helmfile Deployment
+# This helmfile deploys the entire CallTelemetry environment based on the namespace value
+# Usage: helmfile --environment ct-dev sync
+
+repositories:
+  - name: haproxy-ingress
+    url: https://haproxy-ingress.github.io/charts
+  - name: metallb
+    url: https://metallb.github.io/metallb
+  - name: nats
+    url: https://nats-io.github.io/k8s/helm/charts
+  - name: calltelemetry
+    url: https://calltelemetry.github.io/k8s/helm/charts
+
+# Global values that can be referenced in releases
+helmDefaults:
+  wait: false
+  timeout: 600
+  atomic: true
+
+# Environment values
+environments:
+  default:
+    values:
+      - env-common.yaml
+      - env-dev.yaml
+  ct-dev:
+    values:
+      - env-common.yaml
+      - env-dev.yaml
+  ct-prod:
+    values:
+      - env-common.yaml
+      - env-prod.yaml
+  ct-test:
+    values:
+      - env-common.yaml
+      - env-dev.yaml
+
+---
+# Global hooks
+hooks:
+  - events: ["presync"]
+    showlogs: true
+    command: "kubectl"
+    args:
+      [
+        "create",
+        "namespace",
+        "{{ .Environment.Values.env.namespace }}",
+        "--dry-run=client",
+        "-o",
+        "yaml",
+        "| kubectl apply -f -",
+      ]
+
+---
+# Releases to be deployed
+releases:
+  # MetalLB
+  - name: metallb
+    namespace: metallb-system
+    chart: metallb/metallb
+    createNamespace: true
+    version: 0.14.9
+
+  # HAProxy Ingress Controller
+  - name: haproxy-ingress
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    createNamespace: true
+    chart: haproxy-ingress/haproxy-ingress
+    version: 0.14.7
+    values:
+      - "{{ .Environment.Values.haproxy.values_file }}"
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "bash"
+        args:
+          [
+            "-c",
+            "kubectl create namespace ct-dev --dry-run=client -o yaml | kubectl apply -f -",
+          ]
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["apply", "-f", "examples/haproxy-shared-rbac-narrow.yaml"]
+
+  # CT Ingress Configs
+  - name: ingress-haproxy
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    createNamespace: true
+    chart: calltelemetry/ct-ingress
+    values:
+      - "{{ .Environment.Values.ingress.values_file }}"
+    needs:
+      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args:
+          [
+            "delete",
+            "ipaddresspool",
+            "secondary-ip-ct-dev",
+            "-n",
+            "metallb-system",
+            "--ignore-not-found=true",
+          ]
+
+  # NATS Server
+  - name: nats
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    chart: nats/nats
+    version: 1.3.1
+    values:
+      - "{{ .Environment.Values.nats.values_file }}"
+
+  # Call Telemetry API
+  - name: api
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    chart: calltelemetry/api
+    values:
+      - "{{ .Environment.Values.api.values_file }}"
+    needs:
+      - "{{ .Environment.Values.env.namespace }}/ingress-haproxy"
+      - "{{ .Environment.Values.env.namespace }}/nats"
+      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+
+  # CT Web Frontend
+  - name: ct-web
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    chart: calltelemetry/ct-web
+    values:
+      - "{{ .Environment.Values.vue_web.values_file }}"
+    needs:
+      - "{{ .Environment.Values.env.namespace }}/api"
+      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+
+  # # Microsoft Teams Authentication Service
+  # - name: teams-auth
+  #   namespace: "{{ .Environment.Values.env.namespace }}"
+  #   chart: calltelemetry/teams-auth
+  #   version: 1.0.0 # Pinned version for stability
+  #   values:
+  #     - "{{ .Environment.Values.teams_auth.values_file }}"
+  #   needs:
+  #     - "{{ .Environment.Values.env.namespace }}/api"
+
+  # Traceroute Service
+  # - name: traceroute
+  #   namespace: "{{ .Environment.Values.env.namespace }}"
+  #   chart: calltelemetry/traceroute
+  #   values:
+  #     - "{{ .Environment.Values.traceroute.values_file }}"
+  #   needs:
+  #     - "{{ .Environment.Values.env.namespace }}/nats"
+  #     - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+
+  # Echo Service
+  - name: echo
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    chart: calltelemetry/echo
+    values:
+      - "{{ .Environment.Values.echo.values_file }}"
+    needs:
+      - "{{ .Environment.Values.env.namespace }}/ingress-haproxy"
+      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
