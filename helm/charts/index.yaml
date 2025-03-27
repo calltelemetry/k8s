@@ -124,4 +124,15 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.1.0/teams-auth-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-13T15:57:52.696084191Z"
+  traceroute:
+  - apiVersion: v2
+    appVersion: 0.8.3
+    created: "2025-03-27T01:04:19.382042082Z"
+    description: A Helm chart for the CallTelemetry Traceroute Service
+    digest: 3f0dd6a184cd6b58ea9851095bf3a4068ceb1c116e530b21bc0d6ced9f304be7
+    name: traceroute
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/traceroute-0.1.0/traceroute-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-03-27T01:04:19.382070364Z"
