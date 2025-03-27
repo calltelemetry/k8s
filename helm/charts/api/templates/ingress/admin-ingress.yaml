@@ -7,6 +7,7 @@ metadata:
     kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
     haproxy.org/load-balance: "roundrobin"
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:
     - host: {{ .Values.admin.hostname }}
       http:

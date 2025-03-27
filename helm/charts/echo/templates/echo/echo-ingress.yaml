@@ -8,6 +8,7 @@ metadata:
     haproxy.org/load-balance: "roundrobin"
     # haproxy.org/load-balance: "leastconn"
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:
     - host: {{ .Values.primary_hostname }}
       http:

@@ -11,6 +11,8 @@ This helmfile provides a simple way to deploy the entire CallTelemetry environme
 
 ## Installation
 
+### Install Required Tools
+
 1. Install Helmfile:
 
 ```bash
@@ -22,7 +24,17 @@ curl -L https://github.com/helmfile/helmfile/releases/latest/download/helmfile_l
 chmod +x /usr/local/bin/helmfile
 ```
 
-2. Clone this repository:
+2. Install the Helm Diff Plugin (required by Helmfile):
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+```
+
+This plugin is required for Helmfile to show differences between the current state and the desired state before applying changes.
+
+## Repository Setup
+
+Clone this repository:
 
 ```bash
 git clone https://github.com/calltelemetry/k8s-charts.git
@@ -41,7 +53,11 @@ This structure allows for easy customization and reuse of common configuration v
 ### Deploy the Development Environment
 
 ```bash
-helmfile --environment ct-dev sync
+# With diff (recommended)
+helmfile --environment ct-dev apply
+
+# Without diff (if helm-diff plugin is not installed)
+helmfile --environment ct-dev apply --skip-diff
 ```
 
 This will:
@@ -60,7 +76,11 @@ This will:
 ### Deploy the Production Environment
 
 ```bash
-helmfile --environment ct-prod sync
+# With diff (recommended)
+helmfile --environment ct-prod apply
+
+# Without diff (if helm-diff plugin is not installed)
+helmfile --environment ct-prod apply --skip-diff
 ```
 
 This will deploy the same components but with production-specific configurations.
@@ -91,6 +111,22 @@ To customize the deployment, you can either:
 2. Modify the values files directly
 
 ## Troubleshooting
+
+### Helm Diff Plugin Issues
+
+If you encounter errors related to the `helm diff` command, such as:
+
+```
+Error: unknown command "diff" for "helm"
+```
+
+This means the Helm Diff plugin is not installed. Install it with:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+```
+
+### General Troubleshooting
 
 If you encounter issues during deployment, you can check the status of the releases:
 

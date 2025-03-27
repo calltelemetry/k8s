@@ -16,7 +16,7 @@ repositories:
 helmDefaults:
   wait: false
   timeout: 600
-  atomic: true
+  atomic: false
 
 # Environment values
 environments:

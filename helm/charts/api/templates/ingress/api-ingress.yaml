@@ -6,14 +6,15 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   rules:
     - host: {{ .Values.api.hostname }}
       http:
         paths:
-        - path: /api/policy
-          pathType: Prefix
-          backend:
-            service:
-              name: curri-api-service
-              port:
-                number: 4080
+          - path: /api/policy
+            pathType: Prefix
+            backend:
+              service:
+                name: curri-api-service
+                port:
+                  number: 4080
