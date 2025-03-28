@@ -10,6 +10,7 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
   rules:
+    {{- if .Values.primary_hostname }}
     - host: {{ .Values.primary_hostname }}
       http:
         paths:
@@ -20,6 +21,8 @@ spec:
               name: {{ .Release.Name }}-echo-service
               port:
                 number: 80
+    {{- end }}
+    {{- if .Values.secondary_hostname }}
     - host: {{ .Values.secondary_hostname }}
       http:
         paths:
@@ -30,6 +33,8 @@ spec:
               name: {{ .Release.Name }}-echo-service
               port:
                 number: 80
+    {{- end }}
+    {{- if .Values.admin_hostname }}
     - host: {{ .Values.admin_hostname }}
       http:
         paths:
@@ -40,3 +45,16 @@ spec:
               name: {{ .Release.Name }}-echo-service
               port:
                 number: 80
+    {{- end }}
+    {{- if .Values.enableCatchAllRoute }}
+    # Catch-all route that matches any host (including IP addresses)
+    - http:
+        paths:
+        - path: /echo
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Release.Name }}-echo-service
+              port:
+                number: 80
+    {{- end }}
