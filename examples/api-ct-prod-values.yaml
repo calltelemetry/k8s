@@ -9,6 +9,10 @@ db:
 # API Config
 api:
   hostname: prod.calltelemetry.com
+  # Example of API ingress annotations
+  ingress:
+    annotations: {}
+    haproxy.org/load-balance: "roundrobin"
 
 # Admin configuration
 admin:
@@ -21,6 +25,9 @@ admin:
     - name: ssh
       port: 3022
   hostname: prod.calltelemetry.com
+  ingress:
+    annotations:
+      haproxy.org/load-balance: "roundrobin"
 
 
 # SFTP Configuration

@@ -19,6 +19,8 @@ api:
     - name: curri-api
       port: 4080
   hostname: dev.calltelemetry.com
+  ingress:
+    annotations: {}
 
 admin:
   image: calltelemetry/web
@@ -36,6 +38,9 @@ admin:
       port: 3022
   hostname: dev.calltelemetry.com
   api_worker: false
+  ingress:
+    annotations:
+      haproxy.org/load-balance: "roundrobin"
 
 sftp:
   enabled: true

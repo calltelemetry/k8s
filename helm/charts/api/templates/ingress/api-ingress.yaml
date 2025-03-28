@@ -4,6 +4,9 @@ metadata:
   name: api-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
+    {{- with .Values.api.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
   rules:

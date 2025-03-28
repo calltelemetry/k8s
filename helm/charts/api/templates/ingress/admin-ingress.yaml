@@ -4,7 +4,9 @@ metadata:
   name: admin-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    haproxy.org/load-balance: "roundrobin"
+    {{- with .Values.admin.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
   rules:
