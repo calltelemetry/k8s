@@ -6,6 +6,10 @@ db:
   useExistingSecret: true  # Set to true to use an existing secret
   existingSecretName: hippo-pguser-calltelemetry # Name of the secret containing DB credentials
 
+# API Config
+api:
+  hostname: prod.calltelemetry.com
+
 # Admin configuration
 admin:
   api_worker: true
