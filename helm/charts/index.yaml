@@ -94,6 +94,15 @@ entries:
   ct-web:
   - apiVersion: v2
     appVersion: 0.8.3
+    created: "2025-03-28T02:46:57.064481058Z"
+    description: Call Telemetry Web Portal
+    digest: de8b688d665a57c28f93ecfd27fcfd75565ed4cd5e95f9ecc67ca3eee92c227e
+    name: ct-web
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-web-0.1.4/ct-web-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 0.8.3
     created: "2025-03-28T02:32:30.542677371Z"
     description: Call Telemetry Web Portal
     digest: 466c19c3dcf6fe8d3d1a374662fa2c36777ee7df755223f87bbe61de3e7881f2
@@ -186,4 +195,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/traceroute-0.1.0/traceroute-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-28T02:32:30.644986475Z"
+generated: "2025-03-28T02:46:57.064507677Z"
