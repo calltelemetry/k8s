@@ -38,7 +38,7 @@ environments:
       - env-dev.yaml
 
 ---
-# Global hooks - removed as namespace creation is now handled in the release hooks
+# Global hooks
 
 ---
 # Releases to be deployed
@@ -85,19 +85,6 @@ releases:
       - "{{ .Environment.Values.ingress.values_file }}"
     needs:
       - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
-    hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args:
-          [
-            "delete",
-            "ipaddresspool",
-            "secondary-ip-ct-dev",
-            "-n",
-            "metallb-system",
-            "--ignore-not-found=true",
-          ]
 
   # NATS Server
   - name: nats
@@ -110,7 +97,7 @@ releases:
   # Call Telemetry API
   - name: api
     namespace: "{{ .Environment.Values.env.namespace }}"
-    version: 0.11.6
+    version: 0.11.7
     chart: calltelemetry/api
     values:
       - "{{ .Environment.Values.api.values_file }}"
