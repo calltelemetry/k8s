@@ -42,16 +42,19 @@ environments:
 hooks:
   - events: ["presync"]
     showlogs: true
-    command: "kubectl"
+    command: "bash"
     args:
       [
-        "create",
-        "namespace",
-        "{{ .Environment.Values.env.namespace }}",
-        "--dry-run=client",
-        "-o",
-        "yaml",
-        "| kubectl apply -f -",
+        "-c",
+        "kubectl create namespace ct-dev --dry-run=client -o yaml | kubectl apply -f -",
+      ]
+  - events: ["presync"]
+    showlogs: true
+    command: "bash"
+    args:
+      [
+        "-c",
+        "kubectl create namespace ct-prod --dry-run=client -o yaml | kubectl apply -f -",
       ]
 
 ---
