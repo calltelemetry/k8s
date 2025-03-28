@@ -76,11 +76,7 @@ This will:
 ### Deploy the Production Environment
 
 ```bash
-# With diff (recommended)
 helmfile --environment ct-prod apply
-
-# Without diff (if helm-diff plugin is not installed)
-helmfile --environment ct-prod apply --skip-diff
 ```
 
 This will deploy the same components but with production-specific configurations.
@@ -112,19 +108,6 @@ To customize the deployment, you can either:
 
 ## Troubleshooting
 
-### Helm Diff Plugin Issues
-
-If you encounter errors related to the `helm diff` command, such as:
-
-```
-Error: unknown command "diff" for "helm"
-```
-
-This means the Helm Diff plugin is not installed. Install it with:
-
-```bash
-helm plugin install https://github.com/databus23/helm-diff
-```
 
 ### General Troubleshooting
 
