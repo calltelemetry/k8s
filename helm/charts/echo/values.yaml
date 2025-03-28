@@ -12,6 +12,13 @@ admin_hostname: ""
 # When true, requests to /echo path will be routed to the echo service regardless of hostname
 enableCatchAllRoute: true
 
+# Ingress annotations configuration
+ingress:
+  annotations:
+    haproxy.org/load-balance: "roundrobin"
+    # Add additional annotations as needed
+    # Example: haproxy.org/timeout-client: "30s"
+
 # Echo server configuration
 server:
   replicas: 3

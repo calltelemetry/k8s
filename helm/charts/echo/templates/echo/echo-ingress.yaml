@@ -4,8 +4,9 @@ metadata:
   name: {{ .Release.Name }}-echo-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    haproxy.org/load-balance: "roundrobin"
-    # haproxy.org/load-balance: "leastconn"
+    {{- if .Values.ingress.annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
   rules:
