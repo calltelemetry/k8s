@@ -1,5 +1,5 @@
 # Values for API chart with HAProxy ingress
-ingressClassName: haproxy
+ingressClassName: haproxy-ct-prod
 
 # Database configuration
 db:
