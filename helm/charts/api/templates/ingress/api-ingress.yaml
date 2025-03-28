@@ -4,9 +4,8 @@ metadata:
   name: api-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingressClassName | default "nginx" }}
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
     - host: {{ .Values.api.hostname }}
       http:
