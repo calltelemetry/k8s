@@ -65,4 +65,4 @@ nats_server: "nats"
 teams_auth_service: "teams-auth-service"
 
 # Ingress configuration
-ingressClassName: nginx
+ingressClassName: haproxy

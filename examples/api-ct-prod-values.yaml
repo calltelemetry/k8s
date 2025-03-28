@@ -16,6 +16,8 @@ admin:
       port: 4080
     - name: ssh
       port: 3022
+  hostname: prod.calltelemetry.com
+
 
 # SFTP Configuration
 sftp:
