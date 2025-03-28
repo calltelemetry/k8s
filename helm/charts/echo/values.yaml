@@ -1,7 +1,8 @@
 # Echo Chart Values
 
 # Ingress class name to use for the ingress
-ingressClassName: "haproxy"
+# This will be automatically set to "haproxy-{namespace}" if not overridden
+ingressClassName: ""
 
 # Hostnames for the ingress rules
 primary_hostname: ""
