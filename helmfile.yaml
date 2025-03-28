@@ -79,7 +79,7 @@ releases:
         args:
           [
             "-c",
-            "kubectl create namespace ct-dev --dry-run=client -o yaml | kubectl apply -f -",
+            "kubectl create namespace {{ .Environment.Values.env.namespace }} --dry-run=client -o yaml | kubectl apply -f -",
           ]
       - events: ["presync"]
         showlogs: true
@@ -90,6 +90,7 @@ releases:
   - name: ingress-haproxy
     namespace: "{{ .Environment.Values.env.namespace }}"
     createNamespace: true
+    version: 0.14.1
     chart: calltelemetry/ct-ingress
     values:
       - "{{ .Environment.Values.ingress.values_file }}"
@@ -120,6 +121,7 @@ releases:
   # Call Telemetry API
   - name: api
     namespace: "{{ .Environment.Values.env.namespace }}"
+    version: 0.11.5
     chart: calltelemetry/api
     values:
       - "{{ .Environment.Values.api.values_file }}"
@@ -131,6 +133,7 @@ releases:
   # CT Web Frontend
   - name: ct-web
     namespace: "{{ .Environment.Values.env.namespace }}"
+    version: 0.1.2
     chart: calltelemetry/ct-web
     values:
       - "{{ .Environment.Values.vue_web.values_file }}"
