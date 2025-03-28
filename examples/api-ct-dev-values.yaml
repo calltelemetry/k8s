@@ -12,18 +12,19 @@ api:
   # Example of API ingress annotations
   ingress:
     annotations:
-      # Add any annotations as needed
-      # haproxy.org/load-balance: "roundrobin"
+      kubernetes.io/ingress.class: "haproxy-ct-dev"
+      haproxy.org/load-balance: "roundrobin"
 
 # Admin configuration
 admin:
   api_worker: true
   # Only override hostname if different from default
   hostname: dev.calltelemetry.com
-  # Example of adding additional ingress annotations if needed
-  # ingress:
-  #   annotations:
-  #     haproxy.org/ssl-redirect: "true"
+  # Admin ingress annotations
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: "haproxy-ct-dev"
+      haproxy.org/load-balance: "roundrobin"
 
 
 # SFTP Configuration
