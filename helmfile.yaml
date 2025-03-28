@@ -38,24 +38,7 @@ environments:
       - env-dev.yaml
 
 ---
-# Global hooks
-hooks:
-  - events: ["presync"]
-    showlogs: true
-    command: "bash"
-    args:
-      [
-        "-c",
-        "kubectl create namespace ct-dev --dry-run=client -o yaml | kubectl apply -f -",
-      ]
-  - events: ["presync"]
-    showlogs: true
-    command: "bash"
-    args:
-      [
-        "-c",
-        "kubectl create namespace ct-prod --dry-run=client -o yaml | kubectl apply -f -",
-      ]
+# Global hooks - removed as namespace creation is now handled in the release hooks
 
 ---
 # Releases to be deployed
@@ -76,18 +59,21 @@ releases:
     values:
       - "{{ .Environment.Values.haproxy.values_file }}"
     hooks:
+      # Apply the ClusterRole first
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["apply", "-f", "examples/haproxy-cluster-role.yaml"]
+
+      # Create namespace and apply namespace-specific RBAC based on environment
       - events: ["presync"]
         showlogs: true
         command: "bash"
         args:
           [
             "-c",
-            "kubectl create namespace {{ .Environment.Values.env.namespace }} --dry-run=client -o yaml | kubectl apply -f -",
+            "NAMESPACE={{ .Environment.Values.env.namespace }} && kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - && cat examples/haproxy-namespace-template.yaml | sed \"s/NAMESPACE_PLACEHOLDER/$NAMESPACE/g\" | kubectl apply -f -",
           ]
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args: ["apply", "-f", "examples/haproxy-shared-rbac-narrow.yaml"]
 
   # CT Ingress Configs
   - name: ingress-haproxy

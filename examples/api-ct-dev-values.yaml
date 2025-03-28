@@ -8,7 +8,7 @@ db:
 
 # API Config
 api:
-  hostname: prod.calltelemetry.com
+  hostname: dev.calltelemetry.com
 
 # Admin configuration
 admin:
