@@ -133,7 +133,7 @@ releases:
   # CT Web Frontend
   - name: ct-web
     namespace: "{{ .Environment.Values.env.namespace }}"
-    version: 0.1.4
+    version: 0.1.5
     chart: calltelemetry/ct-web
     values:
       - "{{ .Environment.Values.vue_web.values_file }}"
