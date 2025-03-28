@@ -1,0 +1,18 @@
+# Echo Chart Values
+
+# Ingress class name to use for the ingress
+ingressClassName: "haproxy"
+
+# Hostnames for the ingress rules
+primary_hostname: ""
+secondary_hostname: ""
+admin_hostname: ""
+
+# Enable catch-all route that matches any host (including IP addresses)
+# When true, requests to /echo path will be routed to the echo service regardless of hostname
+enableCatchAllRoute: true
+
+# Echo server configuration
+server:
+  replicas: 3
+  image: "ealen/echo-server:latest"
