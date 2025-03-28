@@ -121,7 +121,7 @@ releases:
   # Call Telemetry API
   - name: api
     namespace: "{{ .Environment.Values.env.namespace }}"
-    version: 0.11.5
+    version: 0.11.6
     chart: calltelemetry/api
     values:
       - "{{ .Environment.Values.api.values_file }}"
