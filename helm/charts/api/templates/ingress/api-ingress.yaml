@@ -19,4 +19,4 @@ spec:
               service:
                 name: curri-api-service
                 port:
-                  number: 4080
+                  number: {{ range .Values.api.container_ports }}{{ if eq .name "curri-api" }}{{ .port }}{{ end }}{{ end }}  # Reference the curri-api port

@@ -9,38 +9,25 @@ db:
 # API Config
 api:
   hostname: prod.calltelemetry.com
-  # Example of API ingress annotations
-  ingress:
-    annotations: {}
-    haproxy.org/load-balance: "roundrobin"
+  # Example of API ingress annotations if needed
+  # ingress:
+  #   annotations:
+  #     haproxy.org/load-balance: "roundrobin"
 
 # Admin configuration
 admin:
   api_worker: true
-  container_ports:
-    - name: web-api
-      port: 4000
-    - name: curri-api
-      port: 4080
-    - name: ssh
-      port: 3022
   hostname: prod.calltelemetry.com
-  ingress:
-    annotations:
-      haproxy.org/load-balance: "roundrobin"
+  # Example of adding additional ingress annotations if needed
+  # ingress:
+  #   annotations:
+  #     haproxy.org/ssl-redirect: "true"
 
 
 # SFTP Configuration
 sftp:
- enabled: true
- image: lscr.io/linuxserver/openssh-server
- tag: latest
- imagePullPolicy: IfNotPresent
- cpus: 1
+  enabled: true
 
 # Syslog Configuration
 syslog:
- enabled: true
- tcp_port: 514
- udp_port: 514
- targetPort: 514
+  enabled: true
