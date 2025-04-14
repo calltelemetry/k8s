@@ -56,8 +56,8 @@ syslog:
   targetPort: 514
 cdr_root_path: "/tmp"
 db:
-  useSecret: false  # Set to false to use direct values
-  secretName: api-db-secret # Name of the secret containing DB credentials
+  useExistingSecret: false  # Set to false to use direct values
+  existingSecretName: api-db-secret # Name of the secret containing DB credentials
   values:
     db_username: postgres
     db_password: calltelemetry
