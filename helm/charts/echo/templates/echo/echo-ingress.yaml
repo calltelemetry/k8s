@@ -9,6 +9,28 @@ metadata:
     {{- end }}
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
+  {{- if and .Values.tls.enabled (or .Values.primary_hostname .Values.secondary_hostname .Values.admin_hostname) }}
+  tls:
+    - hosts:
+        {{- if .Values.primary_hostname }}
+        - {{ .Values.primary_hostname }}
+        {{- end }}
+        {{- if .Values.secondary_hostname }}
+        - {{ .Values.secondary_hostname }}
+        {{- end }}
+        {{- if .Values.admin_hostname }}
+        - {{ .Values.admin_hostname }}
+        {{- end }}
+      {{- if .Values.tls.secretName }}
+      secretName: {{ .Values.tls.secretName }}
+      {{- else if .Values.primary_hostname }}
+      secretName: {{ .Values.primary_hostname }}
+      {{- else if .Values.secondary_hostname }}
+      secretName: {{ .Values.secondary_hostname }}
+      {{- else if .Values.admin_hostname }}
+      secretName: {{ .Values.admin_hostname }}
+      {{- end }}
+  {{- end }}
   rules:
     {{- if .Values.primary_hostname }}
     - host: {{ .Values.primary_hostname }}

@@ -12,6 +12,14 @@ admin_hostname: ""
 # When true, requests to /echo path will be routed to the echo service regardless of hostname
 enableCatchAllRoute: true
 
+# TLS configuration
+tls:
+  # Enable TLS for the ingress
+  enabled: false
+  # Secret name containing the TLS certificate
+  # If not specified, will use the hostname as the secret name
+  secretName: ""
+
 # Ingress annotations configuration
 ingress:
   annotations:
