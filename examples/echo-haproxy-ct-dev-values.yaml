@@ -6,10 +6,16 @@ primary_hostname: dev.calltelemetry.com
 secondary_hostname: dev.calltelemetry.com
 admin_hostname: dev.calltelemetry.com
 
+# TLS configuration
+tls:
+  enabled: true
+  secretName: dev.calltelemetry.com
+
 # Ingress annotations configuration
 ingress:
   annotations:
     kubernetes.io/ingress.class: "haproxy-ct-dev"
     haproxy.org/load-balance: "roundrobin"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # Add additional annotations as needed
     # Example: haproxy.org/timeout-client: "30s"
