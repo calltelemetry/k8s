@@ -1,7 +1,7 @@
 # kubectl delete -A ValidatingWebhookConfiguration ingress-ingress-nginx-admission
 metallb:
   enabled: false
-
+ingressClassName: haproxy-ct-dev
 # Ingress Controller Configuration
 ingress-controller:
   # Type of ingress controller to use
