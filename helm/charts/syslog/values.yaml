@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: calltelemetry/syslog
+  tag: 0.8.3
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 514
+
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# NATS Configuration
+nats:
+  url: "nats://nats:4222"
+  credentialsBucket: "credentials"
+

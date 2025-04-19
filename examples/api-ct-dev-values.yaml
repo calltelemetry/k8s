@@ -13,7 +13,7 @@ api:
   ingress:
     annotations:
       kubernetes.io/ingress.class: "haproxy-ct-dev"
-      haproxy.org/load-balance: "roundrobin"
+      haproxy.org/load-balance: "leastconn"
 
 # Admin configuration
 admin:

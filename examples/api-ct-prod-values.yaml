@@ -10,9 +10,9 @@ db:
 api:
   hostname: prod.calltelemetry.com
   # Example of API ingress annotations if needed
-  # ingress:
-  #   annotations:
-  #     haproxy.org/load-balance: "roundrobin"
+  ingress:
+    annotations:
+      haproxy.org/load-balance: "leastconn"
 
 # Admin configuration
 admin:

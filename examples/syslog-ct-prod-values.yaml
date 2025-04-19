@@ -1,0 +1,43 @@
+# Default values for syslog in production environment
+# This is a YAML-formatted file.
+
+replicaCount: 2
+
+image:
+  repository: calltelemetry/syslog
+  tag: 0.8.3
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 514
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - syslog
+        topologyKey: kubernetes.io/hostname
+
+# NATS Configuration
+nats:
+  url: "nats://nats:4222"
+  credentialsBucket: "credentials"
