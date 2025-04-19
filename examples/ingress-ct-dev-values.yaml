@@ -2,6 +2,8 @@
 ingress-controller:
   # Type of ingress controller to use, creates ingress class.
   type: haproxy
+  # Class name for the ingress controller
+  class: haproxy-ct-dev
   # Selector labels for the ingress controller - must match the actual HAProxy pod labels
   selector:
     name: "haproxy-ingress"
