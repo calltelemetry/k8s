@@ -103,10 +103,7 @@ spec:
                   name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: db_port
             - name: DB_SSL_ENABLED
-              valueFrom:
-                secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_ssl_enabled
+              value: "true"
             - name: CDR_ROOT_PATH
               value: {{ .Values.cdr_root_path }}
             - name: LOGGING_LEVEL
