@@ -80,28 +80,28 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_user
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_password
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: password
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_name
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: dbname
             - name: DB_HOSTNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_hostname
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: host
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.db.useSecret }}{{ .Values.db.secretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
-                  key: db_port
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: port
             - name: DB_SSL_ENABLED
               value: "true"
             - name: CDR_ROOT_PATH
