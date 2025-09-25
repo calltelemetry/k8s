@@ -122,3 +122,16 @@ spec:
               value: "/home/app/cert/appliance.pem"
             - name: TEAMS_AUTH_SERVICE
               value: {{ .Values.teams_auth_service | quote }}
+            - name: LOG_PATH
+              value: {{ .Values.logs.path | quote }}
+{{- if .Values.logs.enabled }}
+          volumeMounts:
+            - name: admin-logs
+              mountPath: {{ .Values.logs.path | quote }}
+{{- end }}
+{{- if .Values.logs.enabled }}
+      volumes:
+        - name: admin-logs
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-admin-logs
+{{- end }}

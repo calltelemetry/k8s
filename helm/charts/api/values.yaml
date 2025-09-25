@@ -69,5 +69,19 @@ logging_level: debug
 nats_server: "nats"
 teams_auth_service: "teams-auth-service"
 
+logs:
+  enabled: true            # Set to false only if a log volume is provided externally
+  size: 1Gi                # Example: "5Gi" for larger clusters
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "local-path"     # Default K3s storage class; override for other providers
+  path: "/var/log"
+
+# Example override snippet:
+# logs:
+#   enabled: true
+#   size: "10Gi"
+#   storageClassName: "premium-rwo"
+
 # Ingress configuration
 ingressClassName: haproxy

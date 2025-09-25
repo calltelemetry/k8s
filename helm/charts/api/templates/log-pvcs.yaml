@@ -1,0 +1,40 @@
+{{- if .Values.logs.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-api-logs
+  labels:
+    app: api-worker
+    release: {{ .Release.Name }}
+spec:
+  accessModes:
+{{- range .Values.logs.accessModes }}
+    - {{ . }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.logs.size | default "1Gi" }}
+{{- if .Values.logs.storageClassName }}
+  storageClassName: {{ .Values.logs.storageClassName | quote }}
+{{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-admin-logs
+  labels:
+    app: admin-service
+    release: {{ .Release.Name }}
+spec:
+  accessModes:
+{{- range .Values.logs.accessModes }}
+    - {{ . }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.logs.size | default "1Gi" }}
+{{- if .Values.logs.storageClassName }}
+  storageClassName: {{ .Values.logs.storageClassName | quote }}
+{{- end }}
+{{- end }}
