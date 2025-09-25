@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   api:
   - apiVersion: v1
+    appVersion: 0.8.5-rc19
+    created: "2025-09-25T18:28:43.039124451Z"
+    description: Call Telemetry for Cisco Callmanager
+    digest: ad1a475b1293743930b66567b973aea11c266592bbe01cd1f7ac060b9a516807
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: api
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/api-0.11.10/api-0.11.10.tgz
+    version: 0.11.10
+  - apiVersion: v1
     appVersion: 0.8.5
     created: "2025-07-04T16:53:55.654340275Z"
     description: Call Telemetry for Cisco Callmanager
@@ -148,6 +162,15 @@ entries:
     - https://github.com/calltelemetry/k8s/releases/download/ct-ingress-0.11.5/ct-ingress-0.11.5.tgz
     version: 0.11.5
   ct-web:
+  - apiVersion: v2
+    appVersion: 0.8.5-rc19
+    created: "2025-09-25T18:28:43.478013921Z"
+    description: Call Telemetry Web Portal
+    digest: 9ac1eae694e5ef1c4478f71490c58a0d749637ee725b2a88e1033654b674c41f
+    name: ct-web
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-web-0.1.6/ct-web-0.1.6.tgz
+    version: 0.1.6
   - apiVersion: v2
     appVersion: 0.8.3
     created: "2025-03-28T02:51:51.829149802Z"
@@ -300,4 +323,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/traceroute-0.1.0/traceroute-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-04T16:53:55.758660022Z"
+generated: "2025-09-25T18:28:43.47812125Z"
