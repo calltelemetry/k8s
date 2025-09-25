@@ -120,3 +120,16 @@ spec:
               value: /home/app/cert/appliance_key.pem
             - name: CERT_PUBLIC
               value: /home/app/cert/appliance.pem
+            - name: LOG_PATH
+              value: {{ .Values.logs.path | quote }}
+{{- if .Values.logs.enabled }}
+          volumeMounts:
+            - name: api-logs
+              mountPath: {{ .Values.logs.path | quote }}
+{{- end }}
+{{- if .Values.logs.enabled }}
+      volumes:
+        - name: api-logs
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-api-logs
+{{- end }}
