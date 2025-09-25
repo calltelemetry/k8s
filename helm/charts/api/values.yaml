@@ -10,7 +10,7 @@ userid: 1001
 #   external_admin_port: 443
 api:
   image: calltelemetry/web
-  tag: 0.8.3-rc63
+  tag: 0.8.5-rc19
   imagePullPolicy: Always
   cpus: 2
   replicas: 0
@@ -24,7 +24,7 @@ api:
 
 admin:
   image: calltelemetry/web
-  tag: 0.8.3-rc63
+  tag: 0.8.5-rc19
   imagePullPolicy: Always
   replicas: 1
   cpus: 2
