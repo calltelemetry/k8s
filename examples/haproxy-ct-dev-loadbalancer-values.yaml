@@ -1,0 +1,23 @@
+# HAProxy Ingress configured with a LoadBalancer service.
+# Use this when your Kubernetes cluster provides an external load-balancer
+# (e.g. MetalLB, cloud LBs). For local OrbStack deployments without L2, use
+# `examples/haproxy-ct-dev-values.yaml` instead.
+
+rbac:
+  create: false
+
+serviceAccount:
+  create: false
+  name: "haproxy-ingress"
+
+controller:
+  ingressClassResource:
+    name: haproxy-ct-dev
+  ingressClass: haproxy-ct-dev
+  extraArgs:
+    tcp-services-configmap: ct-dev/haproxy-tcp-services
+  service:
+    type: LoadBalancer
+    annotations: {}
+    loadBalancerIP: null
+    externalTrafficPolicy: Cluster
