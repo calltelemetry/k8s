@@ -36,6 +36,10 @@ environments:
     values:
       - env-common.yaml
       - env-dev.yaml
+  orb-dev:
+    values:
+      - env-common.yaml
+      - orb-dev.yaml
 
 ---
 # Global hooks
