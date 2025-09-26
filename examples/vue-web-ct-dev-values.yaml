@@ -3,7 +3,7 @@ environment: prod
 vue_web:
   image:
     repository: calltelemetry/vue
-    tag: 0.8.5-rc23
+    tag: 0.8.5-rc25
     pullPolicy: Always
   port: 80
   LogLevel: "INFO"
