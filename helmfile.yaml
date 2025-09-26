@@ -39,7 +39,6 @@ environments:
 
 ---
 # Global hooks
-
 ---
 # Releases to be deployed
 releases:
@@ -72,7 +71,7 @@ releases:
         args:
           [
             "-c",
-            "NAMESPACE={{ .Environment.Values.env.namespace }} && kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - && cat examples/haproxy-namespace-template.yaml | sed \"s/NAMESPACE_PLACEHOLDER/$NAMESPACE/g\" | kubectl apply -f -",
+            'NAMESPACE={{ .Environment.Values.env.namespace }} && kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - && cat examples/haproxy-namespace-template.yaml | sed "s/NAMESPACE_PLACEHOLDER/$NAMESPACE/g" | kubectl apply -f -',
           ]
 
   # CT Ingress Configs
@@ -97,7 +96,7 @@ releases:
   # Call Telemetry API
   - name: api
     namespace: "{{ .Environment.Values.env.namespace }}"
-    version: 0.11.7
+    version: 0.11.10
     chart: calltelemetry/api
     values:
       - "{{ .Environment.Values.api.values_file }}"
@@ -109,7 +108,7 @@ releases:
   # CT Web Frontend
   - name: ct-web
     namespace: "{{ .Environment.Values.env.namespace }}"
-    version: 0.1.5
+    version: 0.1.6
     chart: calltelemetry/ct-web
     values:
       - "{{ .Environment.Values.vue_web.values_file }}"
@@ -128,21 +127,21 @@ releases:
   #     - "{{ .Environment.Values.env.namespace }}/api"
 
   # Traceroute Service
-  # - name: traceroute
-  #   namespace: "{{ .Environment.Values.env.namespace }}"
-  #   chart: calltelemetry/traceroute
-  #   values:
-  #     - "{{ .Environment.Values.traceroute.values_file }}"
-  #   needs:
-  #     - "{{ .Environment.Values.env.namespace }}/nats"
-  #     - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+  - name: traceroute
+    namespace: "{{ .Environment.Values.env.namespace }}"
+    chart: calltelemetry/traceroute
+    values:
+      - "{{ .Environment.Values.traceroute.values_file }}"
+    needs:
+      - "{{ .Environment.Values.env.namespace }}/nats"
+      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
 
   # Echo Service
-  - name: echo
-    namespace: "{{ .Environment.Values.env.namespace }}"
-    chart: calltelemetry/echo
-    values:
-      - "{{ .Environment.Values.echo.values_file }}"
-    needs:
-      - "{{ .Environment.Values.env.namespace }}/ingress-haproxy"
-      - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
+  # - name: echo
+  # namespace: "{{ .Environment.Values.env.namespace }}"
+  # chart: calltelemetry/echo
+  # values:
+  # - "{{ .Environment.Values.echo.values_file }}"
+  # needs:
+  # - "{{ .Environment.Values.env.namespace }}/ingress-haproxy"
+  # - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"

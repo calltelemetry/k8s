@@ -27,3 +27,4 @@ dist/
 build/
 private/
 output/
+helmfile.lock
