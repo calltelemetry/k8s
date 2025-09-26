@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: calltelemetry/traceroute
-  tag: 0.8.5-rc23
+  tag: 0.8.5-rc25
   pullPolicy: Always
 
 resources:

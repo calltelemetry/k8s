@@ -10,7 +10,7 @@ db:
 api:
   hostname: ct-dev.k8s.orb.local
   image: calltelemetry/web
-  tag: 0.8.5-rc23
+  tag: 0.8.5-rc25
   imagePullPolicy: Always
   replicas: 2
   # Example of API ingress annotations
@@ -25,7 +25,7 @@ admin:
   # Only override hostname if different from default
   hostname: ct-dev.k8s.orb.local
   image: calltelemetry/web
-  tag: 0.8.5-rc23
+  tag: 0.8.5-rc25
   imagePullPolicy: Always
   # Admin ingress annotations
   ingress:
