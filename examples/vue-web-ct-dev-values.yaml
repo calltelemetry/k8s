@@ -2,6 +2,8 @@ replicaCount: 1
 environment: prod
 vue_web:
   image:
+    repository: calltelemetry/vue
+    tag: 0.8.5-rc23
     pullPolicy: Always
   port: 80
   LogLevel: "INFO"
@@ -19,8 +21,8 @@ ingress:
     haproxy.org/cookie-strategy: "insert"
     haproxy.org/cookie-name: "CTSESSIONID"
   hosts:
-    - host: dev.calltelemetry.com
-      paths: ['/', '/#']
-  tls: []  # Disabled TLS for testing
+    - host: ct-dev.k8s.orb.local
+      paths: ["/", "/#"]
+  tls: [] # Disabled TLS for testing
 
 resources: {}

@@ -3,12 +3,16 @@ ingressClassName: haproxy-ct-dev
 
 # Database configuration
 db:
-  useExistingSecret: true  # Set to true to use an existing secret
+  useExistingSecret: true # Set to true to use an existing secret
   existingSecretName: hippo-pguser-calltelemetry # Name of the secret containing DB credentials
 
 # API Config
 api:
-  hostname: dev.calltelemetry.com
+  hostname: ct-dev.k8s.orb.local
+  image: calltelemetry/web
+  tag: 0.8.5-rc23
+  imagePullPolicy: Always
+  replicas: 2
   # Example of API ingress annotations
   ingress:
     annotations:
@@ -19,13 +23,15 @@ api:
 admin:
   api_worker: true
   # Only override hostname if different from default
-  hostname: dev.calltelemetry.com
+  hostname: ct-dev.k8s.orb.local
+  image: calltelemetry/web
+  tag: 0.8.5-rc23
+  imagePullPolicy: Always
   # Admin ingress annotations
   ingress:
     annotations:
       kubernetes.io/ingress.class: "haproxy-ct-dev"
       haproxy.org/load-balance: "roundrobin"
-
 
 # SFTP Configuration
 sftp:
