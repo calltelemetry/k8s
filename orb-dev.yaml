@@ -1,10 +1,10 @@
-# Development environment values for CallTelemetry deployment
+# Orbstack development environment values for CallTelemetry deployment
 
 # Environment information
 env:
   namespace: ct-dev
   environment: dev
-  domain: ct-dev.local
+  domain: ct-dev.k8s.orb.local
 
 # HAProxy configuration
 haproxy:
@@ -12,7 +12,7 @@ haproxy:
 
 # Ingress configuration
 ingress:
-  values_file: examples/ingress-ct-dev-values.yaml
+  values_file: examples/ingress-ct-dev-orbstack-values.yaml
 
 # API configuration
 api:
@@ -33,9 +33,3 @@ traceroute:
 # Echo configuration
 echo:
   values_file: examples/echo-haproxy-ct-dev-values.yaml
-
-# MetalLB IP addresses
-metallb:
-  primary_ip: "192.168.123.235"
-  secondary_ip: "192.168.123.236"
-  admin_ip: "192.168.123.237"

@@ -1,0 +1,25 @@
+# OrbStack-specific overrides that avoid LoadBalancer services.
+
+ingress-controller:
+  type: haproxy
+  class: haproxy-ct-dev
+  selector:
+    name: "haproxy-ingress"
+
+primary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+secondary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+admin_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+ports:
+  http: 80
+  https: 443
+
+tcpServices: {}

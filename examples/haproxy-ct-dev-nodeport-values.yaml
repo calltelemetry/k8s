@@ -1,0 +1,27 @@
+# HAProxy Ingress with NodePort exposure for environments without L2 load balancers.
+# Exposes HTTP on 30080 and HTTPS on 30443 on each node.
+
+rbac:
+  create: false
+
+serviceAccount:
+  create: false
+  name: "haproxy-ingress"
+
+controller:
+  ingressClassResource:
+    name: haproxy-ct-dev
+  ingressClass: haproxy-ct-dev
+  extraArgs:
+    tcp-services-configmap: ct-dev/haproxy-tcp-services
+  service:
+    type: NodePort
+    externalTrafficPolicy: Cluster
+    httpPorts:
+      - port: 80
+        targetPort: http
+        nodePort: 30080
+    httpsPorts:
+      - port: 443
+        targetPort: https
+        nodePort: 30443
