@@ -28,3 +28,8 @@ securityContext:
 
 # Termination grace period
 terminationGracePeriodSeconds: 5
+
+# Logging configuration
+env:
+  - name: LOGGING_LEVEL
+    value: "debug"

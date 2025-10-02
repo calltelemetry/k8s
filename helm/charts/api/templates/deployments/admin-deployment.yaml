@@ -65,15 +65,19 @@ spec:
               scheme: HTTP
               path: /healthz
               port: 4080
-            initialDelaySeconds: 15
-            periodSeconds: 3
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               scheme: HTTP
               path: /healthz
               port: 4080
-            initialDelaySeconds: 3
-            periodSeconds: 3
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
           env:
             - name: EXTERNAL_IP
               value: {{ .Values.hostname | quote }}
