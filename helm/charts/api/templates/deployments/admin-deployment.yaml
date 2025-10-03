@@ -60,24 +60,26 @@ spec:
               cpu: "100m"
             limits:
               cpu: {{ .Values.admin.cpus }}
+{{- if .Values.admin.probesEnabled }}
           livenessProbe:
             httpGet:
               scheme: HTTP
               path: /healthz
               port: 4080
-            initialDelaySeconds: 180
-            periodSeconds: 10
-            timeoutSeconds: 10
-            failureThreshold: 5
+            initialDelaySeconds: {{ .Values.admin.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admin.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admin.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               scheme: HTTP
               path: /healthz
               port: 4080
-            initialDelaySeconds: 180
-            periodSeconds: 10
-            timeoutSeconds: 10
-            failureThreshold: 3
+            initialDelaySeconds: {{ .Values.admin.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admin.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admin.readinessProbe.failureThreshold }}
+{{- end }}
           env:
             - name: EXTERNAL_IP
               value: {{ .Values.hostname | quote }}
