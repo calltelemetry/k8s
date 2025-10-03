@@ -62,18 +62,24 @@ spec:
             limits:
               memory: "1024Mi"
               cpu: {{ .Values.api.cpus }}
+{{- if .Values.api.probesEnabled }}
           livenessProbe:
             httpGet:
               path: /healthz
               port: 4080
-            initialDelaySeconds: 15
-            periodSeconds: 3
+            initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.api.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: 4080
-            initialDelaySeconds: 3
-            periodSeconds: 3
+            initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.api.readinessProbe.failureThreshold }}
+{{- end }}
           env:
             - name: EXTERNAL_IP
               value: {{ .Values.hostname }}

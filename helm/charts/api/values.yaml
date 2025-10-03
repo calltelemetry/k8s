@@ -19,6 +19,17 @@ api:
     - name: curri-api
       port: 4080
   hostname: dev.calltelemetry.com
+  probesEnabled: true
+  livenessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 3
+    timeoutSeconds: 1
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 3
+    periodSeconds: 3
+    timeoutSeconds: 1
+    failureThreshold: 3
   ingress:
     annotations: {}
 
@@ -38,6 +49,17 @@ admin:
       port: 3022
   hostname: dev.calltelemetry.com
   api_worker: false
+  probesEnabled: false
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 5
+  readinessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 3
   ingress:
     annotations:
       haproxy.org/load-balance: "roundrobin"
@@ -56,7 +78,7 @@ syslog:
   targetPort: 514
 cdr_root_path: "/tmp"
 db:
-  useExistingSecret: false  # Set to false to use direct values
+  useExistingSecret: false # Set to false to use direct values
   existingSecretName: api-db-secret # Name of the secret containing DB credentials
   values:
     db_username: postgres
@@ -70,11 +92,11 @@ nats_server: "nats"
 teams_auth_service: "teams-auth-service"
 
 logs:
-  enabled: true            # Set to false only if a log volume is provided externally
-  size: 1Gi                # Example: "5Gi" for larger clusters
+  enabled: true # Set to false only if a log volume is provided externally
+  size: 1Gi # Example: "5Gi" for larger clusters
   accessModes:
     - ReadWriteOnce
-  storageClassName: "local-path"     # Default K3s storage class; override for other providers
+  storageClassName: "local-path" # Default K3s storage class; override for other providers
   path: "/var/log"
 
 # Example override snippet:
