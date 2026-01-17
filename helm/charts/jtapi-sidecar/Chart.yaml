@@ -1,0 +1,11 @@
+apiVersion: v2
+name: jtapi-sidecar
+description: JTAPI Sidecar service for Cisco JTAPI integration - provides phone control and audio injection capabilities
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC

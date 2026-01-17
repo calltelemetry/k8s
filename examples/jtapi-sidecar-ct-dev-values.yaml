@@ -1,0 +1,59 @@
+# JTAPI Sidecar Development Values for CallTelemetry
+# Usage: helm install jtapi-sidecar ./helm/charts/jtapi-sidecar -f examples/jtapi-sidecar-ct-dev-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-sidecar
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: DEBUG  # More verbose for development
+
+# CUCM connection - update with your lab CUCM
+cucm:
+  host: "cucm-lab.local"
+  ctiPort: 2748
+  user: "jtapi-dev-user"
+  password: "dev-password"
+
+# WebSocket connection to CallTelemetry API
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "dev-jtapi-1"
+  authToken: "dev-token"
+  autoReconnect: true
+  reconnectDelay: 1000
+  maxReconnectAttempts: 0  # Unlimited retries
+
+connectionPool:
+  maxConnections: 5
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 20
+
+persistence:
+  jars:
+    enabled: true
+    size: 100Mi
+  audio:
+    enabled: true
+    size: 500Mi
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi

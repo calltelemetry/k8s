@@ -1,0 +1,66 @@
+replicaCount: 1
+
+image:
+  repository: minio/minio
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# MinIO credentials
+auth:
+  rootUser: minioadmin
+  rootPassword: minioadmin
+  # Use existing secret instead of creating one
+  existingSecret: ""
+
+service:
+  type: ClusterIP
+  apiPort: 9000
+  consolePort: 9001
+
+# Persistent storage
+persistence:
+  enabled: true
+  # storageClass: Leave empty to use cluster default (local-path on K3s, longhorn if installed)
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  # Use existing PVC
+  existingClaim: ""
+
+# Buckets to create on startup
+buckets:
+  - name: ct-audio
+    policy: none
+  - name: ct-jtapi-jars
+    policy: none
+
+# Init container to create buckets
+bucketInit:
+  enabled: true
+  image:
+    repository: minio/mc
+    tag: latest
+    pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Health check configuration
+healthCheck:
+  liveness:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10

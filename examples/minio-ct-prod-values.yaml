@@ -1,0 +1,57 @@
+# MinIO Production Values for CallTelemetry
+# Usage: helm install minio ./helm/charts/minio -f examples/minio-ct-prod-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: minio/minio
+  tag: RELEASE.2024-01-16T16-07-38Z  # Pin to specific release
+  pullPolicy: IfNotPresent
+
+# Production: Use existing secret with strong credentials
+auth:
+  existingSecret: "minio-credentials"
+
+service:
+  type: ClusterIP
+  apiPort: 9000
+  consolePort: 9001
+
+persistence:
+  enabled: true
+  # storageClass: ""  # Leave empty to use cluster default (local-path on K3s)
+  # storageClass: "longhorn"  # Uncomment if Longhorn is installed
+  # storageClass: "local-path"  # K3s default
+  size: 50Gi
+
+# Default buckets for CallTelemetry
+buckets:
+  - name: ct-audio
+    policy: none
+  - name: ct-jtapi-jars
+    policy: none
+
+bucketInit:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# Production: Enable anti-affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - minio
+          topologyKey: kubernetes.io/hostname

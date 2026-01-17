@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jtapi-sidecar.fullname" . }}
+  labels:
+    {{- include "jtapi-sidecar.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "jtapi-sidecar.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jtapi-sidecar.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.jtapi.port }}
+              protocol: TCP
+          env:
+            # JTAPI Configuration
+            - name: JTAPI_PORT
+              value: {{ .Values.jtapi.port | quote }}
+            - name: JTAPI_JAR_PATH
+              value: {{ .Values.jtapi.jarPath | quote }}
+            - name: WATCH_JARS
+              value: {{ .Values.jtapi.watchJars | quote }}
+            - name: RESTART_DELAY_SECONDS
+              value: {{ .Values.jtapi.restartDelaySeconds | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.jtapi.logLevel | quote }}
+            # CUCM Configuration
+            - name: CUCM_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "jtapi-sidecar.cucmSecretName" . }}
+                  key: {{ .Values.cucm.secretKeys.host }}
+            - name: CUCM_CTI_PORT
+              value: {{ .Values.cucm.ctiPort | quote }}
+            - name: CUCM_JTAPI_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "jtapi-sidecar.cucmSecretName" . }}
+                  key: {{ .Values.cucm.secretKeys.user }}
+            - name: CUCM_JTAPI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "jtapi-sidecar.cucmSecretName" . }}
+                  key: {{ .Values.cucm.secretKeys.password }}
+            # Connection Pool
+            - name: JTAPI_MAX_CONNECTIONS
+              value: {{ .Values.connectionPool.maxConnections | quote }}
+            - name: JTAPI_CONNECTION_TIMEOUT
+              value: {{ .Values.connectionPool.connectionTimeout | quote }}
+            - name: JTAPI_CALL_TIMEOUT
+              value: {{ .Values.connectionPool.callTimeout | quote }}
+            - name: JTAPI_MAX_CONCURRENT_CALLS
+              value: {{ .Values.connectionPool.maxConcurrentCalls | quote }}
+            {{- if .Values.websocket.enabled }}
+            # WebSocket Configuration
+            - name: WEBSOCKET_ENABLED
+              value: "true"
+            - name: WEBSOCKET_URL
+              value: {{ .Values.websocket.url | quote }}
+            - name: JTAPI_SERVER_ID
+              value: {{ .Values.websocket.serverId | quote }}
+            - name: WEBSOCKET_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "jtapi-sidecar.websocketSecretName" . }}
+                  key: {{ .Values.websocket.secretKey }}
+            - name: WEBSOCKET_AUTO_RECONNECT
+              value: {{ .Values.websocket.autoReconnect | quote }}
+            - name: WEBSOCKET_RECONNECT_DELAY
+              value: {{ .Values.websocket.reconnectDelay | quote }}
+            - name: WEBSOCKET_RECONNECT_MAX_DELAY
+              value: {{ .Values.websocket.reconnectMaxDelay | quote }}
+            - name: WEBSOCKET_BACKOFF_MULTIPLIER
+              value: {{ .Values.websocket.backoffMultiplier | quote }}
+            - name: WEBSOCKET_MAX_RECONNECT_ATTEMPTS
+              value: {{ .Values.websocket.maxReconnectAttempts | quote }}
+            - name: WEBSOCKET_HEARTBEAT_INTERVAL
+              value: {{ .Values.websocket.heartbeatInterval | quote }}
+            - name: WEBSOCKET_CONNECT_TIMEOUT
+              value: {{ .Values.websocket.connectTimeout | quote }}
+            {{- else }}
+            - name: WEBSOCKET_ENABLED
+              value: "false"
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.healthCheck.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.healthCheck.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- if .Values.persistence.jars.enabled }}
+            - name: jtapi-jars
+              mountPath: {{ .Values.jtapi.jarPath }}
+            {{- end }}
+            {{- if .Values.persistence.audio.enabled }}
+            - name: jtapi-audio
+              mountPath: /app/audio
+            {{- end }}
+      volumes:
+        {{- if .Values.persistence.jars.enabled }}
+        - name: jtapi-jars
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.jars.existingClaim | default (printf "%s-jars" (include "jtapi-sidecar.fullname" .)) }}
+        {{- end }}
+        {{- if .Values.persistence.audio.enabled }}
+        - name: jtapi-audio
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.audio.existingClaim | default (printf "%s-audio" (include "jtapi-sidecar.fullname" .)) }}
+        {{- end }}
