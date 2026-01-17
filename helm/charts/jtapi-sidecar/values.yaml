@@ -1,0 +1,97 @@
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-sidecar
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# JTAPI Sidecar configuration
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: INFO
+
+# CUCM connection configuration
+cucm:
+  host: ""
+  ctiPort: 2748
+  user: ""
+  password: ""
+  # Use existing secret for CUCM credentials
+  existingSecret: ""
+  # Keys in the secret
+  secretKeys:
+    host: CUCM_HOST
+    user: CUCM_JTAPI_USER
+    password: CUCM_JTAPI_PASSWORD
+
+# WebSocket connection to CallTelemetry backend
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "jtapi-1"
+  authToken: ""
+  # Use existing secret for auth token
+  existingSecret: ""
+  secretKey: WEBSOCKET_AUTH_TOKEN
+  autoReconnect: true
+  reconnectDelay: 1000
+  reconnectMaxDelay: 60000
+  backoffMultiplier: 2.0
+  maxReconnectAttempts: 0
+  heartbeatInterval: 30000
+  connectTimeout: 10000
+
+# Connection pool settings
+connectionPool:
+  maxConnections: 10
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 50
+
+# Persistent storage for JTAPI JARs and audio files
+# storageClass: Leave empty to use cluster default (local-path on K3s, longhorn if installed)
+persistence:
+  jars:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 100Mi
+    existingClaim: ""
+  audio:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 500Mi
+    existingClaim: ""
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Health check configuration
+healthCheck:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 60
+    periodSeconds: 30
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 30
+    periodSeconds: 10

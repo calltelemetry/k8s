@@ -1,0 +1,41 @@
+# MinIO Development Values for CallTelemetry
+# Usage: helm install minio ./helm/charts/minio -f examples/minio-ct-dev-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: minio/minio
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Development credentials (NOT for production!)
+auth:
+  rootUser: minioadmin
+  rootPassword: minioadmin
+
+service:
+  type: ClusterIP
+  apiPort: 9000
+  consolePort: 9001
+
+persistence:
+  enabled: true
+  size: 5Gi
+
+# Default buckets for CallTelemetry
+buckets:
+  - name: ct-audio
+    policy: none
+  - name: ct-jtapi-jars
+    policy: none
+
+bucketInit:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

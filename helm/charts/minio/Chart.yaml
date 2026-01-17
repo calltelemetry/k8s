@@ -1,0 +1,11 @@
+apiVersion: v2
+name: minio
+description: MinIO S3-compatible object storage for CallTelemetry audio files and JTAPI JAR storage
+type: application
+version: 1.0.0
+appVersion: "RELEASE.2024-01-16T16-07-38Z"
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC

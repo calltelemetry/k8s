@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "minio.fullname" . }}
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "minio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "minio.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":{{ .Values.service.consolePort }}"
+          ports:
+            - name: api
+              containerPort: {{ .Values.service.apiPort }}
+              protocol: TCP
+            - name: console
+              containerPort: {{ .Values.service.consolePort }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: {{ include "minio.secretName" . }}
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: api
+            initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: api
+            initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-data" (include "minio.fullname" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

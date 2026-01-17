@@ -1,0 +1,84 @@
+# JTAPI Sidecar Production Values for CallTelemetry
+# Usage: helm install jtapi-sidecar ./helm/charts/jtapi-sidecar -f examples/jtapi-sidecar-ct-prod-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-sidecar
+  tag: "1.0.0"  # Pin to specific version
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: INFO
+
+# Production: Use existing secrets for CUCM credentials
+cucm:
+  existingSecret: "jtapi-cucm-credentials"
+  ctiPort: 2748
+  secretKeys:
+    host: CUCM_HOST
+    user: CUCM_JTAPI_USER
+    password: CUCM_JTAPI_PASSWORD
+
+# WebSocket connection to CallTelemetry API
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "prod-jtapi-1"
+  existingSecret: "jtapi-websocket-credentials"
+  secretKey: WEBSOCKET_AUTH_TOKEN
+  autoReconnect: true
+  reconnectDelay: 1000
+  reconnectMaxDelay: 60000
+  backoffMultiplier: 2.0
+  maxReconnectAttempts: 0
+  heartbeatInterval: 30000
+  connectTimeout: 10000
+
+connectionPool:
+  maxConnections: 10
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 50
+
+persistence:
+  jars:
+    enabled: true
+    # storageClass: ""  # Leave empty to use cluster default (local-path on K3s)
+    # storageClass: "longhorn"  # Uncomment if Longhorn is installed
+    size: 500Mi
+  audio:
+    enabled: true
+    # storageClass: ""  # Leave empty to use cluster default
+    # storageClass: "longhorn"  # Uncomment if Longhorn is installed
+    size: 2Gi
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+# Production: Prefer scheduling away from API pods
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 50
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - api
+          topologyKey: kubernetes.io/hostname
