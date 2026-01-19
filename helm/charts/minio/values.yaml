@@ -28,9 +28,16 @@ persistence:
   existingClaim: ""
 
 # Buckets to create on startup
+# ct-audio: Audio greetings (no lifecycle - kept forever)
+# ct-recordings: Call recordings (365-day lifecycle)
+# ct-jtapi-jars: JTAPI JAR files (no lifecycle)
 buckets:
   - name: ct-audio
     policy: none
+  - name: ct-recordings
+    policy: none
+    lifecycle:
+      expiry_days: 365
   - name: ct-jtapi-jars
     policy: none
 

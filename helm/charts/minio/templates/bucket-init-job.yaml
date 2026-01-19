@@ -40,6 +40,12 @@ spec:
               {{- if .policy }}
               mc anonymous set {{ .policy }} myminio/{{ .name }} || true
               {{- end }}
+              {{- if .lifecycle }}
+              {{- if .lifecycle.expiry_days }}
+              echo "Setting {{ .lifecycle.expiry_days }}-day lifecycle policy on {{ .name }}..."
+              mc ilm rule add --expire-days {{ .lifecycle.expiry_days }} myminio/{{ .name }} || echo "Lifecycle policy may already exist for {{ .name }}"
+              {{- end }}
+              {{- end }}
               {{- end }}
 
               echo "Listing buckets..."
