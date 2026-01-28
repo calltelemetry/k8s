@@ -1,3 +1,9 @@
+# jtapi-sidecar Helm Chart - CallTelemetry Defaults
+# Java JTAPI sidecar for Cisco phone control and audio injection
+
+# Override the full name - defaults to "jtapi-sidecar" for simple service name
+fullnameOverride: "jtapi-sidecar"
+
 replicaCount: 1
 
 image:
@@ -21,6 +27,10 @@ jtapi:
   restartDelaySeconds: 5
   logLevel: INFO
 
+# NATS configuration
+nats:
+  url: "nats://nats:4222"
+
 # CUCM connection configuration
 cucm:
   host: ""
@@ -37,8 +47,8 @@ cucm:
 
 # WebSocket connection to CallTelemetry backend
 websocket:
-  enabled: true
-  url: "ws://api:4000/socket/jtapi/websocket"
+  enabled: false
+  url: "ws://admin-service:4000/socket/jtapi/websocket"
   serverId: "jtapi-1"
   authToken: ""
   # Use existing secret for auth token
@@ -59,8 +69,14 @@ connectionPool:
   callTimeout: 60000
   maxConcurrentCalls: 50
 
+# NATS-based JAR distribution init container
+jarInit:
+  enabled: true
+  image: natsio/nats-box:0.14.5
+  timeoutSeconds: 120
+  objectStoreBucket: "jtapi-jars-default"
+
 # Persistent storage for JTAPI JARs and audio files
-# storageClass: Leave empty to use cluster default (local-path on K3s, longhorn if installed)
 persistence:
   jars:
     enabled: true
@@ -74,6 +90,18 @@ persistence:
     accessMode: ReadWriteOnce
     size: 500Mi
     existingClaim: ""
+
+# MinIO configuration for audio asset cache
+minio:
+  enabled: true
+  endpoint: "http://minio:9000"
+
+# OpenTelemetry configuration
+otel:
+  enabled: true
+  serviceName: "jtapi-sidecar"
+  endpoint: "http://otel-collector:4317"
+  samplingProbability: "0.1"
 
 resources:
   requests:

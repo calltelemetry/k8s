@@ -26,6 +26,39 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.jarInit.enabled }}
+      initContainers:
+        - name: jar-downloader
+          image: {{ .Values.jarInit.image }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              NATS_URL="{{ .Values.nats.url }}"
+              JAR_DIR="{{ .Values.jtapi.jarPath }}"
+              BUCKET="{{ .Values.jarInit.objectStoreBucket }}"
+              TIMEOUT={{ .Values.jarInit.timeoutSeconds }}
+
+              echo "Downloading jtapi.jar from NATS ObjectStore..."
+
+              ELAPSED=0
+              while [ $ELAPSED -lt $TIMEOUT ]; do
+                if nats object get "$BUCKET" jtapi.jar -s "$NATS_URL" -O "$JAR_DIR/jtapi.jar" --force 2>/dev/null; then
+                  echo "Successfully downloaded jtapi.jar"
+                  ls -la "$JAR_DIR/"
+                  exit 0
+                fi
+                echo "Waiting for jtapi.jar... ($ELAPSED/${TIMEOUT}s)"
+                sleep 2
+                ELAPSED=$((ELAPSED + 2))
+              done
+
+              echo "ERROR: Failed to download jtapi.jar after ${TIMEOUT}s"
+              exit 1
+          volumeMounts:
+            - name: jtapi-jars
+              mountPath: {{ .Values.jtapi.jarPath }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -35,15 +68,15 @@ spec:
               containerPort: {{ .Values.jtapi.port }}
               protocol: TCP
             - name: grpc
-              containerPort: {{ .Values.grpc.port | default 50051 }}
+              containerPort: {{ .Values.grpc.port }}
               protocol: TCP
           env:
-            # Pod identity - use service name for single-pod mode (DNS-resolvable)
+            # Pod identity
             - name: POD_NAME
               value: {{ include "jtapi-sidecar.fullname" . }}
-            # gRPC server port (must match service)
+            # gRPC server port
             - name: grpc.server.port
-              value: {{ .Values.grpc.port | default 50051 | quote }}
+              value: {{ .Values.grpc.port | quote }}
             # JTAPI Configuration
             - name: JTAPI_PORT
               value: {{ .Values.jtapi.port | quote }}
@@ -55,6 +88,9 @@ spec:
               value: {{ .Values.jtapi.restartDelaySeconds | quote }}
             - name: LOG_LEVEL
               value: {{ .Values.jtapi.logLevel | quote }}
+            # NATS Configuration
+            - name: NATS_URL
+              value: {{ .Values.nats.url | quote }}
             # CUCM Configuration
             - name: CUCM_HOST
               valueFrom:
@@ -113,6 +149,33 @@ spec:
             - name: WEBSOCKET_ENABLED
               value: "false"
             {{- end }}
+            {{- if .Values.minio.enabled }}
+            # MinIO Configuration
+            - name: MINIO_ENABLED
+              value: "true"
+            - name: MINIO_ENDPOINT
+              value: {{ .Values.minio.endpoint | default "http://minio:9000" | quote }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_USER
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_PASSWORD
+            {{- end }}
+            {{- if .Values.otel.enabled }}
+            # OpenTelemetry Configuration
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.otel.endpoint | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.otel.serviceName | quote }}
+            - name: OTEL_TRACING_SAMPLING_PROBABILITY
+              value: {{ .Values.otel.samplingProbability | quote }}
+            {{- end }}
+          {{- if .Values.healthCheck }}
           livenessProbe:
             httpGet:
               path: {{ .Values.healthCheck.liveness.path }}
@@ -125,6 +188,7 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
+          {{- end }}
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -136,7 +200,7 @@ spec:
             {{- end }}
             {{- if .Values.persistence.audio.enabled }}
             - name: jtapi-audio
-              mountPath: /app/audio
+              mountPath: /data
             {{- end }}
       volumes:
         {{- if .Values.persistence.jars.enabled }}
