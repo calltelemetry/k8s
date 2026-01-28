@@ -34,7 +34,16 @@ spec:
             - name: http
               containerPort: {{ .Values.jtapi.port }}
               protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.grpc.port | default 50051 }}
+              protocol: TCP
           env:
+            # Pod identity - use service name for single-pod mode (DNS-resolvable)
+            - name: POD_NAME
+              value: {{ include "jtapi-sidecar.fullname" . }}
+            # gRPC server port (must match service)
+            - name: grpc.server.port
+              value: {{ .Values.grpc.port | default 50051 | quote }}
             # JTAPI Configuration
             - name: JTAPI_PORT
               value: {{ .Values.jtapi.port | quote }}

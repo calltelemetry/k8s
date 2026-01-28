@@ -1,0 +1,62 @@
+# Demo CUCM configuration for jtapi-sidecar
+# Use with: helm install jtapi-sidecar ./k8s/helm/charts/jtapi-sidecar -f k8s/helm/charts/jtapi-sidecar/values-demo.yaml
+#
+# This connects to the CallTelemetry demo lab CUCM at 192.168.125.10
+# CUCM Version: 15.0
+#
+# CRITICAL: Integration tests MUST run with these credentials set.
+# Tests should NOT be skipped due to missing credentials.
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-sidecar
+  tag: latest
+  pullPolicy: Always
+
+# Demo CUCM connection - CallTelemetry lab
+cucm:
+  host: "192.168.125.10"
+  ctiPort: 2748
+  user: "ct-jtapi-user"
+  password: "tek1links"
+
+# Enable WebSocket connection to API
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "jtapi-demo-1"
+  authToken: "demo-token"
+
+# JTAPI configuration
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: DEBUG
+
+# Connection pool for demo
+connectionPool:
+  maxConnections: 5
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 10
+
+# Smaller resource allocation for demo
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Persistence for demo
+persistence:
+  jars:
+    enabled: true
+    size: 50Mi
+  audio:
+    enabled: true
+    size: 100Mi

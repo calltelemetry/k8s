@@ -1,0 +1,65 @@
+# JTAPI Sidecar Demo Values for CallTelemetry
+# Connects to the demo CUCM environment (192.168.125.10)
+#
+# Usage:
+#   helm install jtapi-sidecar ./helm/charts/jtapi-sidecar -f examples/jtapi-sidecar-demo-values.yaml
+#
+# Or with Tilt:
+#   JTAPI_VALUES=examples/jtapi-sidecar-demo-values.yaml ./tilt.sh up --dev=api,spa
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-sidecar
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: DEBUG
+
+# Demo CUCM credentials (192.168.125.10 - CUCM 15.0)
+cucm:
+  host: "192.168.125.10"
+  ctiPort: 2748
+  user: "ct-jtapi-user"
+  password: "tek1links"
+
+# WebSocket connection to CallTelemetry API
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "demo-jtapi-1"
+  authToken: "demo-token"
+  autoReconnect: true
+  reconnectDelay: 1000
+  maxReconnectAttempts: 0
+
+connectionPool:
+  maxConnections: 5
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 20
+
+persistence:
+  jars:
+    enabled: true
+    size: 100Mi
+  audio:
+    enabled: true
+    size: 500Mi
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
