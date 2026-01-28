@@ -9,6 +9,10 @@ service:
   type: ClusterIP
   port: 8080
 
+# gRPC server configuration (used by Elixir backend for call control)
+grpc:
+  port: 50051
+
 # JTAPI Sidecar configuration
 jtapi:
   port: 8080
