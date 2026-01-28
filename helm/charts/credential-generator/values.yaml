@@ -1,0 +1,66 @@
+# Credential Generator Helm Chart
+# Runs as pre-install hook to auto-generate secure credentials for infrastructure services
+# Only executes on NEW deployments (pre-install), not on upgrades
+
+# Enable/disable the credential generator job
+enabled: true
+
+# Job image configuration
+image:
+  repository: bitnami/kubectl
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Auto-generate credentials
+# If enabled, the job will create secrets if they don't already exist
+# All values below can be overridden to use specific credentials instead
+autoGenerate:
+  enabled: true
+
+# PostgreSQL credentials
+# Leave empty to auto-generate secure random passwords
+postgres:
+  # Username for PostgreSQL (default: calltelemetry)
+  username: ""
+  # Password for PostgreSQL (leave empty to auto-generate 32-char secure random)
+  password: ""
+  # Secret name where credentials are stored (default: postgres-credentials)
+  secretName: "postgres-credentials"
+
+# MinIO credentials
+# Leave empty to auto-generate secure random passwords
+minio:
+  # Root user for MinIO (default: minioadmin)
+  rootUser: ""
+  # Root password for MinIO (leave empty to auto-generate 32-char secure random)
+  rootPassword: ""
+  # Secret name where credentials are stored (default: minio-credentials)
+  secretName: "minio-credentials"
+
+# NATS credentials
+# Leave empty to auto-generate secure random passwords
+nats:
+  # Username for NATS (default: nats)
+  username: ""
+  # Password for NATS (leave empty to auto-generate 32-char secure random)
+  password: ""
+  # Secret name where credentials are stored (default: nats-credentials)
+  secretName: "nats-credentials"
+
+# Resource limits for the credential generator job
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Node selector (empty for dev)
+nodeSelector: {}
+
+# Tolerations (empty for dev)
+tolerations: []
+
+# Affinity rules (empty for dev)
+affinity: {}

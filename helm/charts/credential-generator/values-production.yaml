@@ -1,0 +1,97 @@
+# Credential Generator - Production Values
+# Deploy with: helm install credential-generator . -n prod-namespace -f values-production.yaml
+#
+# IMPORTANT: Do NOT commit actual passwords to Git!
+# Use environment variables or external secret management systems instead.
+# This file shows the structure for production deployments.
+
+# Enable credential generation
+enabled: true
+
+# Auto-generation (set to false to provide all credentials manually)
+autoGenerate:
+  enabled: true
+
+# Use a strong image with security patches
+image:
+  repository: bitnami/kubectl
+  tag: "1.28"  # Pin to specific version in prod
+  pullPolicy: IfNotPresent
+
+# PostgreSQL credentials
+# In production, provide STRONG passwords
+postgres:
+  # Username for PostgreSQL (override default 'calltelemetry')
+  # username: "prod_db_user"
+  
+  # Password for PostgreSQL
+  # DANGER: Do NOT put passwords in this file!
+  # Use environment variables or helm --set flag instead:
+  #   helm install ... --set postgres.password="$(openssl rand -base64 32)"
+  # Or use external secret management:
+  #   helm install ... --set postgres.password="${DB_PASSWORD}"
+  password: ""
+  
+  # Secret name where credentials are stored
+  secretName: "postgres-credentials"
+
+# MinIO credentials
+# In production, provide STRONG passwords
+minio:
+  # Root user for MinIO
+  # rootUser: "prod_minio_admin"
+  
+  # Root password for MinIO
+  # DANGER: Do NOT put passwords in this file!
+  rootPassword: ""
+  
+  # Secret name where credentials are stored
+  secretName: "minio-credentials"
+
+# NATS credentials
+# In production, provide STRONG passwords
+nats:
+  # Username for NATS
+  # username: "prod_nats_user"
+  
+  # Password for NATS
+  # DANGER: Do NOT put passwords in this file!
+  password: ""
+  
+  # Secret name where credentials are stored
+  secretName: "nats-credentials"
+
+# Resource limits (production)
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Node affinity for production (optional)
+# Ensure credential-generator runs on stable nodes
+nodeSelector: {}
+  # karpenter.sh/capacity-type: on-demand
+  # node-role: control-plane
+
+# Pod tolerations (optional)
+tolerations: []
+  # - key: "node-role"
+  #   operator: "Equal"
+  #   value: "control-plane"
+  #   effect: "NoSchedule"
+
+# Pod affinity (optional)
+# Prefer to run on nodes with specific labels
+affinity: {}
+  # podAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #   - labelSelector:
+  #       matchExpressions:
+  #       - key: app
+  #         operator: In
+  #         values:
+  #         - critical
+  #     topologyKey: kubernetes.io/hostname
