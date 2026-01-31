@@ -1,0 +1,46 @@
+# NATS Production Values
+# HA NATS cluster with persistent storage
+
+replicas: 3
+
+jetstream:
+  enabled: true
+  maxMemoryStore: "1GB"
+  maxFileStore: "10GB"
+
+storage:
+  type: pvc
+  size: 20Gi
+  # storageClass: "longhorn"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+exporter:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+monitoring:
+  enableServiceMonitor: true
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - nats
+        topologyKey: topology.kubernetes.io/zone

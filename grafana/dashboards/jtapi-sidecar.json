@@ -1,0 +1,223 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "title": "",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "panels": [],
+      "collapsed": false
+    },
+    {
+      "title": "CTI Pool Operational",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_cti_pool_operational", "legendFormat": "" }],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "OPERATIONAL", "color": "green" } } }] } }
+    },
+    {
+      "title": "CTI Ports In Use",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_cti_ports_in_use", "legendFormat": "in use" }],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 }
+    },
+    {
+      "title": "CTI Ports Idle",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_cti_ports_idle", "legendFormat": "idle" }],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" } } }
+    },
+    {
+      "title": "CTI Ports Error",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_cti_ports_error", "legendFormat": "error" }],
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] } } }
+    },
+    {
+      "title": "Active Streams",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_streams_active", "legendFormat": "active" }],
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 }
+    },
+    {
+      "title": "Streaming Mode",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "jtapi_streaming_available", "legendFormat": "" }],
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "STUB", "color": "yellow" }, "1": { "text": "REAL JTAPI", "color": "green" } } }] } }
+    },
+    {
+      "title": "Telephony",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "panels": [],
+      "collapsed": false
+    },
+    {
+      "title": "Calls Monitored",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(jtapi_calls_monitored_total[5m])", "legendFormat": "calls/s" },
+        { "expr": "jtapi_calls_monitored_total", "legendFormat": "total (cumulative)" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "fieldConfig": { "overrides": [{ "matcher": { "id": "byName", "options": "total (cumulative)" }, "properties": [{ "id": "custom.axisPlacement", "value": "right" }] }] }
+    },
+    {
+      "title": "Audio Injections",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(jtapi_injections_total{status=\"success\"}[5m])", "legendFormat": "success/s" },
+        { "expr": "rate(jtapi_injections_total{status=\"failed\"}[5m])", "legendFormat": "failed/s" },
+        { "expr": "rate(jtapi_injections_total{status=\"skipped\"}[5m])", "legendFormat": "skipped/s" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [{ "matcher": { "id": "byName", "options": "failed/s" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }] }
+    },
+    {
+      "title": "Injection Duration (P50/P95/P99)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "jtapi_injection_duration_seconds{quantile=\"0.5\"}", "legendFormat": "P50" },
+        { "expr": "jtapi_injection_duration_seconds{quantile=\"0.95\"}", "legendFormat": "P95" },
+        { "expr": "jtapi_injection_duration_seconds{quantile=\"0.99\"}", "legendFormat": "P99" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "CTI Port Pool Utilization",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "jtapi_cti_port_pool_size", "legendFormat": "pool size" },
+        { "expr": "jtapi_cti_ports_in_use", "legendFormat": "in use" },
+        { "expr": "jtapi_cti_ports_idle", "legendFormat": "idle" },
+        { "expr": "jtapi_cti_ports_error", "legendFormat": "error" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "fieldConfig": { "overrides": [{ "matcher": { "id": "byName", "options": "error" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }, { "matcher": { "id": "byName", "options": "pool size" }, "properties": [{ "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }] }] }
+    },
+    {
+      "title": "Streaming",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "panels": [],
+      "collapsed": false
+    },
+    {
+      "title": "Streams Started (Real vs Stub)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(jtapi_streams_started_total{mode=\"real\"}[5m])", "legendFormat": "real JTAPI" },
+        { "expr": "rate(jtapi_streams_started_total{mode=\"stub\"}[5m])", "legendFormat": "stub" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 23 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Streams Active / Stopped / Errors",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "jtapi_streams_active", "legendFormat": "active" },
+        { "expr": "rate(jtapi_streams_stopped_total[5m])", "legendFormat": "stopped/s" },
+        { "expr": "rate(jtapi_stream_errors_total[5m])", "legendFormat": "errors/s" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 23 },
+      "fieldConfig": { "overrides": [{ "matcher": { "id": "byName", "options": "errors/s" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }] }
+    },
+    {
+      "title": "Injection Success Rate",
+      "type": "gauge",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "(rate(jtapi_injections_total{status=\"success\"}[5m]) / (rate(jtapi_injections_total{status=\"success\"}[5m]) + rate(jtapi_injections_total{status=\"failed\"}[5m]))) * 100", "legendFormat": "" }],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 23 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "value": 0, "color": "red" }, { "value": 90, "color": "yellow" }, { "value": 99, "color": "green" }] } } }
+    },
+    {
+      "title": "JVM & HTTP",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "panels": [],
+      "collapsed": false
+    },
+    {
+      "title": "JVM Heap Memory",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "jvm_memory_used_bytes{job=\"jtapi-sidecar\", area=\"heap\"}", "legendFormat": "{{ id }} used" },
+        { "expr": "jvm_memory_max_bytes{job=\"jtapi-sidecar\", area=\"heap\"}", "legendFormat": "{{ id }} max" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 32 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "title": "JVM Threads",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "jvm_threads_live{job=\"jtapi-sidecar\"}", "legendFormat": "live" },
+        { "expr": "jvm_threads_peak{job=\"jtapi-sidecar\"}", "legendFormat": "peak" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 32 }
+    },
+    {
+      "title": "HTTP Request Duration by Endpoint",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(http_server_requests_seconds_sum{job=\"jtapi-sidecar\"}[5m]) / rate(http_server_requests_seconds_count{job=\"jtapi-sidecar\"}[5m])", "legendFormat": "{{ method }} {{ uri }}" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 32 },
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "GC Pause Duration",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "rate(jvm_gc_pause_seconds_sum{job=\"jtapi-sidecar\"}[5m])", "legendFormat": "{{ cause }}" }],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 40 },
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "process_cpu_usage{job=\"jtapi-sidecar\"}", "legendFormat": "process" },
+        { "expr": "system_cpu_usage{job=\"jtapi-sidecar\"}", "legendFormat": "system" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 40 },
+      "fieldConfig": { "defaults": { "unit": "percentunit" } }
+    },
+    {
+      "title": "Uptime",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "process_uptime_seconds{job=\"jtapi-sidecar\"}", "legendFormat": "" }],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 40 },
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["jtapi", "telephony", "cisco"],
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "JTAPI Sidecar",
+  "uid": "ct-jtapi-sidecar"
+}

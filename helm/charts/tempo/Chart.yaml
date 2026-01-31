@@ -1,0 +1,8 @@
+# Grafana Tempo Helm Chart for CallTelemetry
+# Single-binary trace storage backend with S3 (MinIO) storage
+apiVersion: v2
+name: tempo
+description: Grafana Tempo distributed tracing backend for CallTelemetry
+type: application
+version: 1.0.0
+appVersion: "2.6.1"

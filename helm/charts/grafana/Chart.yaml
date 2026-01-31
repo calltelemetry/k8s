@@ -1,0 +1,8 @@
+# Grafana Helm Chart for CallTelemetry
+# Lightweight Grafana deployment with Prometheus datasource
+apiVersion: v2
+name: grafana
+description: Grafana dashboard for CallTelemetry observability
+type: application
+version: 1.0.0
+appVersion: "latest"

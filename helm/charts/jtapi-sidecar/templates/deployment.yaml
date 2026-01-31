@@ -168,6 +168,9 @@ spec:
             {{- end }}
             {{- if .Values.otel.enabled }}
             # OpenTelemetry Configuration
+            # Spring Boot OTLP uses HTTP/protobuf - endpoint includes /v1/traces path
+            - name: OTEL_JAVAAGENT_ENABLED
+              value: {{ .Values.otel.javaagentEnabled | quote }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: {{ .Values.otel.endpoint | quote }}
             - name: OTEL_SERVICE_NAME

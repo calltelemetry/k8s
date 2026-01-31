@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jtapi-seed-audio
+  labels:
+    app.kubernetes.io/name: jtapi-seed-audio
+    app.kubernetes.io/component: setup
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jtapi-seed-audio
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: minio/mc:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              MINIO_URL="http://minio:9000"
+              
+              echo "Waiting for MinIO to be ready..."
+              for i in $(seq 1 30); do
+                if mc alias set myminio "$MINIO_URL" "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" 2>/dev/null; then
+                  if mc admin info myminio >/dev/null 2>&1; then
+                    echo "MinIO is ready!"
+                    break
+                  fi
+                fi
+                echo "Waiting for MinIO... ($i/30)"
+                sleep 2
+              done
+              
+              # Ensure bucket exists
+              mc mb myminio/ct-audio --ignore-existing
+              
+              # Upload greeting.wav from ConfigMap
+              echo "Uploading greeting.wav to ct-audio bucket..."
+              mc cp /seed-data/greeting.wav myminio/ct-audio/greeting.wav
+              
+              # Verify upload
+              echo "Verifying upload..."
+              mc ls myminio/ct-audio/greeting.wav
+              
+              echo "Audio seed complete!"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_PASSWORD
+          volumeMounts:
+            - name: seed-data
+              mountPath: /seed-data
+              readOnly: true
+      volumes:
+        - name: seed-data
+          configMap:
+            name: jtapi-seed-data

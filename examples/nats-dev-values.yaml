@@ -1,0 +1,11 @@
+# NATS Development Values
+# Single-node NATS with JetStream for development
+# All values here are defaults - this file documents the dev configuration
+
+# Uses chart defaults:
+# - replicas: 1
+# - jetstream.enabled: true
+# - jetstream.maxMemoryStore: "256MB"
+# - jetstream.maxFileStore: "1GB"
+# - storage.type: emptyDir
+# - exporter.enabled: true

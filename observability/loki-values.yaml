@@ -1,0 +1,15 @@
+# Loki values for dev observability stack
+# Single-binary mode, MinIO S3 backend, 7-day retention
+
+storage:
+  backend: s3
+  s3:
+    endpoint: "minio:9000"
+    bucketName: "loki-logs"
+    accessKey: "minioadmin"
+    secretKey: "minioadmin"
+    insecure: true
+    s3ForcePathStyle: true
+
+retention:
+  days: 7

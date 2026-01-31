@@ -1,0 +1,66 @@
+# PostgreSQL Helm Chart - Production Overrides
+# Use with: helm install postgresql ./postgresql -f values.yaml -f values-production.yaml
+
+cluster:
+  # HA configuration with 3 instances
+  instances: 3
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "2GB"
+      work_mem: "64MB"
+      maintenance_work_mem: "512MB"
+      effective_cache_size: "6GB"
+      # Write-ahead logging for PITR
+      wal_level: replica
+      archive_mode: "on"
+
+  storage:
+    size: 100Gi
+    # Recommended: use a fast storage class
+    # storageClass: "longhorn"
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+
+  # Spread pods across availability zones
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - postgresql
+          topologyKey: topology.kubernetes.io/zone
+
+# Use existing secret for credentials in production
+existingSecret: postgresql-credentials
+
+# Enable backups for production
+backup:
+  enabled: true
+  schedule: "0 0 * * *"  # Daily at midnight
+  retentionPolicy: "30d"
+  s3:
+    bucket: calltelemetry-pg-backups
+    endpoint: s3.amazonaws.com
+    region: us-east-1
+    existingSecret: postgresql-s3-credentials
+
+# Enable connection pooler for production
+pooler:
+  enabled: true
+  instances: 2
+  type: rw
+  poolMode: transaction
+  parameters:
+    default_pool_size: "50"
+    max_client_conn: "2000"

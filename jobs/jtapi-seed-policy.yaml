@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jtapi-seed-policy
+  labels:
+    app.kubernetes.io/name: jtapi-seed-policy
+    app.kubernetes.io/component: setup
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jtapi-seed-policy
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: nats-setup
+          image: natsio/nats-box:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              NATS_URL="${NATS_URL:-nats://nats:4222}"
+              ORG_ID="${ORG_ID:-default}"
+              BUCKET_NAME="jtapi-greeting-policies-${ORG_ID}"
+              POLICY_KEY="${ORG_ID}.default-greeting"
+              
+              echo "Connecting to NATS at $NATS_URL"
+              
+              # Wait for NATS to be ready
+              echo "Waiting for NATS..."
+              for i in $(seq 1 30); do
+                if nats server check connection -s "$NATS_URL" 2>/dev/null; then
+                  echo "NATS is ready!"
+                  break
+                fi
+                echo "Waiting for NATS... ($i/30)"
+                sleep 2
+              done
+              
+              # Create KV bucket for greeting policies (idempotent)
+              echo "Creating KV bucket: $BUCKET_NAME"
+              nats kv add "$BUCKET_NAME" \
+                --server="$NATS_URL" \
+                --history=5 \
+                --replicas=1 \
+                2>/dev/null || echo "KV bucket may already exist"
+              
+              # Seed default policy
+              # Check if policy already exists
+              if nats kv get "$BUCKET_NAME" "$POLICY_KEY" -s "$NATS_URL" >/dev/null 2>&1; then
+                echo "Policy '$POLICY_KEY' already exists, skipping seed"
+              else
+                echo "Seeding default greeting policy..."
+                cat /seed-data/default-policy.pb | nats kv put "$BUCKET_NAME" "$POLICY_KEY" -s "$NATS_URL"
+                echo "Policy '$POLICY_KEY' seeded successfully"
+              fi
+              
+              # Verify
+              echo "Verifying KV bucket contents..."
+              nats kv ls "$BUCKET_NAME" -s "$NATS_URL"
+              
+              echo "Policy seed complete!"
+          env:
+            - name: NATS_URL
+              value: "nats://nats:4222"
+            - name: ORG_ID
+              value: "default"
+          volumeMounts:
+            - name: seed-data
+              mountPath: /seed-data
+              readOnly: true
+      volumes:
+        - name: seed-data
+          configMap:
+            name: jtapi-seed-data

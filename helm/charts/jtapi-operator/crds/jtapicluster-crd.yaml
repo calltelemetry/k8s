@@ -1,0 +1,368 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: jtapiclusters.calltelemetry.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.0
+spec:
+  group: calltelemetry.com
+  names:
+    kind: JtapiCluster
+    listKind: JtapiClusterList
+    plural: jtapiclusters
+    singular: jtapicluster
+    shortNames:
+      - jtc
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.replicas
+        - name: Ready
+          type: integer
+          jsonPath: .status.readyReplicas
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          description: JtapiCluster manages a cluster of JTAPI sidecar pods for a single organization.
+          type: object
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: Desired state of the JTAPI sidecar cluster.
+              type: object
+              required:
+                - replicas
+                - org
+                - cucm
+              properties:
+                replicas:
+                  description: Number of JTAPI sidecar pods.
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  default: 1
+                org:
+                  description: Organization binding.
+                  type: object
+                  required:
+                    - id
+                    - natsUrl
+                  properties:
+                    id:
+                      type: string
+                    natsUrl:
+                      type: string
+                    serverId:
+                      type: string
+                      default: "default"
+                cucm:
+                  description: Cisco UCM connection configuration.
+                  type: object
+                  required:
+                    - credentialsSecret
+                    - nodes
+                  properties:
+                    credentialsSecret:
+                      description: K8s Secret name containing username and password keys.
+                      type: string
+                    nodes:
+                      type: array
+                      items:
+                        type: object
+                        required:
+                          - hostname
+                          - role
+                        properties:
+                          hostname:
+                            type: string
+                          role:
+                            type: string
+                            enum: [publisher, subscriber]
+                          priority:
+                            type: integer
+                            format: int32
+                            default: 1
+                    version:
+                      type: string
+                sharding:
+                  description: Shard distribution configuration.
+                  type: object
+                  properties:
+                    totalShards:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 256
+                    strategy:
+                      type: string
+                      enum: [even, sticky-even, weighted]
+                      default: even
+                dryRun:
+                  description: Compute assignments without applying changes.
+                  type: boolean
+                  default: false
+                image:
+                  description: Container image for JTAPI sidecar pods.
+                  type: object
+                  properties:
+                    repository:
+                      type: string
+                      default: "calltelemetry/jtapi-sidecar"
+                    tag:
+                      type: string
+                      default: "latest"
+                    pullPolicy:
+                      type: string
+                      enum: [Always, IfNotPresent, Never]
+                      default: IfNotPresent
+                resources:
+                  description: Compute resources for each pod.
+                  type: object
+                  properties:
+                    limits:
+                      type: object
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        x-kubernetes-int-or-string: true
+                    requests:
+                      type: object
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        x-kubernetes-int-or-string: true
+                jarDistribution:
+                  description: JAR file distribution via NATS ObjectStore init containers.
+                  type: object
+                  properties:
+                    enabled:
+                      description: Whether JAR distribution is active. Defaults to true.
+                      type: boolean
+                      default: true
+                    objectStoreBucket:
+                      description: NATS ObjectStore bucket name. Auto-derived as jtapi-jars-{org.id} if empty.
+                      type: string
+                    objectName:
+                      description: Object key in the bucket.
+                      type: string
+                      default: "jtapi.jar"
+                    initImage:
+                      description: Container image for the init container.
+                      type: string
+                      default: "natsio/nats-box:0.14.5"
+                    timeoutSeconds:
+                      description: Download timeout in seconds.
+                      type: integer
+                      format: int32
+                      default: 120
+                    jarPath:
+                      description: Mount path for JARs inside the container.
+                      type: string
+                      default: "/app/jars"
+                    jarVersion:
+                      description: SHA256 of current JAR content. Set by API on upload to trigger rolling restart.
+                      type: string
+                storage:
+                  description: MinIO/S3 credentials for audio file storage.
+                  type: object
+                  properties:
+                    type:
+                      description: Storage type - minio or s3. Defaults to minio.
+                      type: string
+                      enum: [minio, s3]
+                      default: minio
+                    endpoint:
+                      description: Storage server endpoint (e.g., minio.namespace.svc.cluster.local:9000).
+                      type: string
+                    bucket:
+                      description: Storage bucket name (e.g., ct-audio).
+                      type: string
+                    credentialsSecret:
+                      description: K8s Secret name containing accessKey and secretKey keys.
+                      type: string
+                    useSSL:
+                      description: Enable TLS/SSL for storage connections. Defaults to false.
+                      type: boolean
+                      default: false
+                    region:
+                      description: AWS region for S3 storage. Only used when type is s3.
+                      type: string
+                autoScaling:
+                  description: Automatic replica scaling based on device count.
+                  type: object
+                  properties:
+                    enabled:
+                      description: Enable automatic scaling.
+                      type: boolean
+                      default: false
+                    minReplicas:
+                      description: Minimum number of replicas.
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 1
+                    maxReplicas:
+                      description: Maximum number of replicas.
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 10
+                    devicesPerPod:
+                      description: Target devices per pod for scaling.
+                      type: integer
+                      format: int32
+                      default: 1000
+                    scaleUpThresholdPercent:
+                      description: Scale up when utilization exceeds this percent.
+                      type: integer
+                      format: int32
+                      default: 110
+                    scaleDownThresholdPercent:
+                      description: Scale down when utilization drops below this percent.
+                      type: integer
+                      format: int32
+                      default: 80
+                    cooldownSeconds:
+                      description: Cooldown period between scaling actions.
+                      type: integer
+                      format: int32
+                      default: 300
+                ctiPorts:
+                  description: CTI port pool configuration for audio injection.
+                  type: object
+                  properties:
+                    enabled:
+                      description: Enable automatic CTI pool configuration.
+                      type: boolean
+                      default: false
+                    autoConnect:
+                      description: Auto-connect to CUCM on startup.
+                      type: boolean
+                      default: false
+                    source:
+                      description: Source for CTI port configs - static or nats.
+                      type: string
+                      enum: [static, nats]
+                      default: static
+                    enableMedia:
+                      description: Enable G.711 media capabilities on CTI ports.
+                      type: boolean
+                      default: true
+                    maxRetries:
+                      description: Max retry attempts for port registration.
+                      type: integer
+                      format: int32
+                      default: 3
+                    retryDelayMs:
+                      description: Delay between retries in milliseconds.
+                      type: integer
+                      format: int32
+                      default: 5000
+                    static:
+                      description: Static CTI port configuration.
+                      type: object
+                      properties:
+                        ports:
+                          description: List of CTI ports to register.
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - deviceName
+                              - directoryNumber
+                            properties:
+                              deviceName:
+                                description: CTI port device name (e.g., CT-JTAPI0001).
+                                type: string
+                              directoryNumber:
+                                description: Directory number for the CTI port.
+                                type: string
+                    nats:
+                      description: NATS KV-based CTI port configuration.
+                      type: object
+                      properties:
+                        bucket:
+                          description: NATS KV bucket name for port configs.
+                          type: string
+                        key:
+                          description: Key within the bucket for port list.
+                          type: string
+                          default: "ports"
+                        pollInterval:
+                          description: How often to poll for updates.
+                          type: string
+                          default: "30s"
+            status:
+              description: Observed state of the JTAPI sidecar cluster.
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Pending, Running, Degraded, Failed]
+                replicas:
+                  type: integer
+                  format: int32
+                readyReplicas:
+                  type: integer
+                  format: int32
+                shardAssignments:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      start:
+                        type: integer
+                        format: int32
+                      end:
+                        type: integer
+                        format: int32
+                      deviceCount:
+                        type: integer
+                        format: int32
+                assignmentVersion:
+                  type: integer
+                  format: int64
+                assignmentHash:
+                  type: string
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum: ["True", "False", "Unknown"]
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string

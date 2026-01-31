@@ -1,0 +1,122 @@
+# Production Values for jtapi-operator
+# High availability, production-grade resource allocation
+
+replicaCount: 2
+
+image:
+  repository: calltelemetry/jtapi-operator
+  tag: "0.1.0"  # Should match Chart.appVersion
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: jtapi-operator
+  annotations: {}
+
+rbac:
+  create: true
+
+# Leader election for HA deployment
+leaderElection:
+  enabled: true
+
+# NATS connection
+nats:
+  url: "nats://nats:4222"
+
+# Production-grade resource allocation
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 2000m
+    memory: 1Gi
+
+# Pod Disruption Budget for high availability
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Security context for pod
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container security context
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Node affinity for stable deployments
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Tolerations for production nodes
+tolerations: []
+
+# Pod anti-affinity to spread replicas across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - jtapi-operator
+          topologyKey: kubernetes.io/hostname
+
+# Liveness and readiness probe settings
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8081
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8081
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Pod annotations for metrics and monitoring
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8443"
+  prometheus.io/path: "/metrics"
+
+# Service monitor for Prometheus (if using Prometheus Operator)
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+
+# Logging configuration
+logging:
+  level: "warn"   # debug, info, warn, error - warn for production
+  format: "json"  # json or console - json for production log aggregation
+
+# Environment variables
+env: []
+# - name: FEATURE_FLAG
+#   value: "true"

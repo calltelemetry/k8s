@@ -1,0 +1,40 @@
+# PostgreSQL Development Values
+# Single instance, small resources, no backups
+
+image:
+  repository: calltelemetry/postgres
+  tag: "17"
+
+cluster:
+  instances: 1
+
+  postgresql:
+    database: calltelemetry
+    username: calltelemetry
+    password: calltelemetry_dev_password
+    shared_preload_libraries:
+      - timescaledb
+      - pg_ivm
+    parameters:
+      max_connections: "100"
+      shared_buffers: "256MB"
+
+  storage:
+    size: 5Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+backup:
+  enabled: false
+
+monitoring:
+  enablePodMonitor: true
+
+pooler:
+  enabled: false

@@ -1,0 +1,54 @@
+# NATS Helm Chart - Production Overrides
+# Use with: helm install nats ./nats -f values.yaml -f values-production.yaml
+
+# HA configuration with 3 replicas
+replicas: 3
+
+# JetStream configuration for production
+jetstream:
+  enabled: true
+  maxMemoryStore: "1GB"
+  maxFileStore: "10GB"
+
+# Use persistent storage for production
+storage:
+  type: pvc
+  size: 20Gi
+  # Recommended: use a fast storage class
+  # storageClass: "longhorn"
+
+# Production resource limits
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+# Exporter resources for production
+exporter:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+# Enable ServiceMonitor for Prometheus Operator
+monitoring:
+  enableServiceMonitor: true
+
+# Spread pods across availability zones
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - nats
+        topologyKey: topology.kubernetes.io/zone

@@ -1,0 +1,59 @@
+{{/*
+Grafana Loki Configuration
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "loki.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "loki.labels" . | nindent 4 }}
+data:
+  loki.yaml: |
+    auth_enabled: false
+
+    server:
+      http_listen_port: {{ .Values.server.httpPort }}
+      grpc_listen_port: {{ .Values.server.grpcPort }}
+
+    common:
+      path_prefix: /var/loki
+      storage:
+        s3:
+          endpoint: {{ .Values.storage.s3.endpoint }}
+          bucketnames: {{ .Values.storage.s3.bucketName }}
+          access_key_id: {{ .Values.storage.s3.accessKey }}
+          secret_access_key: {{ .Values.storage.s3.secretKey }}
+          insecure: {{ .Values.storage.s3.insecure }}
+          s3forcepathstyle: {{ .Values.storage.s3.s3ForcePathStyle }}
+      replication_factor: 1
+      ring:
+        instance_addr: 127.0.0.1
+        kvstore:
+          store: inmemory
+
+    schema_config:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+    limits_config:
+      retention_period: {{ .Values.retention.days }}d
+      allow_structured_metadata: true
+
+    compactor:
+      working_directory: /var/loki/compactor
+      delete_request_store: s3
+      retention_enabled: true
+
+    query_range:
+      results_cache:
+        cache:
+          embedded_cache:
+            enabled: true
+            max_size_mb: 100

@@ -1,0 +1,24 @@
+apiVersion: v2
+name: jtapi-operator
+description: Kubernetes operator for managing JTAPI sidecar clusters via JtapiCluster CRD
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+keywords:
+  - jtapi
+  - operator
+  - kubernetes
+  - cisco
+  - call-control
+sources:
+  - https://github.com/calltelemetry/conductor/tree/main/jtapi-operator
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC
+  - email: engineering@calltelemetry.com
+    name: Call Telemetry Engineering
+annotations:
+  category: Integration
+  licenses: Apache-2.0

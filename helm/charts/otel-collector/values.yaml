@@ -1,0 +1,70 @@
+# OpenTelemetry Collector - Development Defaults
+
+# Override the full name - defaults to "otel-collector" for simple service name
+fullnameOverride: "otel-collector"
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# OTLP receiver configuration
+receivers:
+  grpc:
+    port: 4317
+  http:
+    port: 4318
+
+# Processors configuration
+processors:
+  batch:
+    timeout: 10s
+    sendBatchSize: 1024
+  memoryLimiter:
+    checkInterval: 1s
+    limitMib: 256
+    spikeLimitMib: 64
+
+# Exporters configuration
+exporters:
+  prometheus:
+    port: 8889
+    namespace: claude_code
+  debug:
+    verbosity: basic
+  # OTLP HTTP exporter for Tempo (traces)
+  otlphttp:
+    enabled: false
+    endpoint: "http://tempo:4318"
+
+# Pipeline configuration
+pipelines:
+  metrics:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [prometheus, debug]
+  traces:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [debug]
+  logs:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [debug]
+
+# Service configuration
+service:
+  type: ClusterIP
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

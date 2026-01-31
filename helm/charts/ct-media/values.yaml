@@ -1,0 +1,54 @@
+# ct-media Helm Chart - Development Defaults
+# Rust gRPC audio transcoding service
+
+# Override the full name - defaults to "ct-media" for simple service name
+fullnameOverride: "ct-media"
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/ct-media
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50053
+
+# MinIO/S3 Configuration
+minio:
+  endpoint: "minio:9000"
+  accessKey: "minioadmin"
+  secretKey: "minioadmin"
+  # Use existing secret instead of inline credentials (recommended for production)
+  existingSecret: ""
+  bucket: "ct-audio"
+  secure: false
+
+# Logging configuration
+logging:
+  rustLog: "info,ct_media=debug"
+
+# OpenTelemetry configuration
+otel:
+  enabled: true
+  serviceName: "ct-media"
+  # Endpoint auto-resolves within namespace
+  endpoint: "http://otel-collector:4317"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Security context (empty for dev, set for production)
+securityContext: {}

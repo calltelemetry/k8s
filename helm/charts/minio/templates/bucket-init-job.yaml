@@ -5,12 +5,15 @@ metadata:
   name: {{ include "minio.fullname" . }}-bucket-init
   labels:
     {{- include "minio.labels" . | nindent 4 }}
+  {{- if .Values.bucketInit.useHelmHooks }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+  {{- end }}
 spec:
   ttlSecondsAfterFinished: 300
+  backoffLimit: 5
   template:
     metadata:
       labels:

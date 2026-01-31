@@ -1,0 +1,151 @@
+{{/*
+CloudNativePG Cluster CRD
+This creates a PostgreSQL cluster managed by the CloudNativePG operator.
+For dev: instances: 1 - single node, simple
+For prod: instances: 3+ - automatic HA with streaming replication
+*/}}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "postgresql.clusterName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+spec:
+  # Number of instances (1 for dev, 3+ for HA)
+  instances: {{ .Values.cluster.instances }}
+
+  # Custom CallTelemetry image with pg_ivm + TimescaleDB
+  imageName: {{ include "postgresql.image" . }}
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+  # Primary update strategy
+  primaryUpdateStrategy: {{ .Values.cluster.primaryUpdateStrategy }}
+
+  # PostgreSQL configuration
+  postgresql:
+    parameters:
+      {{- include "postgresql.parameters" . | nindent 6 }}
+
+  # Bootstrap configuration - create database and user
+  bootstrap:
+    initdb:
+      database: {{ .Values.cluster.postgresql.database }}
+      owner: {{ .Values.cluster.postgresql.username }}
+      {{- if not .Values.existingSecret }}
+      secret:
+        name: {{ include "postgresql.secretName" . }}
+      {{- end }}
+      {{- if .Values.initSql }}
+      postInitSQL:
+        {{- range .Values.initSql }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- end }}
+
+  # Superuser secret (for postgres user)
+  superuserSecret:
+    name: {{ include "postgresql.secretName" . }}
+
+  # Storage configuration
+  storage:
+    size: {{ .Values.cluster.storage.size }}
+    {{- if .Values.cluster.storage.storageClass }}
+    storageClass: {{ .Values.cluster.storage.storageClass }}
+    {{- end }}
+
+  # Resource limits
+  resources:
+    requests:
+      cpu: {{ .Values.cluster.resources.requests.cpu }}
+      memory: {{ .Values.cluster.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.cluster.resources.limits.cpu }}
+      memory: {{ .Values.cluster.resources.limits.memory }}
+
+  # Startup/stop delays
+  startDelay: {{ .Values.cluster.startDelay }}
+  stopDelay: {{ .Values.cluster.stopDelay }}
+
+  {{- if .Values.cluster.affinity }}
+  # Affinity rules
+  affinity:
+    {{- toYaml .Values.cluster.affinity | nindent 4 }}
+  {{- end }}
+
+  {{- if .Values.cluster.nodeSelector }}
+  # Node selector
+  nodeSelector:
+    {{- toYaml .Values.cluster.nodeSelector | nindent 4 }}
+  {{- end }}
+
+  {{- if .Values.cluster.tolerations }}
+  # Tolerations
+  tolerations:
+    {{- toYaml .Values.cluster.tolerations | nindent 4 }}
+  {{- end }}
+
+  {{- if .Values.backup.enabled }}
+  # Backup configuration
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://{{ .Values.backup.s3.bucket }}/{{ include "postgresql.clusterName" . }}
+      endpointURL: https://{{ .Values.backup.s3.endpoint }}
+      s3Credentials:
+        accessKeyId:
+          name: {{ include "postgresql.backupSecretName" . }}
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: {{ include "postgresql.backupSecretName" . }}
+          key: ACCESS_SECRET_KEY
+      {{- if .Values.backup.s3.region }}
+      region: {{ .Values.backup.s3.region }}
+      {{- end }}
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: {{ .Values.backup.retentionPolicy | quote }}
+  {{- end }}
+
+  {{- if .Values.monitoring.enablePodMonitor }}
+  # Monitoring configuration
+  monitoring:
+    enablePodMonitor: true
+  {{- end }}
+
+---
+{{/*
+Secret for database credentials (only if not using existingSecret)
+*/}}
+{{- if not .Values.existingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "postgresql.secretName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+type: kubernetes.io/basic-auth
+stringData:
+  username: {{ .Values.cluster.postgresql.username }}
+  password: {{ .Values.cluster.postgresql.password }}
+{{- end }}
+
+{{/*
+Additional databases (if specified)
+*/}}
+{{- range .Values.additionalDatabases }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgresql.fullname" $ }}-init-{{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" $ | nindent 4 }}
+data:
+  init.sql: |
+    SELECT 'CREATE DATABASE {{ .name }} OWNER {{ .owner | default $.Values.cluster.postgresql.username }}'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .name }}')\gexec
+{{- end }}

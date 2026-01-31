@@ -1,0 +1,27 @@
+{{/*
+Grafana Tempo Service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tempo.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tempo.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.server.httpPort }}
+      targetPort: http
+      name: http
+    - port: {{ .Values.server.grpcPort }}
+      targetPort: grpc
+      name: grpc
+    - port: {{ .Values.receiver.otlp.grpcPort }}
+      targetPort: otlp-grpc
+      name: otlp-grpc
+    - port: {{ .Values.receiver.otlp.httpPort }}
+      targetPort: otlp-http
+      name: otlp-http
+  selector:
+    {{- include "tempo.selectorLabels" . | nindent 4 }}

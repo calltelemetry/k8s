@@ -1,28 +1,60 @@
+# vue-web Helm Chart - CallTelemetry Defaults
+# Vue 3/Quasar SPA served by Caddy
+
+# Override the full name - "ct-vue" is the canonical service name
+fullnameOverride: "ct-vue"
+
 replicaCount: 1
-environment: prod
-vue_web:
-  image:
-    repository: calltelemetry/vue
-    tag: 0.8.5-rc19
-    pullPolicy: Always
-  port: 80
-  LogLevel: "INFO"  # Can be set to INFO, DEBUG, etc.
+
+image:
+  repository: calltelemetry/ct-quasar
+  tag: latest
+  pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
   port: 80
-  targetPort: 9000
 
+# Caddy log level
+logLevel: "INFO"
+
+# API backend URL (used for runtime config injection)
+api:
+  # Service name of the backend API
+  service: "admin-service"
+  port: 4000
+
+# Ingress configuration (disabled for dev, enabled for production)
 ingress:
-  enabled: true
-  annotations:
-    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+  enabled: false
+  ingressClassName: ""
+  annotations: {}
   hosts:
-    - host: dev.calltelemetry.com
-      paths: ['/', '/#']
-  tls:
-    - secretName: dev.calltelemetry.com
-      hosts:
-        - dev.calltelemetry.com
+    - host: app.calltelemetry.com
+      paths: ["/"]
+  tls: []
 
-resources: {}
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Health check configuration
+healthCheck:
+  liveness:
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readiness:
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 5

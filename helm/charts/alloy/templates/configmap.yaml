@@ -1,0 +1,70 @@
+{{/*
+Grafana Alloy Configuration (River format)
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "alloy.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "alloy.labels" . | nindent 4 }}
+data:
+  config.alloy: |
+    // Discover K8s pods in the same namespace
+    discovery.kubernetes "pods" {
+      role = "pod"
+      namespaces {
+        names = [env("NAMESPACE")]
+      }
+    }
+
+    // Relabel discovered targets to extract useful metadata
+    discovery.relabel "pod_logs" {
+      targets = discovery.kubernetes.pods.targets
+
+      // Keep only pods with containers
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        action        = "keep"
+        regex         = ".+"
+      }
+
+      // Set the log file path
+      rule {
+        source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+        target_label  = "__path__"
+        separator     = "/"
+        replacement   = "/var/log/pods/*$1/$2/*.log"
+      }
+
+      // Add pod labels
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        target_label  = "app"
+      }
+    }
+
+    // Read log files from discovered pods
+    loki.source.kubernetes "pod_logs" {
+      targets    = discovery.relabel.pod_logs.output
+      forward_to = [loki.write.default.receiver]
+    }
+
+    // Push logs to Loki
+    loki.write "default" {
+      endpoint {
+        url = {{ .Values.loki.endpoint | quote }}
+      }
+    }

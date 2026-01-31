@@ -1,0 +1,21 @@
+{{/*
+Grafana Loki Service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "loki.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "loki.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.server.httpPort }}
+      targetPort: http
+      name: http
+    - port: {{ .Values.server.grpcPort }}
+      targetPort: grpc
+      name: grpc
+  selector:
+    {{- include "loki.selectorLabels" . | nindent 4 }}

@@ -1,0 +1,8 @@
+# Prometheus Helm Chart for CallTelemetry
+# Lightweight Prometheus deployment for dev observability
+apiVersion: v2
+name: prometheus
+description: Prometheus metrics server for CallTelemetry observability
+type: application
+version: 1.0.0
+appVersion: "latest"

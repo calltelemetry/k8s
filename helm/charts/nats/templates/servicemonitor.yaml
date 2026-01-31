@@ -1,0 +1,21 @@
+{{/*
+ServiceMonitor for Prometheus Operator
+Only created when monitoring.enableServiceMonitor is true
+*/}}
+{{- if and .Values.exporter.enabled .Values.monitoring.enableServiceMonitor }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "nats.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nats.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "nats.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+{{- end }}

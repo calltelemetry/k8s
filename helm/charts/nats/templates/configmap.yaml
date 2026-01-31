@@ -1,0 +1,32 @@
+{{/*
+NATS Server Configuration ConfigMap
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nats.configMapName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nats.labels" . | nindent 4 }}
+data:
+  nats.conf: |
+    # NATS Server Configuration
+    port: {{ .Values.config.port }}
+    http_port: {{ .Values.config.httpPort }}
+
+    {{- if .Values.jetstream.enabled }}
+    # JetStream Configuration
+    jetstream {
+      store_dir: {{ .Values.jetstream.storeDir }}
+      max_memory_store: {{ .Values.jetstream.maxMemoryStore }}
+      max_file_store: {{ .Values.jetstream.maxFileStore }}
+    }
+    {{- end }}
+
+    # Logging
+    debug: {{ .Values.config.debug }}
+    trace: {{ .Values.config.trace }}
+    logtime: {{ .Values.config.logtime }}
+
+    # Limits
+    max_payload: {{ .Values.config.maxPayload }}

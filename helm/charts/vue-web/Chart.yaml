@@ -1,5 +1,10 @@
 apiVersion: v2
-version: 0.1.6
-appVersion: 0.8.5-rc19
-name: ct-web
-description: Call Telemetry Web Portal
+name: vue-web
+description: CallTelemetry Vue/Quasar Web Portal - Caddy-served SPA
+type: application
+version: 1.0.0
+appVersion: "0.8.5"
+home: https://calltelemetry.com/
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC

@@ -1,0 +1,113 @@
+{{/*
+NATS Server Deployment
+Includes optional Prometheus exporter sidecar
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nats.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nats.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "nats.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "nats.selectorLabels" . | nindent 8 }}
+      annotations:
+        # Force pod restart when config changes
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        # NATS Server
+        - name: nats
+          image: {{ include "nats.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.config.port }}
+              name: client
+            - containerPort: {{ .Values.config.httpPort }}
+              name: monitor
+          args:
+            - "--config"
+            - "/etc/nats/nats.conf"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nats
+            {{- if .Values.jetstream.enabled }}
+            - name: data
+              mountPath: {{ .Values.jetstream.storeDir }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.config.httpPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.config.httpPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+        {{- if .Values.exporter.enabled }}
+        # Prometheus NATS Exporter sidecar
+        - name: nats-exporter
+          image: {{ include "nats.exporterImage" . }}
+          imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
+          args:
+            {{- range .Values.exporter.flags }}
+            - {{ . | quote }}
+            {{- end }}
+            - "http://localhost:{{ .Values.config.httpPort }}"
+          ports:
+            - containerPort: 7777
+              name: metrics
+          resources:
+            {{- toYaml .Values.exporter.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 7777
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 7777
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        {{- end }}
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "nats.configMapName" . }}
+        {{- if .Values.jetstream.enabled }}
+        - name: data
+          {{- if eq .Values.storage.type "pvc" }}
+          persistentVolumeClaim:
+            claimName: {{ include "nats.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- end }}

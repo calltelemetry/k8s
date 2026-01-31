@@ -1,0 +1,18 @@
+{{/*
+Grafana Alloy Service (for health checks / API)
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "alloy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "alloy.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.server.httpPort }}
+      targetPort: http
+      name: http
+  selector:
+    {{- include "alloy.selectorLabels" . | nindent 4 }}

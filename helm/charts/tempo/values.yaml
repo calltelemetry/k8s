@@ -1,0 +1,51 @@
+# Grafana Tempo - Development Defaults
+# Single-binary mode with MinIO S3 backend
+
+fullnameOverride: "tempo"
+
+image:
+  repository: grafana/tempo
+  tag: "2.6.1"
+  pullPolicy: IfNotPresent
+
+# S3 storage backend (MinIO)
+storage:
+  backend: s3
+  s3:
+    endpoint: "minio:9000"
+    bucket: "tempo-traces"
+    accessKey: "minioadmin"
+    secretKey: "minioadmin"
+    insecure: true
+
+# Trace retention
+retention:
+  days: 7
+
+# Server configuration
+server:
+  httpPort: 3200
+  grpcPort: 9095
+
+# OTLP receiver (receives traces from OTel Collector)
+receiver:
+  otlp:
+    grpcPort: 4317
+    httpPort: 4318
+
+# Service configuration
+service:
+  type: ClusterIP
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

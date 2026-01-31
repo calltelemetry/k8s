@@ -1,0 +1,102 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Trace Waterfall",
+      "type": "traces",
+      "gridPos": { "h": 14, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "tempo", "uid": "${DS_TEMPO}" },
+      "targets": [
+        {
+          "query": "{rootServiceName=~\".+\" && span.correlation_id=\"${correlation_id}\"}",
+          "queryType": "traceql",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Correlated Logs",
+      "type": "logs",
+      "gridPos": { "h": 14, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "loki", "uid": "${DS_LOKI}" },
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true,
+        "enableLogDetails": true
+      },
+      "targets": [
+        {
+          "expr": "{job=~\"cisco-cdr|jtapi-sidecar|ct-media\"} |= `${correlation_id}`",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Injection Events Timeline",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "points", "pointSize": 8 }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "greeting_injection_count_total",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["calltelemetry", "greeting", "tracing"],
+  "templating": {
+    "list": [
+      {
+        "current": { "text": "", "value": "" },
+        "hide": 0,
+        "label": "Correlation ID",
+        "name": "correlation_id",
+        "options": [],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {},
+        "hide": 0,
+        "name": "DS_TEMPO",
+        "type": "datasource",
+        "query": "tempo"
+      },
+      {
+        "current": {},
+        "hide": 0,
+        "name": "DS_LOKI",
+        "type": "datasource",
+        "query": "loki"
+      },
+      {
+        "current": {},
+        "hide": 0,
+        "name": "DS_PROMETHEUS",
+        "type": "datasource",
+        "query": "prometheus"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "CallTelemetry - Greeting Injection Timeline",
+  "uid": "ct-greeting-timeline",
+  "version": 1
+}
