@@ -1,0 +1,34 @@
+# JTAPI Operator Development Values for CallTelemetry
+# Usage: helm install jtapi-operator ./helm/charts/jtapi-operator -f examples/jtapi-operator-ct-dev-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-operator
+  tag: latest
+  pullPolicy: Always
+
+serviceAccount:
+  create: true
+  name: jtapi-operator
+
+# Development: Disable leader election to avoid contention in single-replica setup
+leaderElection:
+  enabled: false
+
+# NATS connection for operator coordination
+nats:
+  url: "nats://nats:4222"
+
+# Development: Minimal resource requests
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

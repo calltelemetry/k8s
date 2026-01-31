@@ -1,0 +1,42 @@
+# ct-media production values
+replicaCount: 2
+
+image:
+  repository: calltelemetry/ct-media
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50053
+
+# MinIO configuration for production
+minio:
+  endpoint: "minio:9000"
+  # Reference the minio credentials secret
+  existingSecret: "ct-minio-credentials"
+  bucket: "ct-audio"
+  secure: false
+
+# Info logging in production
+logging:
+  rustLog: "info,ct_media=debug"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+# Production tolerations for node issues
+tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 30
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 30

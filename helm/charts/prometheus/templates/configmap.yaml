@@ -1,0 +1,75 @@
+{{/*
+Prometheus Configuration ConfigMap
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "prometheus.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "prometheus.labels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.config.scrapeInterval }}
+      evaluation_interval: {{ .Values.config.evaluationInterval }}
+
+    scrape_configs:
+      {{- if .Values.scrapeTargets.otelCollector.enabled }}
+      - job_name: 'otel-collector'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "otel-collector" .Values.scrapeTargets.otelCollector.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.prometheus.enabled }}
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:{{ .Values.scrapeTargets.prometheus.port }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.nats.enabled }}
+      # NATS metrics via prometheus-nats-exporter sidecar
+      - job_name: 'nats'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "nats" .Values.scrapeTargets.nats.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.minio.enabled }}
+      # MinIO metrics - cluster metrics
+      - job_name: 'minio'
+        metrics_path: {{ .Values.scrapeTargets.minio.metricsPath }}
+        scheme: http
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "minio" .Values.scrapeTargets.minio.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.minioBucket.enabled }}
+      # MinIO bucket metrics
+      - job_name: 'minio-bucket'
+        metrics_path: {{ .Values.scrapeTargets.minioBucket.metricsPath }}
+        scheme: http
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "minio" .Values.scrapeTargets.minioBucket.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.postgresql.enabled }}
+      # PostgreSQL metrics via postgres-exporter sidecar
+      - job_name: 'postgresql'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "postgresql" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.caddy.enabled }}
+      # Caddy gateway metrics via admin API
+      - job_name: 'caddy'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "gateway" .Values.scrapeTargets.caddy.port .Release.Namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.jtapiSidecar.enabled }}
+      # JTAPI Sidecar metrics via Spring Boot Actuator
+      - job_name: 'jtapi-sidecar'
+        metrics_path: {{ .Values.scrapeTargets.jtapiSidecar.metricsPath }}
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "jtapi-sidecar" .Values.scrapeTargets.jtapiSidecar.port .Release.Namespace) }}']
+      {{- end }}

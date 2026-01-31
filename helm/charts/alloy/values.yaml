@@ -1,0 +1,40 @@
+# Grafana Alloy - Development Defaults
+# DaemonSet that scrapes container stdout and pushes to Loki
+
+fullnameOverride: "alloy"
+
+image:
+  repository: grafana/alloy
+  tag: "v1.5.1"
+  pullPolicy: IfNotPresent
+
+# Loki push endpoint
+loki:
+  endpoint: "http://loki:3100/loki/api/v1/push"
+
+# Server configuration
+server:
+  httpPort: 12345
+
+# Service configuration
+service:
+  type: ClusterIP
+
+# Resource limits
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# ServiceAccount for K8s API access (pod discovery)
+serviceAccount:
+  create: true
+  name: ""
+
+nodeSelector: {}
+tolerations:
+  - operator: Exists
+affinity: {}

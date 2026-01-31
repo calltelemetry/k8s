@@ -1,0 +1,110 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "title": "Nodes Online",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_nodes_online_total", "legendFormat": "nodes" }],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "value": 0, "color": "red" }, { "value": 1, "color": "green" }] } } }
+    },
+    {
+      "title": "Drives Online",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_drive_online_total", "legendFormat": "drives" }],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
+    },
+    {
+      "title": "Total Objects",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_usage_object_total", "legendFormat": "objects" }],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
+    },
+    {
+      "title": "Storage Used",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_usage_total_bytes", "legendFormat": "used" }],
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "title": "Requests In-Flight",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_s3_requests_inflight_total", "legendFormat": "inflight" }],
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
+    },
+    {
+      "title": "Error Rate",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(minio_s3_requests_4xx_errors_total[5m])) + sum(rate(minio_s3_requests_5xx_errors_total[5m]))", "legendFormat": "errors/s" }],
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "yellow" }, { "value": 10, "color": "red" }] } } }
+    },
+    {
+      "title": "S3 Requests by API",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "rate(minio_s3_requests_total[5m])", "legendFormat": "{{ api }}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "S3 Errors (4xx / 5xx)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(minio_s3_requests_4xx_errors_total[5m])", "legendFormat": "4xx {{ api }}" },
+        { "expr": "rate(minio_s3_requests_5xx_errors_total[5m])", "legendFormat": "5xx {{ api }}" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Traffic (Sent / Received)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(minio_s3_traffic_sent_bytes[1m])", "legendFormat": "sent" },
+        { "expr": "rate(minio_s3_traffic_received_bytes[1m])", "legendFormat": "received" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "Bps" } }
+    },
+    {
+      "title": "Time to First Byte (P99)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "histogram_quantile(0.99, rate(minio_s3_requests_ttfb_seconds_distribution[5m]))", "legendFormat": "P99 TTFB" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Storage Usage Over Time",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_usage_total_bytes", "legendFormat": "used bytes" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "title": "Object Count Over Time",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "minio_cluster_usage_object_total", "legendFormat": "objects" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["minio", "storage"],
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "MinIO Object Storage",
+  "uid": "ct-minio"
+}

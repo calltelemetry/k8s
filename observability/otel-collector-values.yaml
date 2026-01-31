@@ -1,0 +1,35 @@
+# OTel Collector values for full observability stack
+# Adds Tempo trace export pipeline alongside existing Prometheus metrics export
+
+exporters:
+  prometheus:
+    port: 8889
+    namespace: claude_code
+  debug:
+    verbosity: basic
+  # OTLP exporter sends traces to Tempo
+  otlphttp:
+    endpoint: "http://tempo:4318"
+
+pipelines:
+  metrics:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [prometheus, debug]
+  traces:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [otlphttp, debug]
+  logs:
+    receivers: [otlp]
+    processors: [memory_limiter, batch]
+    exporters: [debug]
+
+processors:
+  batch:
+    timeout: 5s
+    sendBatchSize: 512
+  memoryLimiter:
+    checkInterval: 1s
+    limitMib: 256
+    spikeLimitMib: 64

@@ -1,0 +1,73 @@
+# PostgreSQL Production Values
+# HA with 3 instances, S3 backups, connection pooler
+
+image:
+  repository: calltelemetry/postgres
+  tag: "17"
+
+cluster:
+  instances: 3
+
+  postgresql:
+    database: calltelemetry
+    username: calltelemetry
+    shared_preload_libraries:
+      - timescaledb
+      - pg_ivm
+    parameters:
+      max_connections: "200"
+      shared_buffers: "2GB"
+      work_mem: "64MB"
+      maintenance_work_mem: "512MB"
+      effective_cache_size: "6GB"
+      wal_level: replica
+      archive_mode: "on"
+      timescaledb.max_background_workers: "16"
+
+  storage:
+    size: 100Gi
+    # storageClass: longhorn  # Uncomment for fast storage
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - postgresql
+          topologyKey: topology.kubernetes.io/zone
+
+# Use existing secret for credentials
+existingSecret: postgresql-credentials
+
+backup:
+  enabled: true
+  schedule: "0 0 * * *"
+  retentionPolicy: "30d"
+  s3:
+    bucket: calltelemetry-pg-backups
+    endpoint: s3.amazonaws.com
+    region: us-east-1
+    existingSecret: postgresql-s3-credentials
+
+monitoring:
+  enablePodMonitor: true
+
+pooler:
+  enabled: true
+  instances: 2
+  type: rw
+  poolMode: transaction
+  parameters:
+    default_pool_size: "50"
+    max_client_conn: "2000"

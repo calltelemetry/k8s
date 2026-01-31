@@ -1,0 +1,76 @@
+# Grafana Helm Chart - Development Defaults
+
+# Override the full name - defaults to "grafana" for simple service name
+fullnameOverride: "grafana"
+
+image:
+  repository: grafana/grafana
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Admin credentials (use existingSecret in production)
+admin:
+  user: admin
+  password: admin
+  existingSecret: ""
+
+# Grafana configuration
+config:
+  # Disable signup
+  allowSignUp: false
+
+# Datasources configuration
+datasources:
+  # Prometheus datasource (auto-configured)
+  prometheus:
+    enabled: true
+    # URL will be templated with namespace
+    url: ""  # Leave empty to auto-detect: http://prometheus.NAMESPACE.svc.cluster.local:9090
+  # Tempo datasource (traces)
+  tempo:
+    enabled: false
+    url: ""  # Leave empty to auto-detect: http://tempo.NAMESPACE.svc.cluster.local:3200
+  # Loki datasource (logs)
+  loki:
+    enabled: false
+    url: ""  # Leave empty to auto-detect: http://loki.NAMESPACE.svc.cluster.local:3100
+
+# Dashboard provisioning
+dashboards:
+  # Provider configuration
+  provider:
+    name: "CallTelemetry"
+    folder: "CallTelemetry"
+    updateIntervalSeconds: 30
+  # External ConfigMap containing dashboard JSON files
+  # This allows Tilt to dynamically create the ConfigMap from files
+  externalConfigMap: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Storage (emptyDir for dev, PVC for prod)
+persistence:
+  enabled: false
+  size: 1Gi
+  storageClass: ""
+
+# Security context
+securityContext:
+  fsGroup: 472
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,5 @@
+# Alloy values for dev observability stack
+# DaemonSet scraping container stdout, pushing to Loki
+
+loki:
+  endpoint: "http://loki:3100/loki/api/v1/push"

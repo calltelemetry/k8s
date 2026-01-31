@@ -1,0 +1,18 @@
+{{/*
+Grafana Dashboards ConfigMap
+Loads all JSON files from the dashboards/ directory in the chart
+*/}}
+{{- if not .Values.dashboards.externalConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana.fullname" . }}-dashboards
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "grafana.labels" . | nindent 4 }}
+data:
+  {{- range $path, $_ := .Files.Glob "dashboards/*.json" }}
+  {{ base $path }}: |
+    {{- $.Files.Get $path | nindent 4 }}
+  {{- end }}
+{{- end }}

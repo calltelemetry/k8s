@@ -1,0 +1,20 @@
+apiVersion: v2
+name: postgresql
+description: PostgreSQL database using CloudNativePG operator with CallTelemetry extensions (pg_ivm, TimescaleDB)
+type: application
+version: 1.0.0
+appVersion: "17"
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC
+keywords:
+  - postgresql
+  - cloudnativepg
+  - database
+  - timescaledb
+  - pg_ivm
+annotations:
+  artifacthub.io/operator: "true"
+  artifacthub.io/operatorCapabilities: "Full Lifecycle"

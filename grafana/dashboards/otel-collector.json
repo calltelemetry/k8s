@@ -1,0 +1,118 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "title": "Spans Accepted/s",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(otelcol_receiver_accepted_spans[1m]))", "legendFormat": "accepted" }],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Spans Refused/s",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(otelcol_receiver_refused_spans[1m]))", "legendFormat": "refused" }],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] } } }
+    },
+    {
+      "title": "Spans Exported/s",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(otelcol_exporter_sent_spans[1m]))", "legendFormat": "exported" }],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Export Failures/s",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(otelcol_exporter_send_failed_spans[1m]))", "legendFormat": "failed" }],
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] } } }
+    },
+    {
+      "title": "Queue Size",
+      "type": "gauge",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "otelcol_exporter_queue_size", "legendFormat": "queue" }],
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 50, "color": "yellow" }, { "value": 90, "color": "red" }] } } }
+    },
+    {
+      "title": "Metrics Points/s",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "sum(rate(otelcol_receiver_accepted_metric_points[1m]))", "legendFormat": "metrics" }],
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Receiver: Spans Accepted by Receiver",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "rate(otelcol_receiver_accepted_spans[1m])", "legendFormat": "{{ receiver }}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Exporter: Spans Sent vs Failed",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(otelcol_exporter_sent_spans[1m])", "legendFormat": "{{ exporter }} sent" },
+        { "expr": "rate(otelcol_exporter_send_failed_spans[1m])", "legendFormat": "{{ exporter }} failed" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Processor: Incoming vs Outgoing Items",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(otelcol_processor_incoming_items[1m])", "legendFormat": "{{ processor }} in" },
+        { "expr": "rate(otelcol_processor_outgoing_items[1m])", "legendFormat": "{{ processor }} out" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Queue Size Over Time",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "otelcol_exporter_queue_size", "legendFormat": "size" },
+        { "expr": "otelcol_exporter_queue_capacity", "legendFormat": "capacity" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+    },
+    {
+      "title": "Metric Points by Receiver",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "rate(otelcol_receiver_accepted_metric_points[1m])", "legendFormat": "{{ receiver }}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "title": "Batch Send Size",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "rate(otelcol_processor_batch_batch_send_size_sum[1m]) / rate(otelcol_processor_batch_batch_send_size_count[1m])", "legendFormat": "avg batch size" },
+        { "expr": "rate(otelcol_processor_batch_timeout_trigger_send[1m])", "legendFormat": "timeout triggers" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["otel", "observability"],
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "OpenTelemetry Collector",
+  "uid": "ct-otel-collector"
+}

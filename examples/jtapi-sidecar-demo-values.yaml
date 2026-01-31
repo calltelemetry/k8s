@@ -30,14 +30,22 @@ cucm:
   host: "192.168.125.10"
   ctiPort: 2748
   user: "ct-jtapi-user"
-  password: "tek1links"
+  password: ""
+  # Recommended: store credentials in a Kubernetes Secret and reference it here.
+  # existingSecret: "jtapi-demo-credentials"
+  # secretKeys:
+  #   host: CUCM_HOST
+  #   user: CUCM_JTAPI_USER
+  #   password: CUCM_JTAPI_PASSWORD
 
 # WebSocket connection to CallTelemetry API
 websocket:
   enabled: true
   url: "ws://api:4000/socket/jtapi/websocket"
   serverId: "demo-jtapi-1"
-  authToken: "demo-token"
+  authToken: ""
+  # existingSecret: "jtapi-websocket-auth"
+  # secretKey: WEBSOCKET_AUTH_TOKEN
   autoReconnect: true
   reconnectDelay: 1000
   maxReconnectAttempts: 0

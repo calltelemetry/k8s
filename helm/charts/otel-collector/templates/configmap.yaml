@@ -1,0 +1,53 @@
+{{/*
+OpenTelemetry Collector Configuration
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "otel-collector.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "otel-collector.labels" . | nindent 4 }}
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:{{ .Values.receivers.grpc.port }}
+          http:
+            endpoint: 0.0.0.0:{{ .Values.receivers.http.port }}
+
+    processors:
+      batch:
+        timeout: {{ .Values.processors.batch.timeout }}
+        send_batch_size: {{ .Values.processors.batch.sendBatchSize }}
+      memory_limiter:
+        check_interval: {{ .Values.processors.memoryLimiter.checkInterval }}
+        limit_mib: {{ .Values.processors.memoryLimiter.limitMib }}
+        spike_limit_mib: {{ .Values.processors.memoryLimiter.spikeLimitMib }}
+
+    exporters:
+      prometheus:
+        endpoint: "0.0.0.0:{{ .Values.exporters.prometheus.port }}"
+        namespace: {{ .Values.exporters.prometheus.namespace }}
+      debug:
+        verbosity: {{ .Values.exporters.debug.verbosity }}
+      {{- if .Values.exporters.otlphttp.enabled }}
+      otlphttp:
+        endpoint: {{ .Values.exporters.otlphttp.endpoint | quote }}
+      {{- end }}
+
+    extensions:
+      health_check:
+        endpoint: "0.0.0.0:13133"
+
+    service:
+      extensions: [health_check]
+      pipelines:
+        {{- range $name, $pipeline := .Values.pipelines }}
+        {{ $name }}:
+          receivers: {{ toJson $pipeline.receivers }}
+          processors: {{ toJson $pipeline.processors }}
+          exporters: {{ toJson $pipeline.exporters }}
+        {{- end }}

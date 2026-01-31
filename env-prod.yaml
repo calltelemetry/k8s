@@ -34,6 +34,14 @@ traceroute:
 echo:
   values_file: examples/echo-haproxy-ct-prod-values.yaml
 
+# PostgreSQL configuration (CloudNativePG)
+postgresql:
+  values_file: examples/postgresql-prod-values.yaml
+
+# NATS configuration
+nats:
+  values_file: examples/nats-ct-prod-values.yaml
+
 # MetalLB IP addresses
 metallb:
   primary_ip: "192.168.123.225"

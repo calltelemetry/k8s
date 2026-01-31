@@ -1,0 +1,60 @@
+# Grafana values for full observability stack
+# Adds Tempo and Loki datasources with cross-linking
+
+datasources:
+  prometheus:
+    enabled: true
+  tempo:
+    enabled: true
+  loki:
+    enabled: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'calltelemetry'
+        orgId: 1
+        folder: 'CallTelemetry'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/calltelemetry
+
+dashboardsConfigMaps:
+  calltelemetry: "grafana-dashboards-calltelemetry"
+
+alerting:
+  rules.yaml:
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: calltelemetry
+        folder: CallTelemetry
+        interval: 1m
+        rules:
+          - uid: high-error-rate
+            title: HighErrorRate
+            condition: A
+            for: 5m
+            labels:
+              severity: warning
+          - uid: critical-error-rate
+            title: CriticalErrorRate
+            condition: A
+            for: 2m
+            labels:
+              severity: critical
+          - uid: high-latency
+            title: HighLatency
+            condition: A
+            for: 5m
+            labels:
+              severity: warning
+          - uid: service-down
+            title: ServiceDown
+            condition: A
+            for: 2m
+            labels:
+              severity: critical

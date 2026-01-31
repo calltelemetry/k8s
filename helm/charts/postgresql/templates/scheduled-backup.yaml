@@ -1,0 +1,36 @@
+{{/*
+CloudNativePG ScheduledBackup CRD
+Creates a scheduled backup job when backups are enabled
+*/}}
+{{- if .Values.backup.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ include "postgresql.fullname" . }}-backup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+spec:
+  # Cron schedule for backups
+  schedule: {{ .Values.backup.schedule | quote }}
+
+  # Reference to the cluster
+  cluster:
+    name: {{ include "postgresql.clusterName" . }}
+
+  # Backup method
+  method: barmanObjectStore
+
+  # Backup target (prefer standby to reduce load on primary)
+  {{- if gt (int .Values.cluster.instances) 1 }}
+  target: prefer-standby
+  {{- else }}
+  target: primary
+  {{- end }}
+
+  # Immediate backup on schedule creation (set to false for predictable scheduling)
+  immediate: false
+
+  # Backup owner reference (delete backup when cluster is deleted)
+  backupOwnerReference: cluster
+{{- end }}

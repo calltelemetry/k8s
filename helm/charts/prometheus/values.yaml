@@ -1,0 +1,89 @@
+# Prometheus Helm Chart - Development Defaults
+
+# Override the full name - defaults to "prometheus" for simple service name
+fullnameOverride: "prometheus"
+
+image:
+  repository: prom/prometheus
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Prometheus configuration
+config:
+  # Global settings
+  scrapeInterval: 15s
+  evaluationInterval: 15s
+
+# Scrape targets - enabled services will be added to prometheus.yml
+# Targets are auto-configured with namespace
+scrapeTargets:
+  # Self-monitoring
+  prometheus:
+    enabled: true
+    port: 9090
+
+  # OpenTelemetry Collector
+  otelCollector:
+    enabled: true
+    port: 8889
+
+  # NATS (via prometheus-nats-exporter sidecar)
+  nats:
+    enabled: true
+    port: 7777
+
+  # MinIO cluster metrics
+  minio:
+    enabled: true
+    port: 9000
+    metricsPath: /minio/v2/metrics/cluster
+
+  # MinIO bucket metrics
+  minioBucket:
+    enabled: true
+    port: 9000
+    metricsPath: /minio/v2/metrics/bucket
+
+  # PostgreSQL (via postgres-exporter)
+  postgresql:
+    enabled: true
+    port: 9187
+
+  # Caddy gateway
+  caddy:
+    enabled: true
+    port: 2019
+
+  # JTAPI Sidecar (Spring Boot Actuator)
+  jtapiSidecar:
+    enabled: true
+    port: 8080
+    metricsPath: /actuator/prometheus
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 9090
+
+# Persistent storage
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClass: ""
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+# Security context
+securityContext:
+  fsGroup: 65534
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

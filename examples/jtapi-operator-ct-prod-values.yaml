@@ -1,0 +1,56 @@
+# JTAPI Operator Production Values for CallTelemetry
+# Usage: helm install jtapi-operator ./helm/charts/jtapi-operator -f examples/jtapi-operator-ct-prod-values.yaml
+
+replicaCount: 2
+
+image:
+  repository: calltelemetry/jtapi-operator
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: jtapi-operator
+
+# Production: Enable leader election for high availability
+leaderElection:
+  enabled: true
+
+# NATS connection for operator coordination
+nats:
+  url: "nats://nats:4222"
+
+# Production: Higher resource allocation
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+# Production: Pod anti-affinity to spread replicas across nodes
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - jtapi-operator
+        topologyKey: kubernetes.io/hostname
+
+nodeSelector: {}
+
+# Production: Tolerations for node issues
+tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 30
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 30

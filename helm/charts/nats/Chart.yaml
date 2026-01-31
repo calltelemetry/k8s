@@ -1,0 +1,8 @@
+# NATS Helm Chart for CallTelemetry
+# Simple NATS deployment with JetStream and Prometheus metrics
+apiVersion: v2
+name: nats
+description: NATS messaging server with JetStream for CallTelemetry
+type: application
+version: 1.0.0
+appVersion: "2.10"

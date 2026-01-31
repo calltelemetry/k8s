@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: calltelemetry/jtapi-operator
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: jtapi-operator
+
+leaderElection:
+  enabled: true
+
+logging:
+  level: warn  # debug, info, warn, error
+  format: json  # json or console
+
+nats:
+  url: "nats://nats:4222"
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 8Gi  # Increased for Tilt live_update Go compilation
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

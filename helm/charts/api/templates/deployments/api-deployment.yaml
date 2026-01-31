@@ -34,6 +34,9 @@ spec:
           operator: Exists
           tolerationSeconds: 2
       terminationGracePeriodSeconds: 5
+{{- if .Values.jtapiOperator.enabled }}
+      serviceAccountName: {{ .Release.Name }}-api
+{{- end }}
       affinity:
           podAntiAffinity:
             preferredDuringSchedulingIgnoredDuringExecution:
@@ -128,6 +131,12 @@ spec:
               value: /home/app/cert/appliance.pem
             - name: LOG_PATH
               value: {{ .Values.logs.path | quote }}
+{{- if .Values.jtapiOperator.enabled }}
+            - name: JTAPI_OPERATOR_ENABLED
+              value: "true"
+            - name: JTAPI_OPERATOR_ENDPOINT
+              value: {{ .Values.jtapiOperator.endpoint | quote }}
+{{- end }}
 {{- if .Values.logs.enabled }}
           volumeMounts:
             - name: api-logs

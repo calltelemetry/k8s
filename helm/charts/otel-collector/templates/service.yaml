@@ -1,0 +1,24 @@
+{{/*
+OpenTelemetry Collector Service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "otel-collector.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "otel-collector.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.receivers.grpc.port }}
+      targetPort: otlp-grpc
+      name: otlp-grpc
+    - port: {{ .Values.receivers.http.port }}
+      targetPort: otlp-http
+      name: otlp-http
+    - port: {{ .Values.exporters.prometheus.port }}
+      targetPort: prometheus
+      name: prometheus
+  selector:
+    {{- include "otel-collector.selectorLabels" . | nindent 4 }}

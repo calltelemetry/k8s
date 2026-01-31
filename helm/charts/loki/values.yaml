@@ -1,0 +1,46 @@
+# Grafana Loki - Development Defaults
+# Single-binary mode with MinIO S3 backend
+
+fullnameOverride: "loki"
+
+image:
+  repository: grafana/loki
+  tag: "3.3.2"
+  pullPolicy: IfNotPresent
+
+# S3 storage backend (MinIO)
+storage:
+  backend: s3
+  s3:
+    endpoint: "minio:9000"
+    bucketName: "loki-logs"
+    accessKey: "minioadmin"
+    secretKey: "minioadmin"
+    insecure: true
+    s3ForcePathStyle: true
+
+# Log retention
+retention:
+  days: 7
+
+# Server configuration
+server:
+  httpPort: 3100
+  grpcPort: 9096
+
+# Service configuration
+service:
+  type: ClusterIP
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,94 @@
+{{- if .Values.jetstreamSetup.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "nats.fullname" . }}-jetstream-setup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nats.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jetstream-setup
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        {{- include "nats.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: jetstream-setup
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: jetstream-setup
+          image: {{ .Values.jetstreamSetup.image }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              NATS_URL="nats://{{ include "nats.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.config.port }}"
+              echo "Connecting to NATS at $NATS_URL"
+
+              # Wait for NATS to be ready
+              echo "Waiting for NATS..."
+              for i in $(seq 1 60); do
+                if nats server check connection -s "$NATS_URL" 2>/dev/null; then
+                  echo "NATS is ready!"
+                  break
+                fi
+                echo "Waiting for NATS... ($i/60)"
+                sleep 2
+              done
+
+              {{- range .Values.jetstreamSetup.streams }}
+              # Create stream: {{ .name }}
+              echo "Creating JetStream stream: {{ .name }}"
+              nats stream add {{ .name }} \
+                --subjects "{{ join "," .subjects }}" \
+                --retention {{ .retention }} \
+                --max-msgs {{ .maxMsgs }} \
+                --max-age {{ .maxAge }} \
+                --storage {{ .storage }} \
+                --replicas {{ .replicas }} \
+                --discard {{ .discard }} \
+                --max-msg-size {{ .maxMsgSize }} \
+                --dupe-window {{ .dupeWindow }} \
+                --server="$NATS_URL" \
+                --defaults \
+                2>/dev/null || echo "Stream {{ .name }} may already exist"
+              {{- end }}
+
+              {{- range .Values.jetstreamSetup.kvBuckets }}
+              # Create KV bucket: {{ .name }}
+              echo "Creating KV bucket: {{ .name }}"
+              nats kv add {{ .name }} \
+                --server="$NATS_URL" \
+                --history={{ .history }} \
+                --replicas={{ .replicas }} \
+                2>/dev/null || echo "KV bucket {{ .name }} may already exist"
+              {{- end }}
+
+              {{- range .Values.jetstreamSetup.objectBuckets }}
+              # Create ObjectStore bucket: {{ .name }}
+              echo "Creating ObjectStore bucket: {{ .name }}"
+              nats object add {{ .name }} \
+                --server="$NATS_URL" \
+                --replicas={{ .replicas }} \
+                2>/dev/null || echo "ObjectStore bucket {{ .name }} may already exist"
+              {{- end }}
+
+              # Verify setup
+              echo ""
+              echo "=== JetStream Setup Complete ==="
+              echo ""
+              echo "Streams:"
+              nats stream ls --server="$NATS_URL"
+              echo ""
+              echo "KV Buckets:"
+              nats kv ls --server="$NATS_URL"
+              echo ""
+              echo "ObjectStore Buckets:"
+              nats object ls --server="$NATS_URL"
+{{- end }}

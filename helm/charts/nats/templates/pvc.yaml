@@ -1,0 +1,22 @@
+{{/*
+PersistentVolumeClaim for NATS JetStream data
+Only created when storage.type is "pvc"
+*/}}
+{{- if and .Values.jetstream.enabled (eq .Values.storage.type "pvc") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nats.fullname" . }}-data
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nats.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.storage.storageClass }}
+  storageClassName: {{ .Values.storage.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
+{{- end }}

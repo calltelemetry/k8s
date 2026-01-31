@@ -1,0 +1,24 @@
+{{/*
+Grafana Dashboard Provider ConfigMap
+Tells Grafana where to find dashboard JSON files
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana.fullname" . }}-dashboards-provider
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "grafana.labels" . | nindent 4 }}
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: {{ .Values.dashboards.provider.name | quote }}
+        orgId: 1
+        folder: {{ .Values.dashboards.provider.folder | quote }}
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: {{ .Values.dashboards.provider.updateIntervalSeconds }}
+        options:
+          path: /var/lib/grafana/dashboards
+          foldersFromFilesStructure: false

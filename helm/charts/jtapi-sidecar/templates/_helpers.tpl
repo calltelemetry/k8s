@@ -42,6 +42,7 @@ Selector labels
 {{- define "jtapi-sidecar.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "jtapi-sidecar.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "jtapi-sidecar.fullname" . }}
 {{- end }}
 
 {{/*

@@ -1,0 +1,14 @@
+{
+  "policy_id": "default-greeting",
+  "org_id": "default",
+  "policy_name": "Default Test Greeting",
+  "enabled": true,
+  "default_audio_file_id": "greeting.wav",
+  "injection_target": "INJECTION_TARGET_BOTH",
+  "injection_mode": "INJECTION_MODE_MIX",
+  "trigger_timing": "TRIGGER_TIMING_ON_ANSWER",
+  "max_duration_seconds": 10,
+  "skip_key": "#",
+  "version": 1,
+  "rules": []
+}
