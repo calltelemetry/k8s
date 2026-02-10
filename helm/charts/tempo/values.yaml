@@ -20,7 +20,7 @@ storage:
 
 # Trace retention
 retention:
-  days: 7
+  days: 3
 
 # Server configuration
 server:
@@ -44,7 +44,7 @@ resources:
     memory: 256Mi
   limits:
     cpu: 500m
-    memory: 512Mi
+    memory: 1Gi
 
 nodeSelector: {}
 tolerations: []
