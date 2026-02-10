@@ -66,7 +66,10 @@ spec:
                     - natsUrl
                   properties:
                     id:
-                      type: string
+                      description: Organization identifier (integer, matches database org_id).
+                      type: integer
+                      format: int64
+                      minimum: 1
                     natsUrl:
                       type: string
                     serverId:
@@ -277,6 +280,16 @@ spec:
                       type: integer
                       format: int32
                       default: 5000
+                    hostNetwork:
+                      description: Enable host networking for CTI pods. Required when pod IPs are not routable from CUCM.
+                      type: boolean
+                      default: false
+                    rtpLocalAddress:
+                      description: Override IP address for RTP binding. If empty, uses pod IP (or host IP when hostNetwork=true).
+                      type: string
+                    rtpAdvertiseAddress:
+                      description: Externally-routable IP for CUCM SDP in NAT environments. If empty, uses the bind address.
+                      type: string
                     static:
                       description: Static CTI port configuration.
                       type: object
