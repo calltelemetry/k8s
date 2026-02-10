@@ -11,4 +11,4 @@ storage:
     insecure: true
 
 retention:
-  days: 7
+  days: 3
