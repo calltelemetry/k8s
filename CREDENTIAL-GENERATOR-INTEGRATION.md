@@ -6,7 +6,7 @@ This document describes how to integrate the credential-generator Helm chart wit
 
 The `credential-generator` chart is a **pre-install hook** that runs on `helm install` (not `helm upgrade`) to automatically generate secure credentials for infrastructure services:
 - PostgreSQL
-- MinIO
+- S3-compatible storage (SeaweedFS)
 - NATS
 
 ## Architecture
@@ -41,7 +41,7 @@ helm install credential-generator ./k8s/helm/charts/credential-generator \
 helm install postgresql ./k8s/helm/charts/postgresql \
   -n my-namespace
 
-helm install minio ./k8s/helm/charts/minio \
+helm install seaweedfs ./k8s/helm/charts/seaweedfs \
   -n my-namespace
 
 helm install nats ./k8s/helm/charts/nats \
@@ -55,7 +55,7 @@ The credential-generator creates three secrets:
 | Secret Name | Keys | Default Values |
 |------------|------|-----------------|
 | `postgres-credentials` | `POSTGRES_USER`, `POSTGRES_PASSWORD` | `calltelemetry`, auto-generated |
-| `minio-credentials` | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD` | `minioadmin`, auto-generated |
+| `s3-credentials` | `S3_ROOT_USER`, `S3_ROOT_PASSWORD` | `minioadmin`, auto-generated |
 | `nats-credentials` | `NATS_USER`, `NATS_PASSWORD` | `nats`, auto-generated |
 
 ## Using Generated Credentials
@@ -71,14 +71,14 @@ existingSecret: "postgres-credentials"
 
 Then the PostgreSQL cluster will use credentials from that secret.
 
-### MinIO
+### S3-Compatible Storage (SeaweedFS)
 
-To use auto-generated MinIO credentials, update your values.yaml:
+To use auto-generated S3 credentials, update your values.yaml:
 
 ```yaml
-# minio values.yaml
+# seaweedfs values.yaml
 auth:
-  existingSecret: "minio-credentials"
+  existingSecret: "s3-credentials"
 ```
 
 ### NATS
@@ -99,8 +99,8 @@ helm install credential-generator ./k8s/helm/charts/credential-generator \
   -n my-namespace \
   --set postgres.username=customuser \
   --set postgres.password=custompass \
-  --set minio.rootUser=admin \
-  --set minio.rootPassword=secretpass
+  --set s3.rootUser=admin \
+  --set s3.rootPassword=secretpass
 ```
 
 Or via values file:
@@ -114,9 +114,9 @@ postgres:
   username: "produser"
   password: "SecurePassword123!"
 
-minio:
+s3:
   rootUser: "prodadmin"
-  rootPassword: "MinIOSecret456!"
+  rootPassword: "S3Secret456!"
 
 nats:
   username: "natsadmin"
@@ -249,10 +249,10 @@ helm upgrade postgresql ./k8s/helm/charts/postgresql \
   -n my-namespace \
   --set existingSecret=postgres-credentials
 
-# Update minio to use existing secret
-helm upgrade minio ./k8s/helm/charts/minio \
+# Update seaweedfs to use existing secret
+helm upgrade seaweedfs ./k8s/helm/charts/seaweedfs \
   -n my-namespace \
-  --set auth.existingSecret=minio-credentials
+  --set auth.existingSecret=s3-credentials
 ```
 
 ### Password doesn't match what I set
@@ -290,5 +290,5 @@ helm install postgresql ./k8s/helm/charts/postgresql \
 
 - [credential-generator README](./helm/charts/credential-generator/README.md)
 - [PostgreSQL Helm Chart](./helm/charts/postgresql/README.md)
-- [MinIO Helm Chart](./helm/charts/minio/README.md)
+- [SeaweedFS Helm Chart](./helm/charts/seaweedfs/README.md)
 - [NATS Helm Chart](./helm/charts/nats/README.md)

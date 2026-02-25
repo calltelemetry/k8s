@@ -1,5 +1,5 @@
 # Grafana Loki Helm Chart for CallTelemetry
-# Single-binary log aggregation with S3 (MinIO) storage
+# Single-binary log aggregation with S3-compatible storage
 apiVersion: v2
 name: loki
 description: Grafana Loki log aggregation for CallTelemetry

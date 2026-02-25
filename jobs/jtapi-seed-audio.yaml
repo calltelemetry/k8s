@@ -15,49 +15,49 @@ spec:
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: mc
-          image: minio/mc:latest
+        - name: aws-cli
+          image: amazon/aws-cli:latest
           command: ["/bin/sh", "-c"]
           args:
             - |
               set -e
-              MINIO_URL="http://minio:9000"
-              
-              echo "Waiting for MinIO to be ready..."
+              S3_URL="http://seaweedfs:8333"
+
+              echo "Waiting for SeaweedFS to be ready..."
               for i in $(seq 1 30); do
-                if mc alias set myminio "$MINIO_URL" "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" 2>/dev/null; then
-                  if mc admin info myminio >/dev/null 2>&1; then
-                    echo "MinIO is ready!"
-                    break
-                  fi
+                if aws --endpoint-url "$S3_URL" s3 ls 2>/dev/null; then
+                  echo "SeaweedFS is ready!"
+                  break
                 fi
-                echo "Waiting for MinIO... ($i/30)"
+                echo "Waiting for SeaweedFS... ($i/30)"
                 sleep 2
               done
-              
+
               # Ensure bucket exists
-              mc mb myminio/ct-audio --ignore-existing
-              
+              aws --endpoint-url "$S3_URL" s3 mb s3://ct-audio 2>/dev/null || true
+
               # Upload greeting.wav from ConfigMap
               echo "Uploading greeting.wav to ct-audio bucket..."
-              mc cp /seed-data/greeting.wav myminio/ct-audio/greeting.wav
-              
+              aws --endpoint-url "$S3_URL" s3 cp /seed-data/greeting.wav s3://ct-audio/greeting.wav
+
               # Verify upload
               echo "Verifying upload..."
-              mc ls myminio/ct-audio/greeting.wav
-              
+              aws --endpoint-url "$S3_URL" s3 ls s3://ct-audio/greeting.wav
+
               echo "Audio seed complete!"
           env:
-            - name: MINIO_ROOT_USER
+            - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: minio-credentials
-                  key: MINIO_ROOT_USER
-            - name: MINIO_ROOT_PASSWORD
+                  name: s3-credentials
+                  key: accessKey
+            - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-credentials
-                  key: MINIO_ROOT_PASSWORD
+                  name: s3-credentials
+                  key: secretKey
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
           volumeMounts:
             - name: seed-data
               mountPath: /seed-data

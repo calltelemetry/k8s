@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "minio.fullname" . }}
+  name: {{ include "seaweedfs.fullname" . }}
   labels:
-    {{- include "minio.labels" . | nindent 4 }}
+    {{- include "seaweedfs.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "minio.selectorLabels" . | nindent 6 }}
+      {{- include "seaweedfs.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "minio.selectorLabels" . | nindent 8 }}
+        {{- include "seaweedfs.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.affinity }}
       affinity:
@@ -30,34 +30,33 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
+          command:
+            - weed
             - server
-            - /data
-            - --console-address
-            - ":{{ .Values.service.consolePort }}"
+            - -s3
+            - -s3.port={{ .Values.service.s3Port }}
+            - -s3.config=/etc/seaweedfs/s3.json
+            - -master.volumeSizeLimitMB={{ .Values.masterVolumeSizeLimitMB }}
           ports:
-            - name: api
-              containerPort: {{ .Values.service.apiPort }}
+            - name: s3
+              containerPort: {{ .Values.service.s3Port }}
               protocol: TCP
-            - name: console
-              containerPort: {{ .Values.service.consolePort }}
+            - name: filer
+              containerPort: {{ .Values.service.filerPort }}
               protocol: TCP
-          env:
-            - name: MINIO_PROMETHEUS_AUTH_TYPE
-              value: {{ .Values.metrics.authType | quote }}
-          envFrom:
-            - secretRef:
-                name: {{ include "minio.secretName" . }}
+            - name: master
+              containerPort: {{ .Values.service.masterPort }}
+              protocol: TCP
           livenessProbe:
             httpGet:
-              path: /minio/health/live
-              port: api
+              path: /cluster/healthz
+              port: master
             initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
           readinessProbe:
             httpGet:
-              path: /minio/health/ready
-              port: api
+              path: /cluster/healthz
+              port: master
             initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
           {{- with .Values.resources }}
@@ -67,11 +66,17 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: s3-config
+              mountPath: /etc/seaweedfs
+              readOnly: true
       volumes:
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-data" (include "minio.fullname" .)) }}
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-data" (include "seaweedfs.fullname" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: s3-config
+          configMap:
+            name: {{ include "seaweedfs.fullname" . }}-s3-config

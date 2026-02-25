@@ -1,22 +1,23 @@
-# MinIO Development Values for CallTelemetry
-# Usage: helm install minio ./helm/charts/minio -f examples/minio-ct-dev-values.yaml
+# SeaweedFS Development Values for CallTelemetry
+# Usage: helm install seaweedfs ./helm/charts/seaweedfs -f examples/seaweedfs-ct-dev-values.yaml
+# Note: This file is maintained for backward compatibility. See seaweedfs-ct-dev-values.yaml for the canonical version.
 
 replicaCount: 1
 
 image:
-  repository: minio/minio
+  repository: chrislusf/seaweedfs
   tag: latest
   pullPolicy: IfNotPresent
 
 # Development credentials (NOT for production!)
 auth:
-  rootUser: minioadmin
-  rootPassword: minioadmin
+  rootUser: seaweedfsadmin
+  rootPassword: seaweedfsadmin
 
 service:
   type: ClusterIP
-  apiPort: 9000
-  consolePort: 9001
+  apiPort: 8333
+  s3Port: 8333
 
 persistence:
   enabled: true

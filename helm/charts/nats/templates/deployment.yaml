@@ -98,10 +98,19 @@ spec:
             periodSeconds: 10
         {{- end }}
 
+      # Init container validates config is mounted before NATS starts
+      initContainers:
+        - name: wait-for-config
+          image: {{ include "nats.image" . }}
+          command: ['sh', '-c', 'until test -f /etc/nats/nats.conf; do echo "Waiting for config..."; sleep 1; done; echo "Config ready"']
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nats
       volumes:
         - name: config
           configMap:
             name: {{ include "nats.configMapName" . }}
+            optional: true
         {{- if .Values.jetstream.enabled }}
         - name: data
           {{- if eq .Values.storage.type "pvc" }}

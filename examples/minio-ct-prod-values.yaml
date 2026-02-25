@@ -1,21 +1,22 @@
-# MinIO Production Values for CallTelemetry
-# Usage: helm install minio ./helm/charts/minio -f examples/minio-ct-prod-values.yaml
+# SeaweedFS Production Values for CallTelemetry
+# Usage: helm install seaweedfs ./helm/charts/seaweedfs -f examples/seaweedfs-ct-prod-values.yaml
+# Note: This file is maintained for backward compatibility. See seaweedfs-ct-prod-values.yaml for the canonical version.
 
 replicaCount: 1
 
 image:
-  repository: minio/minio
-  tag: RELEASE.2024-01-16T16-07-38Z  # Pin to specific release
+  repository: chrislusf/seaweedfs
+  tag: "3.69"  # Pin to specific release
   pullPolicy: IfNotPresent
 
 # Production: Use existing secret with strong credentials
 auth:
-  existingSecret: "minio-credentials"
+  existingSecret: "seaweedfs-credentials"
 
 service:
   type: ClusterIP
-  apiPort: 9000
-  consolePort: 9001
+  apiPort: 8333
+  s3Port: 8333
 
 persistence:
   enabled: true
@@ -60,5 +61,5 @@ affinity:
               - key: app.kubernetes.io/name
                 operator: In
                 values:
-                  - minio
+                  - seaweedfs
           topologyKey: kubernetes.io/hostname

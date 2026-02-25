@@ -1,5 +1,5 @@
 # Grafana Loki - Development Defaults
-# Single-binary mode with MinIO S3 backend
+# Single-binary mode with SeaweedFS S3 backend
 
 fullnameOverride: "loki"
 
@@ -8,14 +8,14 @@ image:
   tag: "3.3.2"
   pullPolicy: IfNotPresent
 
-# S3 storage backend (MinIO)
+# S3 storage backend (SeaweedFS)
 storage:
   backend: s3
   s3:
-    endpoint: "minio:9000"
+    endpoint: "seaweedfs:8333"
     bucketName: "loki-logs"
-    accessKey: "minioadmin"
-    secretKey: "minioadmin"
+    accessKey: "seaweedfsadmin"
+    secretKey: "seaweedfsadmin"
     insecure: true
     s3ForcePathStyle: true
 

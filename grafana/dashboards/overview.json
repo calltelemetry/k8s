@@ -28,13 +28,13 @@
       "links": [{ "title": "NATS", "url": "/d/ct-nats/nats-jetstream" }]
     },
     {
-      "title": "MinIO",
+      "title": "S3 Storage",
       "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "minio_cluster_nodes_online_total", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 6, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "range", "options": { "from": 1, "to": 999999, "result": { "text": "UP", "color": "green" } } }, { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" } } }] } },
-      "links": [{ "title": "MinIO", "url": "/d/ct-minio/minio-object-storage" }]
+      "links": [{ "title": "S3 Storage", "url": "/d/ct-minio/minio-object-storage" }]
     },
     {
       "title": "Caddy",
@@ -132,7 +132,7 @@
       "gridPos": { "h": 3, "w": 3, "x": 15, "y": 5 }
     },
     {
-      "title": "MinIO Req/s",
+      "title": "S3 Req/s",
       "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "sum(rate(minio_s3_requests_total[1m]))", "legendFormat": "" }],
@@ -140,7 +140,7 @@
       "fieldConfig": { "defaults": { "unit": "ops" } }
     },
     {
-      "title": "MinIO Storage",
+      "title": "S3 Storage Used",
       "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "minio_cluster_usage_total_bytes", "legendFormat": "" }],
@@ -268,7 +268,7 @@
       "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [{ "matcher": { "id": "byName", "options": "injections fail" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }] }
     },
     {
-      "title": "MinIO S3 Operations",
+      "title": "S3 Operations",
       "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "rate(minio_s3_requests_total[5m])", "legendFormat": "{{ api }}" }],
@@ -276,7 +276,7 @@
       "fieldConfig": { "defaults": { "unit": "ops" } }
     },
     {
-      "title": "MinIO Bandwidth",
+      "title": "S3 Bandwidth",
       "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [

@@ -15,11 +15,11 @@ service:
   type: ClusterIP
   port: 50053
 
-# MinIO/S3 Configuration
-minio:
-  endpoint: "minio:9000"
-  accessKey: "minioadmin"
-  secretKey: "minioadmin"
+# S3/SeaweedFS Configuration
+s3:
+  endpoint: "seaweedfs:8333"
+  accessKey: "seaweedfsadmin"
+  secretKey: "seaweedfsadmin"
   # Use existing secret instead of inline credentials (recommended for production)
   existingSecret: ""
   bucket: "ct-audio"
