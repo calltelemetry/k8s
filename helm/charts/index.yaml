@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  alloy:
+  - apiVersion: v2
+    appVersion: 1.5.1
+    created: "2026-02-25T18:31:07.187857864Z"
+    description: Grafana Alloy log collector DaemonSet for CallTelemetry
+    digest: fdb3a4c0d0f5356d98da39bd716264775843176880ac0e7080d3922e901983df
+    name: alloy
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/alloy-1.0.0/alloy-1.0.0.tgz
+    version: 1.0.0
   api:
   - apiVersion: v1
     appVersion: 0.8.5-rc19
@@ -138,6 +149,23 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/azure-msal-service-0.1.0/azure-msal-service-0.1.0.tgz
     version: 0.1.0
+  credential-generator:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-02-25T18:31:07.639389614Z"
+    description: Pre-install hook to auto-generate secure credentials for infrastructure
+      services (PostgreSQL, S3 storage, NATS)
+    digest: a00fe0938b205a9be249129ca17cbf3e76cc76689c5735e8445ddd553d23f26d
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: credential-generator
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/credential-generator-1.0.0/credential-generator-1.0.0.tgz
+    version: 1.0.0
   ct-ingress:
   - apiVersion: v1
     appVersion: 0.8.0
@@ -189,6 +217,23 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/ct-ingress-0.11.5/ct-ingress-0.11.5.tgz
     version: 0.11.5
+  ct-media:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-02-25T18:31:08.144691572Z"
+    description: ct-media Rust gRPC service for audio/media processing with S3/SeaweedFS
+      storage
+    digest: 036ded89cea4c2e1f528958c81f89edab70845161d0f6362f591fbfef403564c
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: ct-media
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-media-1.0.0/ct-media-1.0.0.tgz
+    version: 1.0.0
   ct-web:
   - apiVersion: v2
     appVersion: 0.8.5-rc19
@@ -306,6 +351,151 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/echo-0.1.1/echo-0.1.1.tgz
     version: 0.1.1
+  grafana:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-02-25T18:31:08.350617742Z"
+    description: Grafana dashboard for CallTelemetry observability
+    digest: 9d37e54398f2b55e8141668b9225493ad3b3d96cf44d6390cabcb0e350e706d4
+    name: grafana
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/grafana-1.0.0/grafana-1.0.0.tgz
+    version: 1.0.0
+  jtapi-operator:
+  - annotations:
+      category: Integration
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-02-25T18:31:08.572783617Z"
+    description: Kubernetes operator for managing JTAPI sidecar clusters via JtapiCluster
+      CRD
+    digest: ba5baee14160db99167a8ceba7319d91fd47bec76fb4625f0d7b5a9b695368ec
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    keywords:
+    - jtapi
+    - operator
+    - kubernetes
+    - cisco
+    - call-control
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    - email: engineering@calltelemetry.com
+      name: Call Telemetry Engineering
+    name: jtapi-operator
+    sources:
+    - https://github.com/calltelemetry/conductor/tree/main/jtapi-operator
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/jtapi-operator-0.1.0/jtapi-operator-0.1.0.tgz
+    version: 0.1.0
+  jtapi-sidecar:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-02-25T18:31:08.802152534Z"
+    description: JTAPI Sidecar service for Cisco JTAPI integration - provides phone
+      control and audio injection capabilities
+    digest: a4422742809861ea7dcf80c2838b278a32c8157022e0c5bf28d1912e3bd26f16
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: jtapi-sidecar
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/jtapi-sidecar-1.0.0/jtapi-sidecar-1.0.0.tgz
+    version: 1.0.0
+  loki:
+  - apiVersion: v2
+    appVersion: 3.3.2
+    created: "2026-02-25T18:31:09.006896929Z"
+    description: Grafana Loki log aggregation for CallTelemetry
+    digest: c049bd226f15bb3ae68caaee19dab2caf61cf3e82adcc08b311141759dd825be
+    name: loki
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/loki-1.0.0/loki-1.0.0.tgz
+    version: 1.0.0
+  nats:
+  - apiVersion: v2
+    appVersion: "2.10"
+    created: "2026-02-25T18:31:09.194482675Z"
+    description: NATS messaging server with JetStream for CallTelemetry
+    digest: 7bbba6061c0ae178e5e3d77cf67b1def760c57a629f9290824c1b125fde0bab0
+    name: nats
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/nats-1.0.0/nats-1.0.0.tgz
+    version: 1.0.0
+  otel-collector:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-02-25T18:31:09.382592607Z"
+    description: OpenTelemetry Collector for CallTelemetry observability
+    digest: e01590b6d8619e56019c91c85e0a476426d0cecfce1bbabeccfeb5366315106e
+    name: otel-collector
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/otel-collector-1.0.0/otel-collector-1.0.0.tgz
+    version: 1.0.0
+  postgresql:
+  - annotations:
+      artifacthub.io/operator: "true"
+      artifacthub.io/operatorCapabilities: Full Lifecycle
+    apiVersion: v2
+    appVersion: "17"
+    created: "2026-02-25T18:31:09.608206657Z"
+    description: PostgreSQL database using CloudNativePG operator with CallTelemetry
+      extensions (pg_ivm, TimescaleDB)
+    digest: 25cdd657beafcac25c4a70d49f22fee572d910eec7112c71690ca1a1c53513af
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    keywords:
+    - postgresql
+    - cloudnativepg
+    - database
+    - timescaledb
+    - pg_ivm
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: postgresql
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/postgresql-1.0.0/postgresql-1.0.0.tgz
+    version: 1.0.0
+  prometheus:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-02-25T18:31:09.833426261Z"
+    description: Prometheus metrics server for CallTelemetry observability
+    digest: a50fca602b153d57a18679b3aeb395bdefe225c87097b0659a32ee94dd371514
+    name: prometheus
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/prometheus-1.0.0/prometheus-1.0.0.tgz
+    version: 1.0.0
+  seaweedfs:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-02-25T18:31:10.122522858Z"
+    description: SeaweedFS S3-compatible object storage for CallTelemetry audio files
+      and JTAPI JAR storage
+    digest: c09d02651635ddbbcbae38dd0fc51aea662b155e3a92006709bc9c4016789435
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: seaweedfs
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/seaweedfs-1.0.0/seaweedfs-1.0.0.tgz
+    version: 1.0.0
   syslog:
   - apiVersion: v2
     appVersion: 1.1.0
@@ -340,6 +530,17 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/teams-auth-service-0.1.0/teams-auth-service-0.1.0.tgz
     version: 0.1.0
+  tempo:
+  - apiVersion: v2
+    appVersion: 2.6.1
+    created: "2026-02-25T18:31:10.333256458Z"
+    description: Grafana Tempo distributed tracing backend for CallTelemetry
+    digest: 5c0ce1cf7b40e6df7b89958d7b2a913492bb06192ef9529a900d698355677cdc
+    name: tempo
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/tempo-1.0.0/tempo-1.0.0.tgz
+    version: 1.0.0
   traceroute:
   - apiVersion: v2
     appVersion: 0.8.3
@@ -351,4 +552,19 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/traceroute-0.1.0/traceroute-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-03T13:58:37.301138792Z"
+  vue-web:
+  - apiVersion: v2
+    appVersion: 0.8.5
+    created: "2026-02-25T18:31:10.57821656Z"
+    description: CallTelemetry Vue/Quasar Web Portal - Caddy-served SPA
+    digest: 65757ef046e14ab2c2f65b240ae5d122d9be9f4ab646638222f55a61c915e3ee
+    home: https://calltelemetry.com/
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: vue-web
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-02-25T18:31:10.578273025Z"
