@@ -2,7 +2,7 @@
 
 ## Implementation Summary
 
-Successfully implemented a Helm pre-install hook to auto-generate secure credentials for infrastructure services (PostgreSQL, MinIO, NATS).
+Successfully implemented a Helm pre-install hook to auto-generate secure credentials for infrastructure services (PostgreSQL, S3-compatible storage, NATS).
 
 ## What Was Created
 
@@ -36,7 +36,7 @@ The Job creates three secrets in the deployment namespace:
 | Secret | Keys | Auto-Generated | Default Username |
 |--------|------|---|---|
 | `postgres-credentials` | `POSTGRES_USER`, `POSTGRES_PASSWORD` | Password only | `calltelemetry` |
-| `minio-credentials` | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD` | Password only | `minioadmin` |
+| `s3-credentials` | `S3_ROOT_USER`, `S3_ROOT_PASSWORD` | Password only | `minioadmin` |
 | `nats-credentials` | `NATS_USER`, `NATS_PASSWORD` | Password only | `nats` |
 
 ### 3. Updated Service Charts
@@ -44,7 +44,7 @@ The Job creates three secrets in the deployment namespace:
 Modified values.yaml files to reference generated credentials:
 
 - `/k8s/helm/charts/postgresql/values.yaml` — Added note about `existingSecret: "postgres-credentials"`
-- `/k8s/helm/charts/minio/values.yaml` — Added note about `auth.existingSecret: "minio-credentials"`
+- `/k8s/helm/charts/seaweedfs/values.yaml` — Added note about `auth.existingSecret: "s3-credentials"`
 - `/k8s/helm/charts/nats/values.yaml` — Added note about credential-generator integration
 
 ### 4. Documentation
@@ -118,7 +118,7 @@ All defaults can be overridden:
 # Via command line
 helm install credential-generator . \
   --set postgres.password="CustomPass123!" \
-  --set minio.rootUser="custom-admin"
+  --set s3.rootUser="custom-admin"
 
 # Via values file
 helm install credential-generator . \
@@ -145,7 +145,7 @@ Pre-install hooks execute (weight order):
   2. credential-generator Job (weight: -10)
      - Checks for existing secrets
      - Generates secure random passwords
-     - Creates postgres-credentials, minio-credentials, nats-credentials
+     - Creates postgres-credentials, s3-credentials, nats-credentials
   
 Services start and use created secrets
 ```
@@ -173,7 +173,7 @@ helm install credential-generator ./k8s/helm/charts/credential-generator \
 
 Secrets created with:
 - PostgreSQL: `calltelemetry` user, random password
-- MinIO: `minioadmin` user, random password
+- S3 storage: `minioadmin` user, random password
 - NATS: `nats` user, random password
 
 ### 2. Deploy with Custom Credentials
@@ -183,8 +183,8 @@ helm install credential-generator ./k8s/helm/charts/credential-generator \
   --create-namespace \
   --set postgres.username=dbadmin \
   --set postgres.password=$(openssl rand -base64 32) \
-  --set minio.rootUser=storage-admin \
-  --set minio.rootPassword=$(openssl rand -base64 32)
+  --set s3.rootUser=storage-admin \
+  --set s3.rootPassword=$(openssl rand -base64 32)
 ```
 
 ### 3. Use Generated Credentials in PostgreSQL
@@ -317,7 +317,7 @@ k8s/
 │       └── secret-generator-job.yaml
 ├── helm/charts/postgresql/
 │   └── values.yaml                            # UPDATED: Added credential-generator reference
-├── helm/charts/minio/
+├── helm/charts/seaweedfs/
 │   └── values.yaml                            # UPDATED: Added credential-generator reference
 ├── helm/charts/nats/
 │   └── values.yaml                            # UPDATED: Added credential-generator reference

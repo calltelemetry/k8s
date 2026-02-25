@@ -32,17 +32,11 @@ scrapeTargets:
     enabled: true
     port: 7777
 
-  # MinIO cluster metrics
-  minio:
+  # SeaweedFS cluster metrics
+  seaweedfs:
     enabled: true
-    port: 9000
-    metricsPath: /minio/v2/metrics/cluster
-
-  # MinIO bucket metrics
-  minioBucket:
-    enabled: true
-    port: 9000
-    metricsPath: /minio/v2/metrics/bucket
+    port: 8333
+    metricsPath: /metrics
 
   # PostgreSQL (via postgres-exporter)
   postgresql:

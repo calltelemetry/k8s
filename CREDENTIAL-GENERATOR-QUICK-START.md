@@ -32,12 +32,12 @@ helm install postgresql ./k8s/helm/charts/postgresql \
   --set existingSecret=postgres-credentials
 ```
 
-## Use in MinIO
+## Use in SeaweedFS (S3 Storage)
 
 ```bash
-helm install minio ./k8s/helm/charts/minio \
+helm install seaweedfs ./k8s/helm/charts/seaweedfs \
   -n my-ns \
-  --set auth.existingSecret=minio-credentials
+  --set auth.existingSecret=s3-credentials
 ```
 
 ## Custom Credentials
@@ -47,7 +47,7 @@ helm install minio ./k8s/helm/charts/minio \
 helm install credential-generator ./k8s/helm/charts/credential-generator \
   -n my-ns \
   --set postgres.password="MyPass123!" \
-  --set minio.rootPassword="MinioPass456!"
+  --set s3.rootPassword="S3Pass456!"
 
 # Via values file
 helm install credential-generator ./k8s/helm/charts/credential-generator \

@@ -27,15 +27,15 @@ postgres:
   # Secret name where credentials are stored (default: postgres-credentials)
   secretName: "postgres-credentials"
 
-# MinIO credentials
+# SeaweedFS/S3 credentials
 # Leave empty to auto-generate secure random passwords
-minio:
-  # Root user for MinIO (default: minioadmin)
+s3:
+  # Root user for S3 (default: seaweedfsadmin)
   rootUser: ""
-  # Root password for MinIO (leave empty to auto-generate 32-char secure random)
+  # Root password for S3 (leave empty to auto-generate 32-char secure random)
   rootPassword: ""
-  # Secret name where credentials are stored (default: minio-credentials)
-  secretName: "minio-credentials"
+  # Secret name where credentials are stored (default: seaweedfs-credentials)
+  secretName: "seaweedfs-credentials"
 
 # NATS credentials
 # Leave empty to auto-generate secure random passwords

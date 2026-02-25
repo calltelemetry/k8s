@@ -35,18 +35,18 @@ postgres:
   # Secret name where credentials are stored
   secretName: "postgres-credentials"
 
-# MinIO credentials
+# SeaweedFS/S3 credentials
 # In production, provide STRONG passwords
-minio:
-  # Root user for MinIO
-  # rootUser: "prod_minio_admin"
+s3:
+  # Root user for S3
+  # rootUser: "prod_s3_admin"
   
-  # Root password for MinIO
+  # Root password for S3
   # DANGER: Do NOT put passwords in this file!
   rootPassword: ""
   
   # Secret name where credentials are stored
-  secretName: "minio-credentials"
+  secretName: "seaweedfs-credentials"
 
 # NATS credentials
 # In production, provide STRONG passwords

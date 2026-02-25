@@ -1,6 +1,6 @@
 # Credential Generator Helm Chart
 
-Automatically generates secure credentials for infrastructure services (PostgreSQL, MinIO, NATS) on **new deployments only**.
+Automatically generates secure credentials for infrastructure services (PostgreSQL, SeaweedFS/S3, NATS) on **new deployments only**.
 
 ## Features
 
@@ -15,7 +15,7 @@ Automatically generates secure credentials for infrastructure services (PostgreS
 | Service | Secret Name | Keys |
 |---------|-------------|------|
 | PostgreSQL | `postgres-credentials` | `POSTGRES_USER`, `POSTGRES_PASSWORD` |
-| MinIO | `minio-credentials` | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD` |
+| SeaweedFS/S3 | `seaweedfs-credentials` | `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` |
 | NATS | `nats-credentials` | `NATS_USER`, `NATS_PASSWORD` |
 
 ## Installation
@@ -38,8 +38,8 @@ helm install credential-generator ./credential-generator \
   --create-namespace \
   --set postgres.username=myuser \
   --set postgres.password=mypassword \
-  --set minio.rootUser=admin \
-  --set minio.rootPassword=secure-pass \
+  --set s3.rootUser=admin \
+  --set s3.rootPassword=secure-pass \
   --set nats.username=natsuser \
   --set nats.password=natspass
 ```
@@ -82,11 +82,11 @@ postgres:
   password: ""              # Default: 32-char secure random
   secretName: "postgres-credentials"
 
-# MinIO credentials (leave empty to auto-generate)
-minio:
-  rootUser: ""              # Default: minioadmin
+# SeaweedFS/S3 credentials (leave empty to auto-generate)
+s3:
+  rootUser: ""              # Default: seaweedfsadmin
   rootPassword: ""          # Default: 32-char secure random
-  secretName: "minio-credentials"
+  secretName: "seaweedfs-credentials"
 
 # NATS credentials (leave empty to auto-generate)
 nats:
@@ -117,7 +117,7 @@ After installation, verify secrets were created:
 
 ```bash
 kubectl get secrets -n my-namespace
-kubectl get secret postgres-credentials -n my-namespace -o yaml
+kubectl get secret seaweedfs-credentials -n my-namespace -o yaml
 ```
 
 ## Updating Credentials
@@ -125,16 +125,16 @@ kubectl get secret postgres-credentials -n my-namespace -o yaml
 To update credentials **after initial deployment**, use `kubectl`:
 
 ```bash
-kubectl create secret generic postgres-credentials \
-  --from-literal=POSTGRES_USER=newuser \
-  --from-literal=POSTGRES_PASSWORD=newpassword \
+kubectl create secret generic seaweedfs-credentials \
+  --from-literal=S3_ACCESS_KEY_ID=newuser \
+  --from-literal=S3_SECRET_ACCESS_KEY=newpassword \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 Then restart the affected services:
 
 ```bash
-kubectl rollout restart deployment/postgresql -n my-namespace
+kubectl rollout restart deployment/seaweedfs -n my-namespace
 ```
 
 ## CRITICAL: Pre-install Only
@@ -167,7 +167,7 @@ This is expected if you install/reinstall in the same namespace. Secrets are ide
 ### Password not secure enough
 Override with custom password:
 ```bash
---set postgres.password=$(openssl rand -base64 32)
+--set s3.rootPassword=$(openssl rand -base64 32)
 ```
 
 ## Testing

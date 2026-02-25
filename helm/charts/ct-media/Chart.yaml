@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ct-media
-description: ct-media Rust gRPC service for audio/media processing with MinIO storage
+description: ct-media Rust gRPC service for audio/media processing with S3/SeaweedFS storage
 type: application
 version: 1.0.0
 appVersion: "0.1.0"

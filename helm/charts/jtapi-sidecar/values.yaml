@@ -91,10 +91,11 @@ persistence:
     size: 500Mi
     existingClaim: ""
 
-# MinIO configuration for audio asset cache
-minio:
+# S3/SeaweedFS configuration for audio asset cache
+s3:
   enabled: true
-  endpoint: "http://minio:9000"
+  endpoint: "http://seaweedfs:8333"
+  credentialsSecret: "seaweedfs-credentials"
 
 # OpenTelemetry configuration
 otel:

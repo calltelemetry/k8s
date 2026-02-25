@@ -185,22 +185,22 @@ spec:
                       description: SHA256 of current JAR content. Set by API on upload to trigger rolling restart.
                       type: string
                 storage:
-                  description: MinIO/S3 credentials for audio file storage.
+                  description: S3/SeaweedFS credentials for audio file storage.
                   type: object
                   properties:
                     type:
-                      description: Storage type - minio or s3. Defaults to minio.
+                      description: Storage type - s3 or seaweedfs. Defaults to seaweedfs.
                       type: string
-                      enum: [minio, s3]
-                      default: minio
+                      enum: [s3, seaweedfs]
+                      default: seaweedfs
                     endpoint:
-                      description: Storage server endpoint (e.g., minio.namespace.svc.cluster.local:9000).
+                      description: Storage server endpoint (e.g., seaweedfs.namespace.svc.cluster.local:8333).
                       type: string
                     bucket:
                       description: Storage bucket name (e.g., ct-audio).
                       type: string
                     credentialsSecret:
-                      description: K8s Secret name containing accessKey and secretKey keys.
+                      description: K8s Secret name containing S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY keys.
                       type: string
                     useSSL:
                       description: Enable TLS/SSL for storage connections. Defaults to false.

@@ -1,18 +1,18 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "minio.name" -}}
+{{- define "seaweedfs.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{/*
 Create a fullname using the release name and the chart name.
 */}}
-{{- define "minio.fullname" -}}
+{{- define "seaweedfs.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else }}
-{{- $name := include "minio.name" . }}
+{{- $name := include "seaweedfs.name" . }}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 {{- end }}
@@ -20,16 +20,16 @@ Create a fullname using the release name and the chart name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "minio.chart" -}}
+{{- define "seaweedfs.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "minio.labels" -}}
-helm.sh/chart: {{ include "minio.chart" . }}
-{{ include "minio.selectorLabels" . }}
+{{- define "seaweedfs.labels" -}}
+helm.sh/chart: {{ include "seaweedfs.chart" . }}
+{{ include "seaweedfs.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -39,19 +39,19 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "minio.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "minio.name" . }}
+{{- define "seaweedfs.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "seaweedfs.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app: {{ include "minio.fullname" . }}
+app: {{ include "seaweedfs.fullname" . }}
 {{- end }}
 
 {{/*
 Create the name of the secret to use
 */}}
-{{- define "minio.secretName" -}}
+{{- define "seaweedfs.secretName" -}}
 {{- if .Values.auth.existingSecret }}
 {{- .Values.auth.existingSecret }}
 {{- else }}
-{{- include "minio.fullname" . }}-credentials
+{{- include "seaweedfs.fullname" . }}-credentials
 {{- end }}
 {{- end }}

@@ -95,7 +95,7 @@ main() {
   # 6. Verify secrets were created
   log "Test 6: Verifying secrets were created..."
   kubectl get secret postgres-credentials -n "$TEST_NAMESPACE" &>/dev/null || fail "postgres-credentials secret not found"
-  kubectl get secret minio-credentials -n "$TEST_NAMESPACE" &>/dev/null || fail "minio-credentials secret not found"
+  kubectl get secret s3-credentials -n "$TEST_NAMESPACE" &>/dev/null || fail "s3-credentials secret not found"
   kubectl get secret nats-credentials -n "$TEST_NAMESPACE" &>/dev/null || fail "nats-credentials secret not found"
   pass "All three secrets created"
   echo ""
@@ -110,9 +110,9 @@ main() {
   [ ${#pg_pass} -ge 20 ] || fail "POSTGRES_PASSWORD too short (< 20 chars)"
   pass "POSTGRES_PASSWORD generated (${#pg_pass} chars)"
 
-  local minio_user=$(kubectl get secret minio-credentials -n "$TEST_NAMESPACE" -o jsonpath='{.data.MINIO_ROOT_USER}' | base64 -d)
-  [ -n "$minio_user" ] || fail "MINIO_ROOT_USER is empty"
-  pass "MINIO_ROOT_USER: $minio_user"
+  local s3_user=$(kubectl get secret s3-credentials -n "$TEST_NAMESPACE" -o jsonpath='{.data.S3_ROOT_USER}' | base64 -d)
+  [ -n "$s3_user" ] || fail "S3_ROOT_USER is empty"
+  pass "S3_ROOT_USER: $s3_user"
 
   local nats_user=$(kubectl get secret nats-credentials -n "$TEST_NAMESPACE" -o jsonpath='{.data.NATS_USER}' | base64 -d)
   [ -n "$nats_user" ] || fail "NATS_USER is empty"
@@ -142,8 +142,8 @@ main() {
     -n "$TEST_NAMESPACE" \
     --set postgres.username=testuser \
     --set postgres.password=testpass123 \
-    --set minio.rootUser=admin \
-    --set minio.rootPassword=adminpass || fail "Helm install with custom values failed"
+    --set s3.rootUser=admin \
+    --set s3.rootPassword=adminpass || fail "Helm install with custom values failed"
 
   sleep 5
   local custom_user=$(kubectl get secret postgres-credentials -n "$TEST_NAMESPACE" -o jsonpath='{.data.POSTGRES_USER}' | base64 -d)

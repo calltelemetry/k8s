@@ -103,8 +103,8 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["minio", "storage"],
+  "tags": ["s3", "storage"],
   "time": { "from": "now-1h", "to": "now" },
-  "title": "MinIO Object Storage",
+  "title": "S3 Object Storage",
   "uid": "ct-minio"
 }

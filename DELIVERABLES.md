@@ -55,7 +55,7 @@
 - [x] `/k8s/deploy-with-credentials.sh` (executable)
   - Creates namespace
   - Installs credential-generator first
-  - Installs PostgreSQL, MinIO, NATS
+  - Installs PostgreSQL, SeaweedFS, NATS
   - Verifies all deployments
   - Colored output with status indicators
   - Production-ready
@@ -83,10 +83,10 @@
   - Documented how to use `existingSecret: "postgres-credentials"`
   - Shows example configuration
 
-#### MinIO Chart
-- [x] `/k8s/helm/charts/minio/values.yaml`
+#### SeaweedFS Chart
+- [x] `/k8s/helm/charts/seaweedfs/values.yaml`
   - Added credential-generator reference in comments
-  - Documented how to use `auth.existingSecret: "minio-credentials"`
+  - Documented how to use `auth.existingSecret: "s3-credentials"`
   - Shows example configuration
 
 #### NATS Chart
@@ -115,7 +115,7 @@
 - [x] All values in `values.yaml` with empty defaults
 - [x] Override via `--set` flags supported
 - [x] Override via `-f values.yaml` file supported
-- [x] Examples for PostgreSQL, MinIO, NATS
+- [x] Examples for PostgreSQL, SeaweedFS, NATS
 - [x] Production values file created
 - [x] Tested in: `test-credential-generator.sh` (Test 9: Custom credentials)
 
@@ -123,12 +123,12 @@
 
 ### Secrets Generated
 - [x] `postgres-credentials` (POSTGRES_USER, POSTGRES_PASSWORD)
-- [x] `minio-credentials` (MINIO_ROOT_USER, MINIO_ROOT_PASSWORD)
+- [x] `s3-credentials` (S3_ROOT_USER, S3_ROOT_PASSWORD)
 - [x] `nats-credentials` (NATS_USER, NATS_PASSWORD)
 
 ### Default Usernames
 - [x] PostgreSQL: `calltelemetry`
-- [x] MinIO: `minioadmin`
+- [x] S3 storage: `minioadmin`
 - [x] NATS: `nats`
 
 ### Password Generation

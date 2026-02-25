@@ -10,11 +10,11 @@ service:
   type: ClusterIP
   port: 50053
 
-# MinIO configuration for dev
-minio:
-  endpoint: "minio:9000"
-  # Reference the minio credentials secret created by minio chart
-  existingSecret: "ct-minio-credentials"
+# S3/SeaweedFS configuration for dev
+s3:
+  endpoint: "seaweedfs:8333"
+  # Reference the S3 credentials secret
+  existingSecret: "seaweedfs-credentials"
   bucket: "ct-audio"
   secure: false
 

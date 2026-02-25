@@ -107,9 +107,9 @@ main() {
   success "PostgreSQL installed"
   echo ""
 
-  install_chart "minio" "minio" "$NAMESPACE" \
-    --set auth.existingSecret="minio-credentials"
-  success "MinIO installed"
+  install_chart "seaweedfs" "seaweedfs" "$NAMESPACE" \
+    --set auth.existingSecret="s3-credentials"
+  success "SeaweedFS installed"
   echo ""
 
   install_chart "nats" "nats" "$NAMESPACE"

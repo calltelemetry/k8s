@@ -34,7 +34,7 @@ cluster:
     password: calltelemetry_dev_password
     # Additional postgresql.conf parameters
     parameters:
-      max_connections: "100"
+      max_connections: "300"
       shared_buffers: "256MB"
       work_mem: "16MB"
       maintenance_work_mem: "128MB"

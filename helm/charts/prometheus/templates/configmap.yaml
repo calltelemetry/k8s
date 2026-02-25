@@ -34,22 +34,13 @@ data:
           - targets: ['{{ include "prometheus.target" (list "nats" .Values.scrapeTargets.nats.port .Release.Namespace) }}']
       {{- end }}
 
-      {{- if .Values.scrapeTargets.minio.enabled }}
-      # MinIO metrics - cluster metrics
-      - job_name: 'minio'
-        metrics_path: {{ .Values.scrapeTargets.minio.metricsPath }}
+      {{- if .Values.scrapeTargets.seaweedfs.enabled }}
+      # SeaweedFS metrics
+      - job_name: 'seaweedfs'
+        metrics_path: {{ .Values.scrapeTargets.seaweedfs.metricsPath }}
         scheme: http
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "minio" .Values.scrapeTargets.minio.port .Release.Namespace) }}']
-      {{- end }}
-
-      {{- if .Values.scrapeTargets.minioBucket.enabled }}
-      # MinIO bucket metrics
-      - job_name: 'minio-bucket'
-        metrics_path: {{ .Values.scrapeTargets.minioBucket.metricsPath }}
-        scheme: http
-        static_configs:
-          - targets: ['{{ include "prometheus.target" (list "minio" .Values.scrapeTargets.minioBucket.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "seaweedfs" .Values.scrapeTargets.seaweedfs.port .Release.Namespace) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.postgresql.enabled }}
