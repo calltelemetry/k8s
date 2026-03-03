@@ -18,8 +18,8 @@ service:
 # S3/SeaweedFS Configuration
 s3:
   endpoint: "seaweedfs:8333"
-  accessKey: "seaweedfsadmin"
-  secretKey: "seaweedfsadmin"
+  accessKey: "minioadmin"
+  secretKey: "minioadmin"
   # Use existing secret instead of inline credentials (recommended for production)
   existingSecret: ""
   bucket: "ct-audio"
