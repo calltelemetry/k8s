@@ -1,0 +1,58 @@
+# Dev test values — metallb enabled with dev IPs
+metallb:
+  enabled: true
+
+ingressClassName: nginx-test
+
+ingress-controller:
+  type: nginx
+  class: nginx-test
+  controllerValue: "k8s.io/ingress-test"
+  selector:
+    component: controller
+    instance: test-release
+    name: ingress-controller
+  controller:
+    replicaCount: 1
+    service:
+      enabled: false
+      create: false
+
+loadBalancer:
+  ingressClass: nginx-test
+  annotations:
+    kubernetes.io/ingress.class: nginx-test
+    custom.annotation/example: "true"
+    ingress.kubernetes.io/selector-component: controller
+    ingress.kubernetes.io/selector-instance: test-release
+    ingress.kubernetes.io/selector-name: ingress-controller
+
+primary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.205"
+  addressPool: "primary-ip-test-dev"
+  annotations: {}
+
+secondary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.206"
+  addressPool: "secondary-ip-test-dev"
+  annotations: {}
+
+admin_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.123.207"
+  addressPool: "admin-ip-test-dev"
+  annotations: {}
+
+ports:
+  http: 80
+  https: 443
+
+tcpServices:
+  "22":
+    serviceName: sftp-service
+    targetPort: 22

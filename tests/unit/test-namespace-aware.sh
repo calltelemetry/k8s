@@ -5,7 +5,7 @@
 CHART_DIR="helm/charts/ingress"
 RELEASE_NAME="test-release"
 NAMESPACE="test-ns"
-VALUES_FILE="test-values.yaml"
+VALUES_FILE="tests/unit/test-values.yaml"
 
 # Create test directory if it doesn't exist
 mkdir -p tests/unit/output

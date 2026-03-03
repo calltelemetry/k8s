@@ -37,6 +37,7 @@ spec:
             - -s3.port={{ .Values.service.s3Port }}
             - -s3.config=/etc/seaweedfs/s3.json
             - -master.volumeSizeLimitMB={{ .Values.masterVolumeSizeLimitMB }}
+            - -volume.max={{ .Values.volumeMax | default 24 }}
           ports:
             - name: s3
               containerPort: {{ .Values.service.s3Port }}
@@ -54,9 +55,8 @@ spec:
             initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
           readinessProbe:
-            httpGet:
-              path: /cluster/healthz
-              port: master
+            tcpSocket:
+              port: s3
             initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
           {{- with .Values.resources }}

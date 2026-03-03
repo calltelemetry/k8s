@@ -8,7 +8,7 @@ set -e
 NAMESPACE="test-namespace"
 RELEASE_NAME="test-release"
 CHART_DIR="helm/charts/ingress"
-VALUES_FILE="test-values.yaml"
+VALUES_FILE="tests/unit/test-values.yaml"
 OUTPUT_DIR="tests/unit/output"
 
 # Parse command line arguments
