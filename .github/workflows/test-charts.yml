@@ -102,11 +102,11 @@ jobs:
         for chart in helm/charts/*; do
           if [ -d "$chart" ]; then
             echo "Testing installation (dry-run) for chart: $chart"
-            # Skip ingress chart due to CRD ownership issues
-            if [[ "$chart" != *"ingress"* ]]; then
-              helm install test-release "$chart" --namespace test --create-namespace --dry-run
+            # Skip charts that require CRDs not present in kind cluster
+            if [[ "$chart" == *"ingress"* ]] || [[ "$chart" == *"postgresql"* ]]; then
+              echo "Skipping dry-run for $chart (requires CRDs not in kind cluster)"
             else
-              echo "Skipping dry-run installation for ingress chart due to CRD ownership issues"
+              helm install test-release "$chart" --namespace test --create-namespace --dry-run
             fi
           fi
         done
