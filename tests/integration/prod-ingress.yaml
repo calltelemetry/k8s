@@ -1,0 +1,57 @@
+# Prod test values — metallb enabled with prod IPs
+metallb:
+  enabled: true
+
+ingressClassName: nginx-prod
+
+ingress-controller:
+  type: nginx
+  class: nginx-prod
+  controllerValue: "k8s.io/ingress-prod"
+  selector:
+    component: controller
+    instance: prod-release
+    name: ingress-controller
+  controller:
+    replicaCount: 1
+    service:
+      enabled: false
+      create: false
+
+loadBalancer:
+  ingressClass: nginx-prod
+  annotations:
+    kubernetes.io/ingress.class: nginx-prod
+    ingress.kubernetes.io/selector-component: controller
+    ingress.kubernetes.io/selector-instance: prod-release
+    ingress.kubernetes.io/selector-name: ingress-controller
+
+primary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.124.205"
+  addressPool: "primary-ip-test-prod"
+  annotations: {}
+
+secondary_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.124.206"
+  addressPool: "secondary-ip-test-prod"
+  annotations: {}
+
+admin_api:
+  createLoadBalancer: true
+  advertiseL2MetalLb: true
+  metal_ip_address: "192.168.124.207"
+  addressPool: "admin-ip-test-prod"
+  annotations: {}
+
+ports:
+  http: 80
+  https: 443
+
+tcpServices:
+  "22":
+    serviceName: sftp-service
+    targetPort: 22

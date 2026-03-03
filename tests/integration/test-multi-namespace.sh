@@ -5,8 +5,8 @@
 CHART_DIR="helm/charts/ingress"
 DEV_NAMESPACE="test-dev"
 PROD_NAMESPACE="test-prod"
-DEV_VALUES="test-values.yaml"
-PROD_VALUES="prod-ingress.yaml"
+DEV_VALUES="tests/integration/test-values.yaml"
+PROD_VALUES="tests/integration/prod-ingress.yaml"
 
 # Create test directory if it doesn't exist
 mkdir -p tests/integration/output
