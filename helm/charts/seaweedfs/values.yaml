@@ -70,6 +70,10 @@ bucketInit:
 # Master volume size limit in MB
 masterVolumeSizeLimitMB: 100
 
+# Maximum number of volumes per volume server (default: 8)
+# Each S3 bucket collection needs at least one volume
+volumeMax: 24
+
 resources:
   requests:
     cpu: 100m
