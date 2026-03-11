@@ -23,6 +23,10 @@ image:
 cluster:
   # Number of PostgreSQL instances (1 for dev, 3+ for HA in prod)
   instances: 1
+  # Optional: override postgres user/group IDs for custom images.
+  # CNPG defaults to 26/26 when unset.
+  postgresUID: null
+  postgresGID: null
 
   # Database configuration
   postgresql:
@@ -50,10 +54,10 @@ cluster:
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: 1000m
-      memory: 1Gi
+      memory: 2Gi
 
   # Startup/liveness/readiness probe timeouts
   startDelay: 30
