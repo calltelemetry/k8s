@@ -19,6 +19,12 @@ helmDefaults:
   wait: false
   timeout: 600
   atomic: false
+  # Helm v4 defaults to server-side apply (SSA). SSA tracks field ownership per
+  # manager, which conflicts with controllers that mutate their own resources at
+  # runtime (e.g. MetalLB updating CRD webhook certs). Disable SSA to avoid
+  # field manager conflicts on upgrade.
+  args:
+    - "--server-side=false"
 
 # Environment values
 environments:
@@ -56,11 +62,14 @@ releases:
     version: 0.14.9
 
   # CloudNativePG Operator (cluster-wide, manages PostgreSQL clusters)
+  # wait: ensures webhook endpoint is registered before PostgreSQL Cluster CR is applied
   - name: cnpg
     namespace: cnpg-system
     chart: cnpg/cloudnative-pg
     createNamespace: true
     version: 0.23.0
+    wait: true
+    waitForJobs: true
 
   # PostgreSQL Database (using CloudNativePG operator)
   - name: postgresql
