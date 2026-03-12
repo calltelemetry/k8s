@@ -21,9 +21,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ $.Release.Name }}-service
+                name: {{ include "vue-web.fullname" $ }}
                 port:
-                  number: {{ $.Values.vue_web.port }}
+                  number: {{ $.Values.service.port | default 80 }}
           {{- end }}
     {{- end }}
   {{- if .Values.ingress.tls }}
