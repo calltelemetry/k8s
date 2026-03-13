@@ -30,8 +30,8 @@ cluster:
     database: calltelemetry
     # Database owner username
     username: calltelemetry
-    # Password (use existingSecret in production)
-    password: calltelemetry_dev_password
+    # Password — leave empty and use credential-generator or existingSecret
+    password: ""
     # Additional postgresql.conf parameters
     parameters:
       max_connections: "300"

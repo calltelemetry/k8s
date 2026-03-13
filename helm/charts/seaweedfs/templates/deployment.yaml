@@ -78,5 +78,5 @@ spec:
           emptyDir: {}
           {{- end }}
         - name: s3-config
-          configMap:
-            name: {{ include "seaweedfs.fullname" . }}-s3-config
+          secret:
+            secretName: {{ include "seaweedfs.fullname" . }}-s3-config

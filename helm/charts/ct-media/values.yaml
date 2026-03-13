@@ -18,9 +18,10 @@ service:
 # S3/SeaweedFS Configuration
 s3:
   endpoint: "seaweedfs:8333"
-  accessKey: "seaweedfsadmin"
-  secretKey: "seaweedfsadmin"
-  # Use existing secret instead of inline credentials (recommended for production)
+  accessKey: ""
+  secretKey: ""
+  # Use existing secret for S3 credentials (recommended)
+  # Set to "seaweedfs-credentials" to use credentials from credential-generator hook
   existingSecret: ""
   bucket: "ct-audio"
   secure: false

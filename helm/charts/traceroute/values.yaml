@@ -22,7 +22,7 @@ service:
   port: 4100
   targetPort: 4100
 
-# Security context
+# Security context — runs as root for raw socket access (ICMP traceroute)
 securityContext:
   runAsUser: 0
 

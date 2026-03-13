@@ -45,9 +45,15 @@ spec:
             - name: PASSWORD_ACCESS
               value: "true"
             - name: USER_NAME
-              value: "sftpuser"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sftp.existingSecret | default (printf "%s-sftp-secret" .Release.Name) }}
+                  key: USER_NAME
             - name: USER_PASSWORD
-              value: "calltelemetry"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sftp.existingSecret | default (printf "%s-sftp-secret" .Release.Name) }}
+                  key: USER_PASSWORD
             - name: SUDO_ACCESS
               value: "true"
           resources:

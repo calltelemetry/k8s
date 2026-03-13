@@ -47,6 +47,17 @@ ingress-controller:
       default: false
       controllerValue: "k8s.io/ingress-nginx-{{ .Release.Namespace }}"
 
+# Cloud Load Balancer Annotations (examples — set per-LB in annotations block):
+#   DigitalOcean:
+#     service.beta.kubernetes.io/do-loadbalancer-name: "my-lb"
+#     service.beta.kubernetes.io/do-loadbalancer-healthcheck-protocol: "tcp"
+#   AWS EKS:
+#     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+#     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+#   Azure AKS:
+#     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+#     service.beta.kubernetes.io/azure-load-balancer-resource-group: "my-rg"
+
 # Load Balancer Common Configuration
 loadBalancer:
   # Ingress class annotation - used by all load balancers
@@ -65,7 +76,7 @@ loadBalancer:
 primary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.205"
+  metal_ip_address: ""
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/primary_ip.yaml
   addressPool: "primary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
@@ -83,7 +94,7 @@ primary_api:
 secondary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.206"
+  metal_ip_address: ""
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/secondary_ip.yaml
   addressPool: "secondary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
@@ -97,7 +108,7 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.207"
+  metal_ip_address: ""
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/admin_ip.yaml
   addressPool: "admin-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
