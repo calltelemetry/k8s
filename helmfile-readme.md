@@ -1,12 +1,12 @@
 # CallTelemetry Helmfile Deployment
 
-This helmfile provides a simple way to deploy the entire CallTelemetry environment based on a namespace value. It automates the deployment of all required components in the correct order.
+Helmfile deploys the entire CallTelemetry stack in the correct order with a single command. Supports on-prem (K3s), DigitalOcean, AWS EKS, and Azure AKS.
 
 ## Prerequisites
 
 - Kubernetes cluster (v1.30+)
-- Helm 3 installed
-- Helmfile installed
+- Helm v3+ (Helm v4 SSA compatibility handled automatically)
+- Helmfile v1+
 - `kubectl` configured to communicate with your cluster
 
 ## Installation
@@ -16,119 +16,166 @@ This helmfile provides a simple way to deploy the entire CallTelemetry environme
 1. Install Helmfile:
 
 ```bash
-# On macOS
+# macOS
 brew install helmfile
 
-# On Linux
+# Linux
 curl -L https://github.com/helmfile/helmfile/releases/latest/download/helmfile_linux_amd64 > /usr/local/bin/helmfile
 chmod +x /usr/local/bin/helmfile
 ```
 
-2. Install the Helm Diff Plugin (required by Helmfile):
+2. Install the Helm Diff Plugin:
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
 ```
 
-This plugin is required for Helmfile to show differences between the current state and the desired state before applying changes.
-
 ## Repository Setup
 
-Clone this repository:
-
 ```bash
-git clone https://github.com/calltelemetry/k8s-charts.git
-cd k8s-charts
+git clone https://github.com/calltelemetry/k8s.git
+cd k8s
 ```
 
 ## Usage
 
-The helmfile is configured to deploy the entire CallTelemetry environment based on the environment specified. It supports two environments with separate configuration files:
+The helmfile deploys the entire CallTelemetry environment. It supports multiple environments with separate configuration files:
 
-- `ct-dev` - Development environment (uses env-common.yaml and env-dev.yaml)
-- `ct-prod` - Production environment (uses env-common.yaml and env-prod.yaml)
+- `ct-dev` — Development (uses `env-common.yaml` + `env-dev.yaml`)
+- `ct-prod` — Production (uses `env-common.yaml` + `env-prod.yaml`)
 
-This structure allows for easy customization and reuse of common configuration values.
-
-### Deploy the Development Environment
+### Deploy
 
 ```bash
-# With diff (recommended)
+# Dev environment (recommended: apply shows diff first)
 helmfile --environment ct-dev apply
 
-# Without diff (if helm-diff plugin is not installed)
-helmfile --environment ct-dev apply --skip-diff
-```
-
-This will:
-1. Create the `ct-dev` namespace if it doesn't exist
-2. Apply the shared RBAC resources
-3. Install MetalLB if needed
-4. Install HAProxy Ingress Controller
-5. Install the CT Ingress Configs
-6. Install NATS Server
-7. Install Call Telemetry API
-8. Install Vue Web Frontend
-9. Install Microsoft Teams Authentication Service
-10. Install Traceroute Service
-11. Install Echo Service
-
-### Deploy the Production Environment
-
-```bash
+# Prod environment
 helmfile --environment ct-prod apply
+
+# Without diff
+helmfile --environment ct-dev sync
 ```
 
-This will deploy the same components but with production-specific configurations.
-
-## Customization
-
-### Environment Files
-
-The helmfile uses environment files to configure the deployment:
-
-- `env-common.yaml` - Common configuration shared between all environments
-- `env-dev.yaml` - Development-specific configuration
-- `env-prod.yaml` - Production-specific configuration
-
-These files contain references to the values files in the `examples` directory:
-
-- `haproxy-ct-dev-values.yaml` - HAProxy configuration for development
-- `ingress-ct-dev-values.yaml` - Ingress configuration for development
-- `api-ct-dev-values.yaml` - API configuration for development
-- `vue-web-ct-dev-values.yaml` - Vue Web configuration for development
-- `teams-auth-ct-dev-values.yaml` - Teams Auth configuration for development
-- `traceroute-ct-dev-values.yaml` - Traceroute configuration for development
-- `echo-haproxy-ct-dev-values.yaml` - Echo configuration for development
-- `nats-values.yaml` - NATS configuration (shared between environments)
-
-To customize the deployment, you can either:
-1. Modify the environment files to point to different values files
-2. Modify the values files directly
-
-## Troubleshooting
-
-
-### General Troubleshooting
-
-If you encounter issues during deployment, you can check the status of the releases:
+### Preview
 
 ```bash
-helmfile --environment ct-dev status
+# Render all manifests without deploying
+helmfile --environment ct-dev template > /tmp/rendered.yaml
 ```
 
-To see detailed logs for a specific release:
-
-```bash
-helmfile --environment ct-dev --selector name=api logs
-```
-
-To delete all releases:
+### Teardown
 
 ```bash
 helmfile --environment ct-dev destroy
 ```
 
-## Architecture
+## What Gets Deployed
 
-The deployment follows the architecture described in the [CallTelemetry Installation Guide](haproxy-calltelemetry-installation-guide.md).
+Helmfile installs these releases in dependency order:
+
+| Release | Namespace | Condition | Description |
+|---------|-----------|-----------|-------------|
+| `metallb` | metallb-system | On-prem only | L2 load balancer for bare metal |
+| `cnpg` | cnpg-system | CNPG database only | CloudNativePG operator |
+| `postgresql` | app namespace | CNPG database only | PostgreSQL cluster |
+| `haproxy-ingress` | app namespace | Always | HAProxy ingress controller |
+| `ingress-haproxy` | app namespace | Always | Load balancers + routing |
+| `nats` | app namespace | Always | NATS JetStream messaging |
+| `api` | app namespace | Always | CallTelemetry API |
+| `ct-web` | app namespace | Always | Vue frontend |
+| `traceroute` | app namespace | Always | Traceroute service |
+
+## Platform Differences
+
+| | On-Prem (K3s) | DigitalOcean | AWS EKS | Azure AKS |
+|---|---|---|---|---|
+| **MetalLB** | Installed | Not needed | Not needed | Not needed |
+| **LB type** | Static IPs via L2 | DO Load Balancer | AWS NLB | Azure LB |
+| **Storage** | `local-path` | `do-block-storage` | `gp3` | `managed-csi` |
+
+For cloud platforms, skip MetalLB and override the storage class in your values files. The ingress chart's `advertiseL2MetalLb: false` disables MetalLB resource creation — LoadBalancer services get cloud-provisioned IPs automatically.
+
+## Database Options
+
+| | CloudNativePG (Modern) | Crunchy PGO (Legacy) |
+|---|---|---|
+| **Operator** | Installed by helmfile | Pre-installed externally |
+| **DB Cluster** | CNPG Cluster CR deployed | Managed by PGO in `postgres-operator` ns |
+| **Secret** | Auto-created by CNPG | Manually copied to app namespace |
+
+For Crunchy PGO, skip the `cnpg` and `postgresql` releases and configure the API chart to point at your existing PGO database secret.
+
+## Customization
+
+### Environment Files
+
+- `env-common.yaml` — Shared config (chart repos, versions)
+- `env-dev.yaml` — Dev-specific settings (values file paths, replicas)
+- `env-prod.yaml` — Prod-specific settings
+
+Each environment file points to values files in the `examples/` directory. To customize:
+1. Copy the relevant example values file
+2. Edit your copy
+3. Update the environment file to point to your copy
+
+### Cloud Storage Classes
+
+Override storage in your postgresql and API values files:
+
+```yaml
+# postgresql values (CNPG)
+cluster:
+  storage:
+    storageClass: do-block-storage  # or gp3, managed-csi
+
+# API values (log PVCs)
+logs:
+  storageClassName: do-block-storage
+```
+
+## Helm v4 Compatibility
+
+Helmfile sets `--server-side=false` globally. Helm v4 defaults to Server-Side Apply (SSA) which tracks field ownership per manager. This conflicts with controllers that mutate their own resources (MetalLB webhook certs, CNPG status fields). Disabling SSA avoids field manager conflicts on upgrade.
+
+The CNPG release uses `wait: true` and `waitForJobs: true` to ensure the webhook is registered before PostgreSQL Cluster CRs are applied.
+
+## Troubleshooting
+
+### General
+
+```bash
+helmfile --environment ct-dev status
+kubectl get pods -n ct-dev
+kubectl get svc -n ct-dev
+```
+
+### Database Issues
+
+```bash
+# CNPG cluster status
+kubectl get cluster -n ct-dev
+
+# PGO: verify secret was copied
+kubectl get secret hippo-pguser-calltelemetry -n ct-dev
+
+# API DB connection logs
+kubectl logs -n ct-dev -l app=api --tail=50
+```
+
+### Load Balancer Issues
+
+```bash
+# On-prem: MetalLB speaker logs
+kubectl logs -n metallb-system -l app=metallb -l component=speaker
+
+# Cloud: check external IP assignment
+kubectl get svc -n ct-dev -o wide
+
+# HAProxy logs
+kubectl logs -n ct-dev -l app.kubernetes.io/name=haproxy-ingress
+```
+
+### Helm v4 Field Manager Conflicts
+
+If `helm upgrade` fails with field ownership errors, verify `--server-side=false` is set in helmDefaults or passed as a CLI flag.

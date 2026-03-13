@@ -46,3 +46,13 @@ spec:
           env:
             - name: NATS_HOSTNAME
               value: "{{ .Values.nats.server }}"
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 3
+            periodSeconds: 5

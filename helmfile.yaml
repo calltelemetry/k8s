@@ -55,11 +55,14 @@ environments:
 # Releases to be deployed
 releases:
   # MetalLB
+  # wait: ensures webhook endpoint is registered before IPAddressPool CRs are applied
   - name: metallb
     namespace: metallb-system
     chart: metallb/metallb
     createNamespace: true
     version: 0.14.9
+    wait: true
+    waitForJobs: true
 
   # CloudNativePG Operator (cluster-wide, manages PostgreSQL clusters)
   # wait: ensures webhook endpoint is registered before PostgreSQL Cluster CR is applied

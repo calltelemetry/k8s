@@ -1,414 +1,402 @@
 # Installing Call Telemetry with HAProxy Ingress Controller
 
-This guide walks through the complete installation of Call Telemetry using HAProxy as the ingress controller in a Kubernetes environment. We'll cover everything from adding the necessary Helm repositories to configuring all components for a production-ready deployment.
+Complete installation guide for deploying Call Telemetry on Kubernetes using HAProxy as the ingress controller. Supports on-prem (K3s/bare metal), DigitalOcean, AWS EKS, and Azure AKS.
 
 ## Prerequisites
 
 - Kubernetes cluster (v1.30+)
-- Helm 3 installed
+- Helm v3+ installed
 - `kubectl` configured to communicate with your cluster
-``` bash
+
+```bash
+# K3s — copy kubeconfig
 mkdir -p ~/.kube
 sudo cat /etc/rancher/k3s/k3s.yaml > ~/.kube/config
 ```
 
-## Architecture Overview
+### Cloud-Specific Prerequisites
 
-The following diagram illustrates the high-level architecture of the Call Telemetry deployment with HAProxy in a Kubernetes cluster:
+| Platform | Additional Requirements |
+|----------|----------------------|
+| **DigitalOcean** | DOKS cluster provisioned |
+| **AWS EKS** | [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html), [EBS CSI Driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) |
+| **Azure AKS** | AKS cluster with managed identity |
+
+## Architecture Overview
 
 ```mermaid
 graph TD
-    classDef centerClass text-align:center;
-
-    Client[External Client]:::centerClass -->|HTTP/HTTPS/SSH| PhysicalNetwork[Physical Network]:::centerClass
-    PhysicalNetwork -->|Layer 2 Traffic| MetalLB[MetalLB Load Balancer]
+    Client[External Client] -->|HTTP/HTTPS/SSH| LB[Load Balancer]
 
     subgraph "Kubernetes Cluster"
-        subgraph "metallb-system Namespace"
-            MetalLB
-            IPPoolDev1[IPAddressPool: primary-ip-ct-dev]
-            IPPoolDev2[IPAddressPool: secondary-ip-ct-dev]
-            IPPoolDev3[IPAddressPool: admin-ip-ct-dev]
-
-            IPPoolProd1[IPAddressPool: primary-ip-ct-prod]
-            IPPoolProd2[IPAddressPool: secondary-ip-ct-prod]
-            IPPoolProd3[IPAddressPool: admin-ip-ct-prod]
+        subgraph "Load Balancer Layer"
+            LB -->|On-Prem| MetalLB[MetalLB L2 - Static IPs]
+            LB -->|Cloud| CloudLB[Cloud Native LB - Dynamic IPs]
         end
 
-        subgraph "ct-dev Namespace"
-            LB1[Primary API LoadBalancer 192.168.123.235]
-            LB2[Secondary API LoadBalancer 192.168.123.236]
-            LB3[Admin API LoadBalancer 192.168.123.237]
+        subgraph "App Namespace"
+            LB1[Primary API LB :80/:443]
+            LB2[Secondary API LB :80/:443]
+            LB3[Admin LB :80/:443/:22/:514]
 
-            HAProxyDev[HAProxy Ingress Controller]
+            HAProxy[HAProxy Ingress Controller]
 
-            subgraph "Helm Charts - ct-dev"
-                APIDev[API Chart]
-                EchoDev[Echo Chart]
-                VueWebDev[Vue Web Chart]
+            subgraph "Application Services"
+                API[API Service :4000]
+                VueWeb[Vue Web :80]
+                Traceroute[Traceroute :4100]
+                SFTP[SFTP :22]
+                Syslog[Syslog :514]
             end
 
-            LB1 -->|Routes Traffic| HAProxyDev
-            LB2 -->|Routes Traffic| HAProxyDev
-            LB3 -->|Routes Traffic| HAProxyDev
-
-            HAProxyDev -->|Routes Based on Rules| APIDev
-            HAProxyDev -->|Routes Based on Rules| EchoDev
-            HAProxyDev -->|Routes Based on Rules| VueWebDev
-        end
-
-        subgraph "ct-prod Namespace"
-            LB4[Primary API LoadBalancer 192.168.123.225]
-            LB5[Secondary API LoadBalancer 192.168.123.226]
-            LB6[Admin API LoadBalancer 192.168.123.227]
-
-            HAProxyProd[HAProxy Ingress Controller]
-
-            subgraph "Helm Charts - ct-prod"
-                APIProd[API Chart]
-                EchoProd[Echo Chart]
-                VueWebProd[Vue Web Chart]
+            subgraph "Infrastructure"
+                NATS[NATS JetStream]
+                PG[PostgreSQL]
             end
 
-            LB4 -->|Routes Traffic| HAProxyProd
-            LB5 -->|Routes Traffic| HAProxyProd
-            LB6 -->|Routes Traffic| HAProxyProd
+            LB1 --> HAProxy
+            LB2 --> HAProxy
+            LB3 --> HAProxy
 
-            HAProxyProd -->|Routes Based on Rules| APIProd
-            HAProxyProd -->|Routes Based on Rules| EchoProd
-            HAProxyProd -->|Routes Based on Rules| VueWebProd
+            HAProxy --> API
+            HAProxy --> VueWeb
+            HAProxy -->|TCP| SFTP
+            HAProxy -->|TCP| Syslog
+
+            API --> NATS
+            API --> PG
+            Traceroute --> NATS
         end
-
-        IPPoolDev1 -->|Routes Traffic| LB1
-        IPPoolDev2 -->|Routes Traffic| LB2
-        IPPoolDev3 -->|Routes Traffic| LB3
-
-        IPPoolProd1 -->|Routes Traffic| LB4
-        IPPoolProd2 -->|Routes Traffic| LB5
-        IPPoolProd3 -->|Routes Traffic| LB6
     end
 ```
 
-### Port Mapping Diagram
+### Components
 
-The following diagram illustrates how external ports on the load balancers map to internal services and pods:
+| Component | Purpose |
+|-----------|---------|
+| **MetalLB** | Layer 2 load balancer for bare metal (on-prem only) |
+| **HAProxy Ingress** | Routes external traffic to services, handles TCP passthrough |
+| **NATS** | JetStream messaging for inter-service communication |
+| **PostgreSQL** | Data storage (CNPG or Crunchy PGO) |
+| **API** | CallTelemetry core application |
+| **Vue Web** | Frontend user interface |
+| **Traceroute** | Network diagnostics service |
 
-```mermaid
-graph LR
-    classDef externalClass fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef serviceClass fill:#bbf,stroke:#333,stroke-width:1px;
-    classDef podClass fill:#bfb,stroke:#333,stroke-width:1px;
+### Port Mapping
 
-    %% External Load Balancers
-    LB1[Admin LB 192.168.123.237]:::externalClass
-    LB2[Primary LB 192.168.123.235]:::externalClass
-    LB3[Secondary LB 192.168.123.236]:::externalClass
+| Load Balancer | Port | Destination |
+|--------------|------|-------------|
+| Primary API | 80, 443 | HAProxy → API (policy endpoints) |
+| Secondary API | 80, 443 | HAProxy → API (data endpoints) |
+| Admin | 80, 443 | HAProxy → API + Vue Web |
+| Admin | 22 | HAProxy → SFTP (TCP passthrough) |
+| Admin | 514 | HAProxy → Syslog (TCP passthrough) |
 
-    %% HAProxy Service
-    HAProxy[HAProxy Service]:::serviceClass
+## Quick Start (Helmfile)
 
-    %% Internal Services
-    API[API Service]:::serviceClass
-    SFTP[SFTP Service]:::serviceClass
-    VueWeb[Vue Web Service]:::serviceClass
+The fastest path. Helmfile handles ordering, dependencies, and RBAC automatically.
 
-    %% Pods
-    APIPod[API Pod Port: 4000]:::podClass
-    SFTPPod[SFTP Pod Port: 2222]:::podClass
-    VueWebPod[Vue Web Pod Port: 80]:::podClass
+```bash
+# Install helmfile
+brew install helmfile  # macOS
+# Linux: curl -L https://github.com/helmfile/helmfile/releases/latest/download/helmfile_linux_amd64 > /usr/local/bin/helmfile
 
-    %% External to HAProxy connections
-    LB1 -->|Port 80| HAProxy
-    LB1 -->|Port 443| HAProxy
-    LB1 -->|Port 22| HAProxy
-    LB1 -->|Port 514| HAProxy
+# Install helm-diff plugin
+helm plugin install https://github.com/databus23/helm-diff
 
-    LB2 -->|Port 80| HAProxy
-    LB2 -->|Port 443| HAProxy
-
-    LB3 -->|Port 80| HAProxy
-    LB3 -->|Port 443| HAProxy
-
-    %% HAProxy to Services connections
-    HAProxy -->|HTTP Routes| API
-    HAProxy -->|HTTP Routes| VueWeb
-    HAProxy -->|TCP Port 22| SFTP
-    HAProxy -->|TCP Port 514| SFTP
-
-    %% Services to Pods connections
-    API -->|Port 4000| APIPod
-    SFTP -->|Port 2222| SFTPPod
-    VueWeb -->|Port 80| VueWebPod
+# Clone and deploy
+git clone https://github.com/calltelemetry/k8s.git
+cd k8s
+helmfile --environment ct-dev apply
 ```
 
-The deployment consists of the following components:
+See [Helmfile README](../helmfile-readme.md) for environments, customization, and cloud platform details.
 
-1. **MetalLB** - Layer 2 load balancer for Kubernetes (bare metal)
-   - Provides external IP addresses for services
-   - Configured with a range of IPs for the cluster
-2. **HAProxy Ingress Controller** - Routes external traffic to services
-    - Configured with multiple Ingress resources for different environments
-    - Handles TCP services for SFTP and Syslog
-    - Uses shared RBAC resources for multi-namespace deployment
-3. **NATS Server** - Message broker for inter-service communication
-    - Configured with JetStream for persistent messaging
-    - Deployed in both ct-dev and ct-prod namespaces
-4. **PostgreSQL Database** - Data storage
-5. **Call Telemetry API** - Core application services
-6. **Vue Web Frontend** - User interface for Call Telemetry
-7. **Microsoft Teams Authentication Service** - Provides authentication for Microsoft Teams integration
-## Add Required Helm Repositories
+## Step-by-Step Manual Installation
 
-First, add all the necessary Helm repositories:
+### 1. Add Helm Repositories
 
 ```bash
 helm repo add haproxy-ingress https://haproxy-ingress.github.io/charts
 helm repo add metallb https://metallb.github.io/metallb
 helm repo add nats https://nats-io.github.io/k8s/helm/charts
+helm repo add cnpg https://cloudnative-pg.github.io/charts
 helm repo add calltelemetry https://calltelemetry.github.io/k8s/helm/charts
 helm repo update
 ```
 
-## Cluster Wide Install and Configure MetalLB - Bare Metal Load Balancer
+### 2. Install MetalLB (On-Prem Only)
 
-MetalLB provides external IP addresses for Kubernetes services.
+**Skip this step for DigitalOcean, AWS, and Azure.** Cloud providers have native load balancers.
 
 ```bash
-helm install metallb metallb/metallb -n metallb-system
+helm install metallb metallb/metallb -n metallb-system --create-namespace
 ```
 
-
-## Create ct-dev and ct-prod Namespace
-
-Create dedicated namespaces for the Call Telemetry deployment Dev and Prod environments:
+### 3. Create Application Namespace
 
 ```bash
 kubectl create namespace ct-dev
-kubectl create namespace ct-prod
 ```
 
-## Create Shared RBAC Resources for Multi-Namespace Deployment
+### 4. Set Up RBAC for HAProxy
 
-When deploying HAProxy in multiple namespaces, you need to create shared RBAC resources to avoid conflicts with cluster-wide resources like ClusterRoles.
-
-1. Use the provided `examples/haproxy-shared-rbac-narrow.yaml` file which contains:
-   - A shared ClusterRole with all necessary permissions
-   - ServiceAccounts for each namespace (ct-dev and ct-prod)
-   - ClusterRoleBindings that grant permissions to the ServiceAccounts
-
-2. Apply the shared RBAC resources:
+HAProxy needs cluster-wide RBAC resources. Apply the shared role and namespace bindings:
 
 ```bash
-kubectl apply -f examples/haproxy-shared-rbac-narrow.yaml
+# Cluster-wide role
+kubectl apply -f examples/haproxy-cluster-role.yaml
+
+# Namespace-specific bindings
+cat examples/haproxy-namespace-template.yaml \
+  | sed "s/NAMESPACE_PLACEHOLDER/ct-dev/g" \
+  | kubectl apply -f -
 ```
 
-This grants the necessary permissions to the service accounts in both namespaces, so you don't need to update the RBAC configuration when deploying HAProxy in each namespace.
-
-## Install HAProxy Ingress Controller in Multiple Namespaces
-
-After applying the shared RBAC resources, you can install HAProxy in both namespaces. HAProxy handles ingress traffic and routes it to the appropriate services.
-
-The example values files (`examples/haproxy-ct-dev-values.yaml` and `examples/haproxy-ct-prod-values.yaml`) include:
-- Disabled RBAC creation (using the shared RBAC resources)
-- Existing ServiceAccount configuration
-- Namespace-specific IngressClass names
-- TCP services configuration for SFTP and Syslog
+### 5. Install HAProxy Ingress Controller
 
 ```bash
-# Install in ct-dev namespace
-helm install haproxy-ingress haproxy-ingress/haproxy-ingress -n ct-dev -f examples/haproxy-ct-dev-values.yaml
-
-# Install in ct-prod namespace
-helm install haproxy-ingress haproxy-ingress/haproxy-ingress -n ct-prod -f examples/haproxy-ct-prod-values.yaml
+helm install haproxy-ingress haproxy-ingress/haproxy-ingress \
+  -n ct-dev \
+  -f examples/haproxy-ct-dev-values.yaml
 ```
 
-## Install the CT Ingress Configs
+The values file configures:
+- Disabled RBAC creation (using shared resources from step 4)
+- Namespace-specific IngressClass name
+- TCP services for SFTP and Syslog
 
-Each namespace has its own Ingress configuration that routes traffic to the Call Telemetry API services. This layer allows you to configure load balancing concerns without impacting the API Service Chart.
-
-The example values files (`examples/ingress-ct-dev-values.yaml` and `examples/ingress-ct-prod-values.yaml`) include:
-- Load balancer configurations for primary, secondary, and admin APIs
-- MetalLB IP address assignments
-- SFTP and Syslog port configurations
-- HAProxy selector configuration
+### 6. Install Ingress / Load Balancers
 
 ```bash
-# Install in ct-dev namespace
-helm install ingress-haproxy calltelemetry/ingress -n ct-dev -f examples/ingress-ct-dev-values.yaml
-
-# Install in ct-prod namespace
-helm install ingress-haproxy calltelemetry/ingress -n ct-prod -f examples/ingress-ct-prod-values.yaml
+helm install ingress-haproxy ./helm/charts/ingress \
+  -n ct-dev \
+  -f examples/ingress-ct-dev-values.yaml \
+  --skip-crds
 ```
 
-## Install NATS Server
+**On-prem:** The values file assigns MetalLB static IPs for primary, secondary, and admin load balancers. Set `advertiseL2MetalLb: true` and provide your IP addresses.
 
-NATS is a lightweight messaging system that Call Telemetry uses for inter-service communication. The example values file (`examples/nats-values.yaml`) configures NATS with JetStream enabled for persistent messaging.
+**Cloud:** Set `advertiseL2MetalLb: false` in your values file. LoadBalancer services will be provisioned with dynamic IPs by your cloud provider. After deployment, get the assigned IPs/hostnames:
 
 ```bash
-# Install in ct-dev namespace
-helm install nats nats/nats -n ct-dev -f examples/nats-values.yaml
-
-# Install in ct-prod namespace
-helm install nats nats/nats -n ct-prod -f examples/nats-values.yaml
+kubectl get svc -n ct-dev -o wide
 ```
 
-## Set Up PostgreSQL Database
+#### Cloud LB Annotations
 
-Call Telemetry requires a PostgreSQL database for data storage. You can either use an external PostgreSQL instance or deploy one within your Kubernetes cluster.
+Add provider-specific annotations to your load balancer values:
 
-### Option 1: Crunchy PostgreSQL
-
-
-## Install Call Telemetry API
-
-This chart deploys the Call Telemetry API and its immediate dependencies. The example values files (`examples/api-ct-dev-values.yaml` and `examples/api-ct-prod-values.yaml`) include:
-- Database configuration with existing secret
-- Admin service configuration with SSH port
-- SFTP server configuration
-- Syslog configuration
-
-```bash
-# Install in ct-dev namespace
-helm install api calltelemetry/api -n ct-dev -f examples/api-ct-dev-values.yaml
-
-# Install in ct-prod namespace
-helm install api calltelemetry/api -n ct-prod -f examples/api-ct-prod-values.yaml
+**DigitalOcean:**
+```yaml
+primary_api:
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-name: "ct-dev-primary"
+    service.beta.kubernetes.io/do-loadbalancer-healthcheck-protocol: "tcp"
 ```
 
-## Install Vue Web Frontend
-
-The Vue Web frontend provides the user interface for Call Telemetry. The example values files (`examples/vue-web-ct-dev-values.yaml` and `examples/vue-web-ct-prod-values.yaml`) include:
-- Service configuration
-- Ingress configuration with HAProxy-specific annotations
-- Session cookie configuration
-
-```bash
-# Install in ct-dev namespace
-helm install vue-web calltelemetry/vue-web -n ct-dev -f examples/vue-web-ct-dev-values.yaml
-
-# Install in ct-prod namespace
-helm install vue-web calltelemetry/vue-web -n ct-prod -f examples/vue-web-ct-prod-values.yaml
+**AWS EKS:**
+```yaml
+primary_api:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
 ```
 
-## Install Microsoft Teams Authentication Service
+**Azure AKS:**
+```yaml
+admin_api:
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+```
 
-The Teams Authentication service provides Microsoft Teams authentication for Call Telemetry. The example values files (`examples/teams-auth-ct-dev-values.yaml` and `examples/teams-auth-ct-prod-values.yaml`) include:
-- Ingress configuration with path-based routing
-- TLS configuration with Let's Encrypt
-- Resource limits and anti-affinity rules (production)
+### 7. Set Up PostgreSQL
+
+#### Option 1: CloudNativePG (Recommended)
 
 ```bash
-# Install in ct-dev namespace
-helm install teams-auth calltelemetry/teams-auth -n ct-dev -f examples/teams-auth-ct-dev-values.yaml
+# Install the CNPG operator (cluster-wide, once)
+helm install cnpg cnpg/cloudnative-pg \
+  -n cnpg-system --create-namespace \
+  --wait --wait-for-jobs
 
-# Install in ct-prod namespace
-helm install teams-auth calltelemetry/teams-auth -n ct-prod -f examples/teams-auth-ct-prod-values.yaml
+# Deploy the PostgreSQL cluster
+helm install postgresql ./helm/charts/postgresql -n ct-dev
+```
+
+**Production (HA with backups):**
+```bash
+helm install postgresql ./helm/charts/postgresql -n ct-dev \
+  -f helm/charts/postgresql/values-production.yaml
+```
+
+**Cloud storage class override:**
+```bash
+# DigitalOcean
+--set cluster.storage.storageClass=do-block-storage
+
+# AWS EKS
+--set cluster.storage.storageClass=gp3
+
+# Azure AKS
+--set cluster.storage.storageClass=managed-csi
+```
+
+#### Option 2: Crunchy PGO (Legacy)
+
+For environments with an existing Crunchy Data PostgreSQL Operator:
+
+1. PGO operator must be running in the `postgres-operator` namespace
+2. A PGO cluster (e.g., `hippo`) must already exist
+3. Copy the PGO-generated secret to your application namespace:
+
+```bash
+kubectl -n postgres-operator get secret hippo-pguser-calltelemetry -o json \
+  | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences","managedFields"])' \
+  | kubectl apply -n ct-dev -f -
+```
+
+4. When installing the API chart (step 9), configure it to use the PGO secret:
+
+```yaml
+db:
+  useExistingSecret: true
+  existingSecretName: hippo-pguser-calltelemetry
+  sslEnabled: true
+```
+
+### 8. Install NATS Server
+
+```bash
+helm install nats ./helm/charts/nats -n ct-dev
+```
+
+### 9. Install Call Telemetry API
+
+```bash
+helm install api calltelemetry/api \
+  -n ct-dev \
+  -f examples/api-ct-dev-values.yaml
+```
+
+**Cloud storage class for logs:**
+```yaml
+logs:
+  storageClassName: do-block-storage  # or gp3, managed-csi
+```
+
+### 10. Install Vue Web Frontend
+
+```bash
+helm install ct-web calltelemetry/ct-web \
+  -n ct-dev \
+  -f examples/vue-web-ct-dev-values.yaml
+```
+
+### 11. Install Traceroute Service
+
+```bash
+helm install traceroute calltelemetry/traceroute \
+  -n ct-dev \
+  -f examples/traceroute-ct-dev-values.yaml
 ```
 
 ## Verify the Installation
 
-Check that all pods are running in both namespaces:
-
 ```bash
-# Check ct-dev namespace
+# Check all pods
 kubectl get pods -n ct-dev
 
-# Check ct-prod namespace
-kubectl get pods -n ct-prod
-```
+# Check services and external IPs
+kubectl get svc -n ct-dev
 
-Verify the services and their external IPs:
-
-```bash
-# Check ct-dev namespace
-kubectl get services -n ct-dev
-
-# Check ct-prod namespace
-kubectl get services -n ct-prod
-```
-
-Check the ingress resources:
-
-```bash
-# Check ct-dev namespace
+# Check ingress resources
 kubectl get ingress -n ct-dev
 
-# Check ct-prod namespace
-kubectl get ingress -n ct-prod
+# Check PostgreSQL cluster (CNPG only)
+kubectl get cluster -n ct-dev
 ```
 
-## Testing the Deployment
+### Test the Endpoints
 
-Test the API endpoints using curl for both environments:
+**On-prem (static MetalLB IPs):**
+```bash
+curl -H "Host: k8s1.calltelemetry.local" http://192.168.123.237/api
+curl -H "Host: k8s1.calltelemetry.local" http://192.168.123.235/api/policy
+```
+
+**Cloud (dynamic IPs):**
+```bash
+# Get the admin LB IP
+ADMIN_IP=$(kubectl get svc -n ct-dev admin-api-lb -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+curl -H "Host: your-hostname.com" http://$ADMIN_IP/api
+```
+
+## Multi-Namespace Deployment
+
+To run multiple environments on the same cluster (e.g., dev + prod), repeat steps 3-11 for each namespace. Cluster-wide resources (MetalLB, CNPG operator) only need to be installed once.
 
 ```bash
-# Test the dev environment
-# Test the admin API
-curl -H "Host: dev.calltelemetry.com" http://192.168.123.237/api
+# Dev
+kubectl create namespace ct-dev
+# ... install charts in ct-dev
 
-# Test the primary API
-curl -H "Host: dev.calltelemetry.com" http://192.168.123.235/api/policy
-
-# Test the prod environment
-# Test the admin API
-curl -H "Host: prod.calltelemetry.com" http://192.168.123.217/api
-
-# Test the primary API
-curl -H "Host: prod.calltelemetry.com" http://192.168.123.225/api/policy
+# Prod
+kubectl create namespace ct-prod
+# ... install charts in ct-prod with prod values
 ```
+
+Each namespace gets its own HAProxy IngressClass, load balancer IPs, and database.
 
 ## Troubleshooting
 
 ### Database Connection Issues
 
-If the API pods are having trouble connecting to the database, verify the database secret:
-
 ```bash
-# For ct-dev namespace
+# CNPG: check cluster health
+kubectl get cluster -n ct-dev -o yaml
+
+# PGO: verify secret was copied
 kubectl get secret hippo-pguser-calltelemetry -n ct-dev -o jsonpath='{.data}' | jq
 
-# For ct-prod namespace
-kubectl get secret hippo-pguser-calltelemetry -n ct-prod -o jsonpath='{.data}' | jq
+# API logs
+kubectl logs -n ct-dev -l app=api --tail=50
 ```
 
 ### Ingress Routing Issues
 
-Check the HAProxy Ingress Controller logs:
+```bash
+kubectl logs -n ct-dev -l app.kubernetes.io/name=haproxy-ingress
+kubectl get configmap -n ct-dev haproxy-tcp-services -o yaml
+```
+
+### Load Balancer Issues
 
 ```bash
-# For ct-dev namespace
-kubectl logs -n ct-dev -l app.kubernetes.io/name=haproxy-ingress
+# On-prem: MetalLB
+kubectl logs -n metallb-system -l app=metallb -l component=speaker
+kubectl get ipaddresspool -n metallb-system
+kubectl get l2advertisement -n metallb-system
 
-# For ct-prod namespace
-kubectl logs -n ct-prod -l app.kubernetes.io/name=haproxy-ingress
+# Cloud: check external IP assignment
+kubectl get svc -n ct-dev -o wide
 ```
 
 ### SFTP Connection Issues
 
-If you're having trouble connecting to the SFTP server, verify that HAProxy is properly configured to forward port 22:
-
 ```bash
-# Check if HAProxy is listening on port 22
-kubectl exec -n ct-dev $(kubectl get pods -n ct-dev -l app.kubernetes.io/name=haproxy-ingress -o jsonpath='{.items[0].metadata.name}') -- netstat -tulpn | grep ":22"
-
-# Check the TCP services configmap
-kubectl get configmap -n ct-dev haproxy-tcp-services -o yaml
+kubectl exec -n ct-dev \
+  $(kubectl get pods -n ct-dev -l app.kubernetes.io/name=haproxy-ingress -o jsonpath='{.items[0].metadata.name}') \
+  -- netstat -tulpn | grep ":22"
 ```
+
+### Helm v4 Field Manager Conflicts
+
+If `helm upgrade` fails with field ownership errors, pass `--server-side=false` as a flag. Helm v4 defaults to Server-Side Apply which conflicts with controllers that mutate their own resources (MetalLB, CNPG). This is expected on single-tenant clusters.
 
 ### Pod Startup Issues
 
-Check the logs of the failing pods:
-
 ```bash
-# For ct-dev namespace
-kubectl logs -n ct-dev <pod-name>
-
-# For ct-prod namespace
-kubectl logs -n ct-prod <pod-name>
+kubectl describe pod -n ct-dev <pod-name>
+kubectl logs -n ct-dev <pod-name> --previous
 ```
-
-## Conclusion
-
-You now have a fully functional Call Telemetry deployment with HAProxy as the ingress controller. This setup provides high availability and scalability for production environments.
-
-For more information on customizing your deployment, refer to the Call Telemetry documentation.

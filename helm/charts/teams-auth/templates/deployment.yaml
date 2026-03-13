@@ -35,3 +35,15 @@ spec:
               value: "{{ .Values.port | default 3000 }}"
             - name: DEBUG_LEVEL
               value: "{{ .Values.debugLevel }}"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.port | default 3000 }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.port | default 3000 }}
+            initialDelaySeconds: 5
+            periodSeconds: 5

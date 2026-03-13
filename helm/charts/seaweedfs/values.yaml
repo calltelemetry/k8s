@@ -15,10 +15,10 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-# SeaweedFS S3 credentials
+# SeaweedFS S3 credentials — leave empty to require explicit override or credential-generator
 auth:
-  accessKey: minioadmin
-  secretKey: minioadmin
+  accessKey: ""
+  secretKey: ""
   # Use existing secret instead of creating one
   # Set to "seaweedfs-credentials" to use credentials from credential-generator hook
   existingSecret: ""
@@ -40,11 +40,10 @@ persistence:
   existingClaim: ""
 
 # S3 configuration for SeaweedFS
+# Note: s3Config is only used if NOT using auth.existingSecret.
+# With credential-generator, set auth.existingSecret: "seaweedfs-credentials"
 s3Config:
-  # Admin user with full permissions
   admin:
-    accessKey: minioadmin
-    secretKey: minioadmin
     actions:
       - Admin
       - Read

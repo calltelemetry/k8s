@@ -71,6 +71,12 @@ sftp:
   imagePullPolicy: Always
   cpus: 1
   logging_level: info
+  # SFTP credentials — override in your values file or use credential-generator
+  username: sftpuser
+  password: ""  # REQUIRED: must be set in your values override
+  # Use an existing secret for SFTP credentials (keys: USER_NAME, USER_PASSWORD)
+  # Set to "sftp-credentials" to use credentials from credential-generator hook
+  existingSecret: ""
 syslog:
   enabled: false
   tcp_port: 514
@@ -81,12 +87,12 @@ db:
   useExistingSecret: false # Set to false to use direct values
   existingSecretName: api-db-secret # Name of the secret containing DB credentials
   values:
-    db_username: postgres
-    db_password: calltelemetry
-    db_name: calltelemetry_prod
-    db_hostname: hippo-ha.postgres-operator.svc.cluster.local
+    db_username: ""
+    db_password: ""
+    db_name: calltelemetry
+    db_hostname: postgresql-rw
     db_port: "5432"
-    db_ssl_enabled: true
+    db_ssl_enabled: false
 logging_level: debug
 nats_server: "nats"
 teams_auth_service: "teams-auth-service"
@@ -96,7 +102,7 @@ logs:
   size: 1Gi # Example: "5Gi" for larger clusters
   accessModes:
     - ReadWriteOnce
-  storageClassName: "local-path" # Default K3s storage class; override for other providers
+  storageClassName: "" # Empty uses cluster default (local-path on K3s, do-block-storage on DO, gp3 on EKS, managed-csi on AKS)
   path: "/var/log"
 
 # Example override snippet:
