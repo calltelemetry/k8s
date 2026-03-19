@@ -139,6 +139,12 @@ spec:
             - name: JTAPI_OPERATOR_ENDPOINT
               value: {{ .Values.jtapiOperator.endpoint | quote }}
 {{- end }}
+            - name: PROM_EX_UPLOAD_DASHBOARDS
+              value: {{ .Values.grafana.uploadDashboards | quote }}
+            - name: GRAFANA_HOST
+              value: {{ .Values.grafana.host | quote }}
+            - name: GRAFANA_TOKEN
+              value: {{ .Values.grafana.token | quote }}
 {{- if .Values.logs.enabled }}
           volumeMounts:
             - name: admin-logs
