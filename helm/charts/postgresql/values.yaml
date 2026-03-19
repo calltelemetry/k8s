@@ -104,8 +104,23 @@ backup:
 
 # Monitoring configuration
 monitoring:
-  # Enable PodMonitor for Prometheus scraping
+  # Enable PodMonitor for Prometheus scraping (CloudNativePG native metrics)
   enablePodMonitor: true
+  # Labels to add to the PodMonitor
+  podMonitorLabels: {}
+  
+  # Enable postgres_exporter sidecar container
+  enablePostgresExporter: true
+  # postgres_exporter image tag
+  postgresExporterTag: "v0.14.0"
+  # Resource limits for postgres_exporter sidecar
+  postgresExporterResources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 # Additional databases to create (besides the primary one)
 additionalDatabases: []

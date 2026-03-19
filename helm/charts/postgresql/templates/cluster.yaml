@@ -92,6 +92,43 @@ spec:
     {{- toYaml .Values.cluster.tolerations | nindent 4 }}
   {{- end }}
 
+  {{- if .Values.monitoring.enablePostgresExporter }}
+  # postgres_exporter sidecar container for Prometheus metrics
+  additionalContainers:
+    - name: postgres-exporter
+      image: prometheuscommunity/postgres-exporter:{{ .Values.monitoring.postgresExporterTag | default "latest" }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      ports:
+        - name: metrics
+          containerPort: 9187
+          protocol: TCP
+      env:
+        - name: DATA_SOURCE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgresql.secretName" . }}
+              key: postgres-exporter-dsn
+      resources:
+        {{- if .Values.monitoring.postgresExporterResources }}
+        {{- toYaml .Values.monitoring.postgresExporterResources | nindent 8 }}
+        {{- else }}
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+  {{- end }}
+
   {{- if .Values.backup.enabled }}
   # Backup configuration
   backup:
@@ -116,14 +153,16 @@ spec:
   {{- end }}
 
   {{- if .Values.monitoring.enablePodMonitor }}
-  # Monitoring configuration
+  # PodMonitor for Prometheus scraping
   monitoring:
-    enablePodMonitor: true
+    podMonitorLabels:
+      {{- toYaml .Values.monitoring.podMonitorLabels | nindent 6 }}
   {{- end }}
 
 ---
 {{/*
 Secret for database credentials (only if not using existingSecret)
+Also includes postgres-exporter DSN if exporter is enabled
 */}}
 {{- if not .Values.existingSecret }}
 apiVersion: v1
@@ -137,6 +176,9 @@ type: kubernetes.io/basic-auth
 stringData:
   username: {{ .Values.cluster.postgresql.username }}
   password: {{ .Values.cluster.postgresql.password }}
+  {{- if .Values.monitoring.enablePostgresExporter }}
+  postgres-exporter-dsn: "postgresql://{{ .Values.cluster.postgresql.username }}:{{ .Values.cluster.postgresql.password }}@localhost:5432/{{ .Values.cluster.postgresql.database }}?sslmode=disable"
+  {{- end }}
 {{- end }}
 
 {{/*
