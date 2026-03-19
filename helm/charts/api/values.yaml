@@ -108,6 +108,14 @@ logs:
 # Ingress configuration
 ingressClassName: haproxy
 
+# Grafana / PromEx dashboard upload
+# On startup the API uploads PromEx dashboards (built-in + custom) to Grafana.
+# Override grafana.token via --set or a secret values file — never commit real tokens.
+grafana:
+  uploadDashboards: "true"
+  host: "http://grafana:3000/grafana"
+  token: ""
+
 # JTAPI Sidecar Integration
 # NOTE: Standalone JTAPI sidecars are now operator-managed via JtapiCluster CRDs
 # in the jtapi-operator. This config enables the API to watch and communicate
