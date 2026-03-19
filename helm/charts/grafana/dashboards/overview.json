@@ -12,7 +12,7 @@
     {
       "title": "PostgreSQL",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_up", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 0, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }] } },
@@ -21,7 +21,7 @@
     {
       "title": "NATS",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "gnatsd_varz_current_connections > 0 or vector(0)", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 3, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "range", "options": { "from": 1, "to": 999999, "result": { "text": "UP", "color": "green" } } }, { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" } } }] } },
@@ -30,7 +30,7 @@
     {
       "title": "S3 Storage",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "minio_cluster_nodes_online_total", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 6, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "range", "options": { "from": 1, "to": 999999, "result": { "text": "UP", "color": "green" } } }, { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" } } }] } },
@@ -39,7 +39,7 @@
     {
       "title": "Caddy",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "caddy_http_requests_in_flight >= 0 or vector(0)", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 9, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "range", "options": { "from": 0, "to": 999999, "result": { "text": "UP", "color": "green" } } }] } },
@@ -48,7 +48,7 @@
     {
       "title": "JTAPI CTI Pool",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_cti_pool_operational", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 12, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }] } },
@@ -57,7 +57,7 @@
     {
       "title": "JTAPI Streaming",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_streaming_available", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 15, "y": 1 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "STUB", "color": "yellow" }, "1": { "text": "REAL", "color": "green" } } }] } }
@@ -65,7 +65,7 @@
     {
       "title": "OTEL Collector",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(otelcol_receiver_accepted_spans[1m]))", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 18, "y": 1 },
       "fieldConfig": { "defaults": { "unit": "ops", "noValue": "0" } },
@@ -74,7 +74,7 @@
     {
       "title": "OTEL Failures",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(otelcol_exporter_send_failed_spans[5m]))", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 21, "y": 1 },
       "fieldConfig": { "defaults": { "unit": "ops", "noValue": "0", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] } } }
@@ -89,14 +89,14 @@
     {
       "title": "PG Connections",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(pg_stat_activity_count)", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 0, "y": 5 }
     },
     {
       "title": "PG TPS",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(pg_stat_database_xact_commit[1m]))", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 3, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -104,7 +104,7 @@
     {
       "title": "PG Cache Hit %",
       "type": "gauge",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "(sum(rate(pg_stat_database_blks_hit[5m])) / (sum(rate(pg_stat_database_blks_hit[5m])) + sum(rate(pg_stat_database_blks_read[5m])))) * 100", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 6, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "value": 0, "color": "red" }, { "value": 80, "color": "yellow" }, { "value": 95, "color": "green" }] } } }
@@ -112,7 +112,7 @@
     {
       "title": "NATS Msgs/s",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(gnatsd_varz_in_msgs[1m]) + rate(gnatsd_varz_out_msgs[1m])", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 9, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -120,21 +120,21 @@
     {
       "title": "JetStream Streams",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jetstream_server_total_streams", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 12, "y": 5 }
     },
     {
       "title": "JS Consumers",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jetstream_server_total_consumers", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 15, "y": 5 }
     },
     {
       "title": "S3 Req/s",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(minio_s3_requests_total[1m]))", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 18, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -142,7 +142,7 @@
     {
       "title": "S3 Storage Used",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "minio_cluster_usage_total_bytes", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 21, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "bytes" } }
@@ -157,14 +157,14 @@
     {
       "title": "CTI Ports In Use",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_cti_ports_in_use", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 0, "y": 9 }
     },
     {
       "title": "CTI Ports Idle",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_cti_ports_idle", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 3, "y": 9 },
       "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" } } }
@@ -172,7 +172,7 @@
     {
       "title": "CTI Ports Error",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_cti_ports_error", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 6, "y": 9 },
       "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "red" }] } } }
@@ -180,21 +180,21 @@
     {
       "title": "Active Streams",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_streams_active", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 9, "y": 9 }
     },
     {
       "title": "Calls Monitored",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "jtapi_calls_monitored_total", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 12, "y": 9 }
     },
     {
       "title": "Injections OK",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(jtapi_injections_total{status=\"success\"}[5m])", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 15, "y": 9 },
       "fieldConfig": { "defaults": { "unit": "ops", "color": { "mode": "fixed", "fixedColor": "green" } } }
@@ -202,7 +202,7 @@
     {
       "title": "Injections Failed",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(jtapi_injections_total{status=\"failed\"}[5m])", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 18, "y": 9 },
       "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 0.01, "color": "red" }] } } }
@@ -210,7 +210,7 @@
     {
       "title": "Injection Success %",
       "type": "gauge",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "(rate(jtapi_injections_total{status=\"success\"}[5m]) / (rate(jtapi_injections_total{status=\"success\"}[5m]) + rate(jtapi_injections_total{status=\"failed\"}[5m]))) * 100", "legendFormat": "" }],
       "gridPos": { "h": 3, "w": 3, "x": 21, "y": 9 },
       "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "value": 0, "color": "red" }, { "value": 90, "color": "yellow" }, { "value": 99, "color": "green" }] } } }
@@ -225,7 +225,7 @@
     {
       "title": "PostgreSQL Transactions",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "sum(rate(pg_stat_database_xact_commit[5m]))", "legendFormat": "commits" },
         { "expr": "sum(rate(pg_stat_database_xact_rollback[5m]))", "legendFormat": "rollbacks" }
@@ -236,7 +236,7 @@
     {
       "title": "NATS Messages",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "rate(gnatsd_varz_in_msgs[1m])", "legendFormat": "in" },
         { "expr": "rate(gnatsd_varz_out_msgs[1m])", "legendFormat": "out" }
@@ -247,7 +247,7 @@
     {
       "title": "Caddy Requests & Latency",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "sum(rate(caddy_http_requests_total[1m]))", "legendFormat": "req/s" },
         { "expr": "histogram_quantile(0.99, sum(rate(caddy_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "P99 latency" }
@@ -258,7 +258,7 @@
     {
       "title": "JTAPI Calls & Injections",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "rate(jtapi_calls_monitored_total[5m])", "legendFormat": "calls" },
         { "expr": "rate(jtapi_injections_total{status=\"success\"}[5m])", "legendFormat": "injections ok" },
@@ -270,7 +270,7 @@
     {
       "title": "S3 Operations",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(minio_s3_requests_total[5m])", "legendFormat": "{{ api }}" }],
       "gridPos": { "h": 7, "w": 6, "x": 0, "y": 20 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -278,7 +278,7 @@
     {
       "title": "S3 Bandwidth",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "rate(minio_s3_traffic_sent_bytes[1m])", "legendFormat": "sent" },
         { "expr": "rate(minio_s3_traffic_received_bytes[1m])", "legendFormat": "received" }
@@ -289,7 +289,7 @@
     {
       "title": "OTEL Pipeline",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "sum(rate(otelcol_receiver_accepted_spans[1m]))", "legendFormat": "received" },
         { "expr": "sum(rate(otelcol_exporter_sent_spans[1m]))", "legendFormat": "exported" },
@@ -301,7 +301,7 @@
     {
       "title": "CTI Port Pool",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "jtapi_cti_port_pool_size", "legendFormat": "pool size" },
         { "expr": "jtapi_cti_ports_in_use", "legendFormat": "in use" },

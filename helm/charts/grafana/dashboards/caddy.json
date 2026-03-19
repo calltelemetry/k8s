@@ -6,14 +6,14 @@
     {
       "title": "Requests In Flight",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "caddy_http_requests_in_flight", "legendFormat": "inflight" }],
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
     },
     {
       "title": "Request Rate",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(caddy_http_requests_total[1m]))", "legendFormat": "req/s" }],
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -21,7 +21,7 @@
     {
       "title": "Error Rate",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(caddy_http_request_errors_total[5m]))", "legendFormat": "errors/s" }],
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "yellow" }, { "value": 10, "color": "red" }] } } }
@@ -29,7 +29,7 @@
     {
       "title": "P99 Latency",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "histogram_quantile(0.99, sum(rate(caddy_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "P99" }],
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "s" } }
@@ -37,7 +37,7 @@
     {
       "title": "Request Rate by Handler",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(caddy_http_requests_total[1m])", "legendFormat": "{{ handler }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -45,7 +45,7 @@
     {
       "title": "Request Duration (P50 / P95 / P99)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "histogram_quantile(0.50, sum(rate(caddy_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "P50" },
         { "expr": "histogram_quantile(0.95, sum(rate(caddy_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "P95" },
@@ -57,7 +57,7 @@
     {
       "title": "Response Size (P50 / P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "histogram_quantile(0.50, sum(rate(caddy_http_response_size_bytes_bucket[5m])) by (le))", "legendFormat": "P50" },
         { "expr": "histogram_quantile(0.95, sum(rate(caddy_http_response_size_bytes_bucket[5m])) by (le))", "legendFormat": "P95" }
@@ -68,7 +68,7 @@
     {
       "title": "5xx Errors",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "rate(caddy_http_requests_total{code=~\"5..\"}[1m])", "legendFormat": "{{ code }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -76,14 +76,14 @@
     {
       "title": "Upstream Health",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "caddy_reverse_proxy_upstreams_healthy", "legendFormat": "{{ upstream }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
     },
     {
       "title": "Memory / Goroutines",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "process_resident_memory_bytes{job=\"caddy\"}", "legendFormat": "memory" },
         { "expr": "go_goroutines{job=\"caddy\"}", "legendFormat": "goroutines" }

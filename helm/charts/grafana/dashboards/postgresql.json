@@ -6,7 +6,7 @@
     {
       "title": "PostgreSQL Up",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_up", "legendFormat": "status" }],
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }] } }
@@ -14,14 +14,14 @@
     {
       "title": "Active Connections",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(pg_stat_activity_count)", "legendFormat": "connections" }],
       "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
     },
     {
       "title": "Cache Hit Ratio",
       "type": "gauge",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "(sum(rate(pg_stat_database_blks_hit[5m])) / (sum(rate(pg_stat_database_blks_hit[5m])) + sum(rate(pg_stat_database_blks_read[5m])))) * 100", "legendFormat": "hit %" }],
       "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "value": 0, "color": "red" }, { "value": 80, "color": "yellow" }, { "value": 95, "color": "green" }] } } }
@@ -29,7 +29,7 @@
     {
       "title": "Transactions Per Second",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(pg_stat_database_xact_commit[1m]) + rate(pg_stat_database_xact_rollback[1m]))", "legendFormat": "TPS" }],
       "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops" } }
@@ -37,14 +37,14 @@
     {
       "title": "Max Connections",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_settings_max_connections", "legendFormat": "max" }],
       "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
     },
     {
       "title": "Rollback Rate",
       "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "sum(rate(pg_stat_database_xact_rollback[5m]))", "legendFormat": "rollbacks/s" }],
       "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops", "thresholds": { "steps": [{ "value": 0, "color": "green" }, { "value": 1, "color": "yellow" }, { "value": 5, "color": "red" }] } } }
@@ -52,14 +52,14 @@
     {
       "title": "Connections by State",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_stat_activity_count", "legendFormat": "{{ state }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
     },
     {
       "title": "Transactions (Commits vs Rollbacks)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "sum(rate(pg_stat_database_xact_commit[5m]))", "legendFormat": "commits/s" },
         { "expr": "sum(rate(pg_stat_database_xact_rollback[5m]))", "legendFormat": "rollbacks/s" }
@@ -70,7 +70,7 @@
     {
       "title": "Buffer Cache Hit vs Read",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "sum(rate(pg_stat_database_blks_hit[5m]))", "legendFormat": "cache hits" },
         { "expr": "sum(rate(pg_stat_database_blks_read[5m]))", "legendFormat": "disk reads" }
@@ -81,7 +81,7 @@
     {
       "title": "Checkpoints",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [
         { "expr": "rate(pg_stat_bgwriter_checkpoints_timed[5m])", "legendFormat": "scheduled" },
         { "expr": "rate(pg_stat_bgwriter_checkpoints_req[5m])", "legendFormat": "requested" }
@@ -91,14 +91,14 @@
     {
       "title": "Connections by Database",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_stat_activity_count{state=\"active\"}", "legendFormat": "{{ datname }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
     },
     {
       "title": "Database Size",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "calltelemetry-prometheus" },
       "targets": [{ "expr": "pg_database_size_bytes", "legendFormat": "{{ datname }}" }],
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
       "fieldConfig": { "defaults": { "unit": "bytes" } }
