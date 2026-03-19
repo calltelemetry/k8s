@@ -16,6 +16,7 @@ data:
       - name: {{ .Values.dashboards.provider.name | quote }}
         orgId: 1
         folder: {{ .Values.dashboards.provider.folder | quote }}
+        folderUid: "calltelemetry"
         type: file
         disableDeletion: false
         updateIntervalSeconds: {{ .Values.dashboards.provider.updateIntervalSeconds }}
