@@ -47,7 +47,7 @@ data:
       # PostgreSQL metrics via CNPG native exporter (port 9187 on pod)
       - job_name: 'postgresql'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "postgresql-rw" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "postgresql-metrics" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.caddy.enabled }}
