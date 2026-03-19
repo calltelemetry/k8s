@@ -54,6 +54,10 @@ spec:
             {{- end }}
             - name: GF_USERS_ALLOW_SIGN_UP
               value: {{ .Values.config.allowSignUp | quote }}
+            - name: GF_SERVER_ROOT_URL
+              value: "/grafana"
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "true"
             {{- if .Values.authProxy.enabled }}
             - name: GF_AUTH_PROXY_ENABLED
               value: "true"
