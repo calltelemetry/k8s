@@ -54,6 +54,18 @@ spec:
             {{- end }}
             - name: GF_USERS_ALLOW_SIGN_UP
               value: {{ .Values.config.allowSignUp | quote }}
+            {{- if .Values.authProxy.enabled }}
+            - name: GF_AUTH_PROXY_ENABLED
+              value: "true"
+            - name: GF_AUTH_PROXY_HEADER_NAME
+              value: {{ .Values.authProxy.headerName | quote }}
+            - name: GF_AUTH_PROXY_HEADER_PROPERTY
+              value: {{ .Values.authProxy.headerProperty | quote }}
+            - name: GF_AUTH_PROXY_AUTO_SIGN_UP
+              value: {{ .Values.authProxy.autoSignUp | quote }}
+            - name: GF_AUTH_DISABLE_LOGIN_FORM
+              value: "false"
+            {{- end }}
           {{- if .Values.admin.existingSecret }}
           envFrom:
             - secretRef:

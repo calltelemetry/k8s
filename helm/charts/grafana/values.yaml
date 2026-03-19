@@ -19,6 +19,13 @@ config:
   # Disable signup
   allowSignUp: false
 
+# Auth proxy — Caddy/Ingress validates CT JWT, passes X-Webauth-User header
+authProxy:
+  enabled: true
+  headerName: X-Webauth-User
+  headerProperty: email
+  autoSignUp: true
+
 # Datasources configuration
 datasources:
   # Prometheus datasource (auto-configured)
@@ -26,6 +33,10 @@ datasources:
     enabled: true
     # URL will be templated with namespace
     url: ""  # Leave empty to auto-detect: http://prometheus.NAMESPACE.svc.cluster.local:9090
+  # AlertManager datasource (alert state + silences in Grafana Alerting tab)
+  alertmanager:
+    enabled: true
+    url: ""  # Leave empty to auto-detect: http://alertmanager.NAMESPACE.svc.cluster.local:9093
   # Tempo datasource (traces)
   tempo:
     enabled: false

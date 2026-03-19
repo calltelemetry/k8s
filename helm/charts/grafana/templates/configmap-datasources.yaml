@@ -20,6 +20,16 @@ data:
         isDefault: true
         editable: false
       {{- end }}
+      {{- if .Values.datasources.alertmanager.enabled }}
+      - name: AlertManager
+        type: alertmanager
+        access: proxy
+        url: {{ include "grafana.alertmanagerUrl" . }}
+        editable: false
+        jsonData:
+          implementation: prometheus
+          handleGrafanaManagedAlerts: false
+      {{- end }}
       {{- if .Values.datasources.tempo.enabled }}
       - name: Tempo
         type: tempo
