@@ -24,9 +24,17 @@ api:
 vue_web:
   values_file: examples/vue-web-appliance-values.yaml
 
+# Teams Auth configuration (not used in appliance, but helmfile references it)
+teams_auth:
+  values_file: examples/teams-auth-ct-dev-values.yaml
+
 # Traceroute configuration
 traceroute:
   values_file: examples/traceroute-appliance-values.yaml
+
+# Echo configuration (not used in appliance)
+echo:
+  values_file: examples/echo-haproxy-ct-dev-values.yaml
 
 # PostgreSQL configuration (CloudNativePG)
 postgresql:
@@ -37,7 +45,8 @@ nats:
   values_file: examples/nats-appliance-values.yaml
 
 # MetalLB IP addresses — placeholders, overridden at first-boot
+# Must be unique even for single-node (MetalLB rejects overlapping CIDRs)
 metallb:
   primary_ip: "192.168.1.100"
-  secondary_ip: "192.168.1.100"
-  admin_ip: "192.168.1.100"
+  secondary_ip: "192.168.1.101"
+  admin_ip: "192.168.1.102"
