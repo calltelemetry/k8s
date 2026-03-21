@@ -5,13 +5,15 @@ ingressClassName: haproxy-ct
 # Database configuration
 db:
   useExistingSecret: true
-  existingSecretName: hippo-pguser-calltelemetry
+  existingSecretName: postgresql-app-credentials
+  values:
+    db_ssl_enabled: false
 
 # API Config
 api:
   hostname: calltelemetry.local
   image: calltelemetry/web
-  tag: latest
+  tag: 0.8.6-rc140
   imagePullPolicy: IfNotPresent
   replicas: 1
   ingress:
@@ -24,7 +26,7 @@ admin:
   api_worker: true
   hostname: calltelemetry.local
   image: calltelemetry/web
-  tag: latest
+  tag: 0.8.6-rc140
   imagePullPolicy: IfNotPresent
   ingress:
     annotations:

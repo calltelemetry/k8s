@@ -6,7 +6,7 @@ environment: prod
 vue_web:
   image:
     repository: calltelemetry/vue
-    tag: latest
+    tag: 0.8.6-rc140
     pullPolicy: IfNotPresent
   port: 80
   LogLevel: "INFO"
