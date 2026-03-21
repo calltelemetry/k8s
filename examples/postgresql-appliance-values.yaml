@@ -3,7 +3,7 @@
 
 image:
   repository: calltelemetry/postgres
-  tag: "17"
+  tag: "17-cnpg"
 
 cluster:
   instances: 1
