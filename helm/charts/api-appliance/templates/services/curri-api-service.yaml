@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: curri-api-service
+  labels:
+    app: curri-api-service
+spec:
+  type: ClusterIP
+  selector:
+    role_curri_api: "true"
+  ports:
+    - port: 4080
+      targetPort: 4080
+      protocol: TCP
+      name: http

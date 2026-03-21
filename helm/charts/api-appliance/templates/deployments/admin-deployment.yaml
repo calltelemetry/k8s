@@ -1,0 +1,143 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-service
+  labels:
+    app: admin-service
+spec:
+  selector:
+    matchLabels:
+      app: admin-service
+  replicas: {{ .Values.admin.replicas }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 70%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: admin-service
+        role_curri_api: {{ .Values.admin.api_worker | quote }}
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.userid }}
+      tolerations:
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 2
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 2
+      terminationGracePeriodSeconds: 5
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Release.Name }}-admin-service
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Release.Name }}-admin
+          image: {{ .Values.admin.image }}:{{ .Values.admin.tag }}
+          imagePullPolicy: {{ .Values.admin.imagePullPolicy }}
+          ports:
+            {{- range .Values.admin.container_ports }}
+            - containerPort: {{ .port }}
+              name: {{ .name }}
+            {{- end }}
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              cpu: {{ .Values.admin.cpus }}
+{{- if .Values.admin.probesEnabled }}
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /healthz
+              port: 4080
+            initialDelaySeconds: {{ .Values.admin.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admin.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admin.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /healthz
+              port: 4080
+            initialDelaySeconds: {{ .Values.admin.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admin.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admin.readinessProbe.failureThreshold }}
+{{- end }}
+          env:
+            - name: EXTERNAL_IP
+              value: {{ .Values.hostname | quote }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: dbname
+            - name: DB_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
+                  key: port
+            - name: DB_SSL_ENABLED
+              value: "{{ .Values.db.values.db_ssl_enabled | default true }}"
+            - name: CDR_ROOT_PATH
+              value: {{ .Values.cdr_root_path | quote }}
+            - name: LOGGING_LEVEL
+              value: {{ .Values.admin.logging_level | quote }}
+            - name: LOCAL_NATS
+              value: {{ .Values.nats_server | quote }}
+            - name: WORKER_NODE
+              value: "{{ if .Values.admin.api_worker }}TRUE{{ else }}FALSE{{ end }}"
+            - name: ADMIN_NODE
+              value: "TRUE"
+            - name: HTTP_ADAPTER
+              value: "HACKNEY"
+            - name: CERT_KEY
+              value: "/home/app/cert/appliance_key.pem"
+            - name: CERT_PUBLIC
+              value: "/home/app/cert/appliance.pem"
+            - name: TEAMS_AUTH_SERVICE
+              value: {{ .Values.teams_auth_service | quote }}
+            - name: LOG_PATH
+              value: {{ .Values.logs.path | quote }}
+{{- if .Values.logs.enabled }}
+          volumeMounts:
+            - name: admin-logs
+              mountPath: {{ .Values.logs.path | quote }}
+{{- end }}
+{{- if .Values.logs.enabled }}
+      volumes:
+        - name: admin-logs
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-admin-logs
+{{- end }}

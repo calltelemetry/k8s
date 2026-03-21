@@ -2,11 +2,17 @@
 # Single-node K3s appliance with SFTP and syslog enabled
 ingressClassName: haproxy-ct
 
-# Database configuration
+# Database configuration — use direct values (not existing secret)
+# because the published API chart hardcodes DB_SSL_ENABLED=true
+# when useExistingSecret=true and doesn't respect overrides.
 db:
-  useExistingSecret: true
-  existingSecretName: postgresql-app-credentials
+  useExistingSecret: false
   values:
+    db_username: calltelemetry
+    db_password: calltelemetry_appliance
+    db_name: calltelemetry
+    db_hostname: postgresql-rw
+    db_port: "5432"
     db_ssl_enabled: false
 
 # API Config
