@@ -73,7 +73,7 @@ releases:
     namespace: "{{ .Environment.Values.env.namespace }}"
     chart: ./helm/charts/postgresql
     values:
-      - "{{ .Environment.Values.postgresql.values_file | default \"examples/postgresql-dev-values.yaml\" }}"
+      - '{{ .Environment.Values.postgresql.values_file | default "examples/postgresql-dev-values.yaml" }}'
     needs:
       - cnpg-system/cnpg
 
@@ -128,7 +128,7 @@ releases:
     namespace: "{{ .Environment.Values.env.namespace }}"
     chart: ./helm/charts/nats
     values:
-      - "{{ .Environment.Values.nats.values_file | default \"examples/nats-dev-values.yaml\" }}"
+      - '{{ .Environment.Values.nats.values_file | default "examples/nats-dev-values.yaml" }}'
 
   # Call Telemetry API
   - name: api

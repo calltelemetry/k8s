@@ -19,7 +19,7 @@ primary_api:
 secondary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  metal_ip_address: "192.168.1.100"
+  metal_ip_address: "192.168.1.101"
   annotations:
     haproxy.org/service: secondary-api
 
@@ -27,7 +27,7 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  metal_ip_address: "192.168.1.100"
+  metal_ip_address: "192.168.1.102"
   annotations:
     haproxy.org/service: admin-api
 ### /Load Balancer Configuration ###
