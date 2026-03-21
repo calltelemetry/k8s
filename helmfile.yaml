@@ -44,6 +44,10 @@ environments:
     values:
       - env-common.yaml
       - orb-dev.yaml
+  ct-appliance:
+    values:
+      - env-common.yaml
+      - env-appliance.yaml
 
 ---
 # Global hooks

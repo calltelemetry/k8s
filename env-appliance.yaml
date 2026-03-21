@@ -1,0 +1,43 @@
+# K3s Appliance environment values for CallTelemetry deployment
+# Single-node K3s appliance — all services on one VM, MetalLB for LoadBalancer IPs.
+# Placeholder IPs are overridden at first-boot by env-appliance-runtime.yaml.
+
+# Environment information
+env:
+  namespace: ct
+  environment: appliance
+  domain: calltelemetry.local
+
+# HAProxy configuration
+haproxy:
+  values_file: examples/haproxy-appliance-values.yaml
+
+# Ingress configuration
+ingress:
+  values_file: examples/ingress-appliance-values.yaml
+
+# API configuration
+api:
+  values_file: examples/api-appliance-values.yaml
+
+# Vue Web configuration
+vue_web:
+  values_file: examples/vue-web-appliance-values.yaml
+
+# Traceroute configuration
+traceroute:
+  values_file: examples/traceroute-appliance-values.yaml
+
+# PostgreSQL configuration (CloudNativePG)
+postgresql:
+  values_file: examples/postgresql-appliance-values.yaml
+
+# NATS configuration
+nats:
+  values_file: examples/nats-appliance-values.yaml
+
+# MetalLB IP addresses — placeholders, overridden at first-boot
+metallb:
+  primary_ip: "192.168.1.100"
+  secondary_ip: "192.168.1.100"
+  admin_ip: "192.168.1.100"

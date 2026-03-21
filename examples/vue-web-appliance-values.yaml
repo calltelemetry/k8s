@@ -1,0 +1,25 @@
+# Vue Web Appliance Values
+# Frontend for K3s appliance
+
+image: calltelemetry/vue
+tag: latest
+imagePullPolicy: IfNotPresent
+
+replicas: 1
+
+ingressClassName: haproxy-ct
+
+hostname: calltelemetry.local
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: "haproxy-ct"
+    haproxy.org/load-balance: "roundrobin"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
