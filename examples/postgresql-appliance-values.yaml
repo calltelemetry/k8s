@@ -1,0 +1,40 @@
+# PostgreSQL Appliance Values
+# Single instance, moderate resources, no S3 backups, local storage
+
+image:
+  repository: calltelemetry/postgres
+  tag: "17"
+
+cluster:
+  instances: 1
+
+  postgresql:
+    database: calltelemetry
+    username: calltelemetry
+    password: calltelemetry_appliance
+    shared_preload_libraries:
+      - timescaledb
+      - pg_ivm
+    parameters:
+      max_connections: "200"
+      shared_buffers: "512MB"
+
+  storage:
+    size: 20Gi
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+backup:
+  enabled: false
+
+monitoring:
+  enablePodMonitor: false
+
+pooler:
+  enabled: false
