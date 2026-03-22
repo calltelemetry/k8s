@@ -19,7 +19,7 @@ db:
 api:
   hostname: calltelemetry.local
   image: calltelemetry/web
-  tag: 0.8.6-rc140
+  tag: 0.8.6-rc143
   imagePullPolicy: IfNotPresent
   replicas: 1
   ingress:
@@ -32,7 +32,7 @@ admin:
   api_worker: true
   hostname: calltelemetry.local
   image: calltelemetry/web
-  tag: 0.8.6-rc140
+  tag: 0.8.6-rc143
   imagePullPolicy: IfNotPresent
   ingress:
     annotations:

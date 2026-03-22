@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: calltelemetry/traceroute
-  tag: latest
+  tag: 0.8.6-rc143
   pullPolicy: IfNotPresent
 
 resources:
