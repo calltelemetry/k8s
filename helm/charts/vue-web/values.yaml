@@ -7,7 +7,7 @@ fullnameOverride: "ct-vue"
 replicaCount: 1
 
 image:
-  repository: calltelemetry/ct-quasar
+  repository: calltelemetry/vue
   tag: latest
   pullPolicy: IfNotPresent
 
