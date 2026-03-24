@@ -17,9 +17,14 @@ ingress:
   annotations:
     haproxy.org/cookie-strategy: "insert"
     haproxy.org/cookie-name: "CTSESSIONID"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    haproxy.org/ssl-redirect: "true"
   hosts:
     - host: prod.calltelemetry.com
       paths: ['/', '/#']
-  tls: []  # Disabled TLS for testing
+  tls:
+    - secretName: prod-calltelemetry-com-tls
+      hosts:
+        - prod.calltelemetry.com
 
 resources: {}

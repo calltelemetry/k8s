@@ -1,0 +1,31 @@
+# Vue Web Appliance Values
+# Frontend for K3s appliance
+
+replicaCount: 1
+environment: prod
+vue_web:
+  image:
+    repository: calltelemetry/vue
+    tag: 0.8.6-rc143
+    pullPolicy: IfNotPresent
+  port: 80
+  LogLevel: "INFO"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  ingressClassName: haproxy-ct
+  annotations:
+    kubernetes.io/ingress.class: "haproxy-ct"
+    haproxy.org/cookie-strategy: "insert"
+    haproxy.org/cookie-name: "CTSESSIONID"
+  hosts:
+    - host: calltelemetry.local
+      paths: ["/", "/#"]
+  tls: []
+
+resources: {}

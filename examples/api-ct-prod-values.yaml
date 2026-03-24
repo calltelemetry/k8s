@@ -9,19 +9,28 @@ db:
 # API Config
 api:
   hostname: prod.calltelemetry.com
-  # Example of API ingress annotations if needed
   ingress:
     annotations:
       haproxy.org/load-balance: "leastconn"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      haproxy.org/ssl-redirect: "true"
+  tls:
+    - secretName: prod-calltelemetry-com-tls
+      hosts:
+        - prod.calltelemetry.com
 
 # Admin configuration
 admin:
   api_worker: true
   hostname: prod.calltelemetry.com
-  # Example of adding additional ingress annotations if needed
-  # ingress:
-  #   annotations:
-  #     haproxy.org/ssl-redirect: "true"
+  ingress:
+    annotations:
+      haproxy.org/ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  tls:
+    - secretName: prod-calltelemetry-com-tls
+      hosts:
+        - prod.calltelemetry.com
 
 
 # SFTP Configuration

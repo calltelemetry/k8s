@@ -1,0 +1,26 @@
+{{/*
+PodMonitor for Prometheus scraping of PostgreSQL metrics
+This creates a Kubernetes Prometheus Operator PodMonitor CRD that Prometheus will discover and scrape.
+*/}}
+{{- if and .Values.monitoring.enablePodMonitor .Values.monitoring.enablePostgresExporter }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "postgresql.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.podMonitorLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "postgresql.selectorLabels" . | nindent 6 }}
+  podMetricsEndpoints:
+    # postgres_exporter metrics
+    - port: metrics
+      interval: 15s
+      path: /metrics
+      scrapeTimeout: 10s
+{{- end }}

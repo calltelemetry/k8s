@@ -14,11 +14,23 @@ data:
     datasources:
       {{- if .Values.datasources.prometheus.enabled }}
       - name: Prometheus
+        uid: calltelemetry-prometheus
         type: prometheus
         access: proxy
         url: {{ include "grafana.prometheusUrl" . }}
         isDefault: true
         editable: false
+      {{- end }}
+      {{- if .Values.datasources.alertmanager.enabled }}
+      - name: AlertManager
+        uid: calltelemetry-alertmanager
+        type: alertmanager
+        access: proxy
+        url: {{ include "grafana.alertmanagerUrl" . }}
+        editable: false
+        jsonData:
+          implementation: prometheus
+          handleGrafanaManagedAlerts: false
       {{- end }}
       {{- if .Values.datasources.tempo.enabled }}
       - name: Tempo

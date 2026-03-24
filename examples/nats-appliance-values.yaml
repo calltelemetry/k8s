@@ -1,0 +1,25 @@
+# NATS Appliance Values
+# Single-node NATS with JetStream for K3s appliance
+
+nats:
+  jetstream:
+    enabled: true
+    memStorage:
+      enabled: true
+      size: 1Gi
+    fileStorage:
+      enabled: true
+      size: 5Gi
+      storageClassName: local-path
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+cluster:
+  enabled: false
+  replicas: 1
