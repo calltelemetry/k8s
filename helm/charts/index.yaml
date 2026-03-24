@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  alertmanager:
+  - apiVersion: v2
+    appVersion: 0.28.1
+    created: "2026-03-24T16:17:04.352901316Z"
+    description: Prometheus AlertManager for CallTelemetry system alerts
+    digest: 77b5a74b89ff51f3e17d730be830d4a581830e8c006b7e4514ee956d74292794
+    name: alertmanager
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/alertmanager-0.1.0/alertmanager-0.1.0.tgz
+    version: 0.1.0
   alloy:
   - apiVersion: v2
     appVersion: 1.5.1
@@ -567,4 +578,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-02-25T18:31:10.578273025Z"
+generated: "2026-03-24T16:17:05.982170686Z"
