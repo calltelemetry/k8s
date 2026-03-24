@@ -14,8 +14,8 @@ storage:
   s3:
     endpoint: "seaweedfs:8333"
     bucket: "tempo-traces"
-    accessKey: "seaweedfsadmin"
-    secretKey: "seaweedfsadmin"
+    accessKey: "minioadmin"
+    secretKey: "minioadmin"
     insecure: true
 
 # Trace retention
