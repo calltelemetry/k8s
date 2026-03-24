@@ -61,6 +61,17 @@ Prometheus URL - auto-detect if not specified
 {{- end }}
 
 {{/*
+AlertManager URL - auto-detect if not specified
+*/}}
+{{- define "grafana.alertmanagerUrl" -}}
+{{- if .Values.datasources.alertmanager.url }}
+{{- .Values.datasources.alertmanager.url }}
+{{- else }}
+{{- printf "http://alertmanager.%s.svc.cluster.local:9093" .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 Tempo URL - auto-detect if not specified
 */}}
 {{- define "grafana.tempoUrl" -}}

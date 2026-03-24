@@ -1,0 +1,30 @@
+# Traceroute Appliance Values
+# Network diagnostic service for K3s appliance
+
+replicaCount: 1
+
+image:
+  repository: calltelemetry/traceroute
+  tag: 0.8.6-rc143
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+nats:
+  server: "nats"
+
+service:
+  type: ClusterIP
+  port: 4100
+  targetPort: 4100
+
+securityContext:
+  runAsUser: 0
+
+terminationGracePeriodSeconds: 5

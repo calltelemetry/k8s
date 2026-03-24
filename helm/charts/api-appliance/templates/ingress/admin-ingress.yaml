@@ -9,10 +9,6 @@ metadata:
     {{- end }}
 spec:
   ingressClassName: {{ .Values.ingressClassName }}
-  {{- if .Values.admin.tls }}
-  tls:
-    {{- toYaml .Values.admin.tls | nindent 4 }}
-  {{- end }}
   rules:
     - host: {{ .Values.admin.hostname }}
       http:

@@ -44,10 +44,10 @@ data:
       {{- end }}
 
       {{- if .Values.scrapeTargets.postgresql.enabled }}
-      # PostgreSQL metrics via postgres-exporter sidecar
+      # PostgreSQL metrics via CNPG native exporter (port 9187 on pod)
       - job_name: 'postgresql'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "postgresql" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "postgresql-metrics" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.caddy.enabled }}
@@ -64,3 +64,97 @@ data:
         static_configs:
           - targets: ['{{ include "prometheus.target" (list "jtapi-sidecar" .Values.scrapeTargets.jtapiSidecar.port .Release.Namespace) }}']
       {{- end }}
+
+      {{- if .Values.scrapeTargets.calltelemetry.enabled }}
+      # CallTelemetry Elixir API metrics (PromEx SystemHealth plugin)
+      - job_name: 'calltelemetry'
+        scrape_interval: 30s
+        metrics_path: {{ .Values.scrapeTargets.calltelemetry.metricsPath | default "/metrics" }}
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "admin-service" .Values.scrapeTargets.calltelemetry.port .Release.Namespace) }}']
+      {{- end }}
+
+    {{- if .Values.alerting.enabled }}
+    # AlertManager integration
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets: ['{{ include "prometheus.target" (list "alertmanager" .Values.alerting.alertmanagerPort .Release.Namespace) }}']
+
+    rule_files:
+      - /etc/prometheus/alert_rules.yml
+    {{- end }}
+
+  {{- if .Values.alerting.enabled }}
+  alert_rules.yml: |
+    groups:
+      - name: system_health
+        rules:
+          - alert: HighDiskUsage
+            expr: ct_disk_usage_percent{mount="/"} > 90
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: 'Disk usage {{`{{ $value }}`}}% exceeds 90%'
+
+          - alert: HighCPUUsage
+            expr: ct_cpu_usage_percent > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'CPU usage {{`{{ $value }}`}}% exceeds 80%'
+
+          - alert: HighMemoryUsage
+            expr: ct_memory_usage_percent > 85
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Memory usage {{`{{ $value }}`}}% exceeds 85%'
+
+      - name: application_health
+        rules:
+          - alert: AppDown
+            expr: up{job="calltelemetry"} == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: 'CallTelemetry API is DOWN'
+
+          - alert: NATSDisconnected
+            expr: ct_nats_connection_status == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: 'NATS connection lost'
+
+          - alert: HighProcessCount
+            expr: ct_beam_process_count > 50000
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'BEAM process count {{`{{ $value }}`}} exceeds 50000'
+
+      - name: oban_health
+        rules:
+          - alert: ObanRetryableJobs
+            expr: ct_oban_queue_depth{state="retryable"} > 50
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Oban queue {{`{{ $labels.queue }}`}} has {{`{{ $value }}`}} retryable jobs'
+
+          - alert: ObanAvailableBacklog
+            expr: ct_oban_queue_depth{state="available"} > 100
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Oban queue {{`{{ $labels.queue }}`}} backlog: {{`{{ $value }}`}} jobs'
+  {{- end }}

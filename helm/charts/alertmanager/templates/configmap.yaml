@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.fullnameOverride }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.fullnameOverride }}
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: {{ .Values.config.resolveTimeout }}
+
+    route:
+      receiver: {{ .Values.config.route.receiver }}
+      group_by:
+        {{- range .Values.config.route.groupBy }}
+        - {{ . }}
+        {{- end }}
+      group_wait: {{ .Values.config.route.groupWait }}
+      group_interval: {{ .Values.config.route.groupInterval }}
+      repeat_interval: {{ .Values.config.route.repeatInterval }}
+      routes:
+        {{- range .Values.config.route.routes }}
+        - match:
+            {{- range $k, $v := .match }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          receiver: {{ .receiver }}
+          {{- if .continue }}
+          continue: true
+          {{- end }}
+        {{- end }}
+
+    receivers:
+      {{- range .Values.config.receivers }}
+      - name: {{ .name }}
+        {{- if .webhookConfigs }}
+        webhook_configs:
+          {{- range .webhookConfigs }}
+          - url: {{ .url | quote }}
+            send_resolved: {{ .sendResolved | default true }}
+          {{- end }}
+        {{- end }}
+        {{- if .emailConfigs }}
+        email_configs:
+          {{- range .emailConfigs }}
+          - to: {{ .to | quote }}
+            send_resolved: {{ .sendResolved | default true }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+
+{{- if .Values.alertRules.enabled }}
+  alert_rules.yml: |
+    groups:
+      - name: system_health
+        rules:
+          - alert: HighDiskUsage
+            expr: ct_disk_usage_percent{mount="/"} > 90
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: 'Disk usage {{`{{ $value }}`}}% exceeds 90%'
+
+          - alert: HighCPUUsage
+            expr: ct_cpu_usage_percent > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'CPU usage {{`{{ $value }}`}}% exceeds 80%'
+
+          - alert: HighMemoryUsage
+            expr: ct_memory_usage_percent > 85
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Memory usage {{`{{ $value }}`}}% exceeds 85%'
+
+      - name: application_health
+        rules:
+          - alert: AppDown
+            expr: up{job="calltelemetry"} == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: 'CallTelemetry API is DOWN'
+
+          - alert: NATSDisconnected
+            expr: ct_nats_connection_status == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: 'NATS connection lost'
+
+          - alert: HighProcessCount
+            expr: ct_beam_process_count > 50000
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'BEAM process count {{`{{ $value }}`}} exceeds 50000'
+
+      - name: oban_health
+        rules:
+          - alert: ObanRetryableJobs
+            expr: ct_oban_queue_depth{state="retryable"} > 50
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Oban queue {{`{{ $labels.queue }}`}} has {{`{{ $value }}`}} retryable jobs'
+
+          - alert: ObanAvailableBacklog
+            expr: ct_oban_queue_depth{state="available"} > 100
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Oban queue {{`{{ $labels.queue }}`}} backlog: {{`{{ $value }}`}} jobs'
+{{- end }}

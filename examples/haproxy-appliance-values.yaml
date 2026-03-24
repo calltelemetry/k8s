@@ -1,0 +1,21 @@
+# HAProxy Ingress - K3s Appliance
+# LoadBalancer via MetalLB on single-node K3s
+
+rbac:
+  create: false
+
+serviceAccount:
+  create: false
+  name: "haproxy-ingress"
+
+controller:
+  ingressClassResource:
+    name: haproxy-ct
+  ingressClass: haproxy-ct
+  extraArgs:
+    tcp-services-configmap: ct/haproxy-tcp-services
+  service:
+    type: LoadBalancer
+    annotations: {}
+    loadBalancerIP: null
+    externalTrafficPolicy: Cluster

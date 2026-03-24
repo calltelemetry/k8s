@@ -13,6 +13,8 @@ repositories:
     url: https://cloudnative-pg.github.io/charts
   - name: calltelemetry
     url: https://calltelemetry.github.io/k8s/helm/charts
+  - name: jetstack
+    url: https://charts.jetstack.io
 
 # Global values that can be referenced in releases
 helmDefaults:
@@ -42,6 +44,10 @@ environments:
     values:
       - env-common.yaml
       - orb-dev.yaml
+  ct-appliance:
+    values:
+      - env-common.yaml
+      - env-appliance.yaml
 
 ---
 # Global hooks
@@ -67,9 +73,19 @@ releases:
     namespace: "{{ .Environment.Values.env.namespace }}"
     chart: ./helm/charts/postgresql
     values:
-      - "{{ .Environment.Values.postgresql.values_file | default \"examples/postgresql-dev-values.yaml\" }}"
+      - '{{ .Environment.Values.postgresql.values_file | default "examples/postgresql-dev-values.yaml" }}'
     needs:
       - cnpg-system/cnpg
+
+  # cert-manager (TLS certificate automation via Let's Encrypt)
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    createNamespace: true
+    version: 1.17.1
+    values:
+      - crds:
+          enabled: true
 
   # HAProxy Ingress Controller
   - name: haproxy-ingress
@@ -112,7 +128,7 @@ releases:
     namespace: "{{ .Environment.Values.env.namespace }}"
     chart: ./helm/charts/nats
     values:
-      - "{{ .Environment.Values.nats.values_file | default \"examples/nats-dev-values.yaml\" }}"
+      - '{{ .Environment.Values.nats.values_file | default "examples/nats-dev-values.yaml" }}'
 
   # Call Telemetry API
   - name: api

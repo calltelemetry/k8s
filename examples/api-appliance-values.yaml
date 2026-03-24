@@ -1,0 +1,48 @@
+# API Appliance Values
+# Single-node K3s appliance with SFTP and syslog enabled
+ingressClassName: haproxy-ct
+
+# Database configuration — use direct values (not existing secret)
+# because the published API chart hardcodes DB_SSL_ENABLED=true
+# when useExistingSecret=true and doesn't respect overrides.
+db:
+  useExistingSecret: false
+  values:
+    db_username: calltelemetry
+    db_password: calltelemetry_appliance
+    db_name: calltelemetry
+    db_hostname: postgresql-rw
+    db_port: "5432"
+    db_ssl_enabled: false
+
+# API Config
+api:
+  hostname: calltelemetry.local
+  image: calltelemetry/web
+  tag: 0.8.6-rc143
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: "haproxy-ct"
+      haproxy.org/load-balance: "leastconn"
+
+# Admin configuration
+admin:
+  api_worker: true
+  hostname: calltelemetry.local
+  image: calltelemetry/web
+  tag: 0.8.6-rc143
+  imagePullPolicy: IfNotPresent
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: "haproxy-ct"
+      haproxy.org/load-balance: "roundrobin"
+
+# SFTP Configuration
+sftp:
+  enabled: true
+
+# Syslog Configuration
+syslog:
+  enabled: true

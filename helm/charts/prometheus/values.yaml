@@ -54,6 +54,17 @@ scrapeTargets:
     port: 8080
     metricsPath: /actuator/prometheus
 
+  # CallTelemetry Elixir API (PromEx on CURRI endpoint)
+  calltelemetry:
+    enabled: true
+    port: 4080
+    metricsPath: /metrics
+
+# AlertManager integration
+alerting:
+  enabled: true
+  alertmanagerPort: 9093
+
 # Service configuration
 service:
   type: ClusterIP
