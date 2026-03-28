@@ -1,16 +1,34 @@
-# Default values for syslog in production environment
-# This is a YAML-formatted file.
+# Production values for ct-syslog-ingest
+# Receives UDP 514 syslog from Cisco CUCM, CUBE, CMS, Expressway, Unity, IM&P
 
 replicaCount: 2
 
 image:
-  repository: calltelemetry/syslog
-  tag: 0.8.3
+  repository: calltelemetry/ct-syslog-ingest
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 514
+  udp:
+    type: ClusterIP
+    port: 514
+  health:
+    type: ClusterIP
+    port: 5514
+
+loki:
+  endpoint: "http://loki:3100/loki/api/v1/push"
+
+nats:
+  url: "nats://nats:4222"
+
+otel:
+  enabled: true
+  endpoint: "http://otel-collector:4318"
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
 
 resources:
   limits:
@@ -19,10 +37,6 @@ resources:
   requests:
     cpu: 200m
     memory: 256Mi
-
-nodeSelector: {}
-
-tolerations: []
 
 affinity:
   podAntiAffinity:
@@ -36,8 +50,3 @@ affinity:
             values:
             - syslog
         topologyKey: kubernetes.io/hostname
-
-# NATS Configuration
-nats:
-  url: "nats://nats:4222"
-  credentialsBucket: "credentials"

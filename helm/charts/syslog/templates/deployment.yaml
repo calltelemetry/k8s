@@ -17,6 +17,7 @@ spec:
         app.kubernetes.io/name: {{ include "syslog.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      terminationGracePeriodSeconds: 30
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -37,12 +38,50 @@ spec:
             - name: syslog
               containerPort: 514
               protocol: UDP
+            - name: health
+              containerPort: 5514
+              protocol: TCP
           env:
+            - name: LOKI_URL
+              value: {{ .Values.loki.endpoint | quote }}
             - name: NATS_URL
-              value: "{{ .Values.nats.url }}"
-            - name: CREDENTIALS_BUCKET
-              value: "{{ .Values.nats.credentialsBucket }}"
+              value: {{ .Values.nats.url | quote }}
+            - name: UDP_PORT
+              value: "514"
+            - name: HEALTH_PORT
+              value: "5514"
+            {{- if .Values.otel.enabled }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.otel.endpoint | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: "ct-syslog-ingest"
+            {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi

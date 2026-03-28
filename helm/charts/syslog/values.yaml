@@ -1,25 +1,56 @@
 replicaCount: 1
 
 image:
-  repository: calltelemetry/syslog
-  tag: 0.8.3
-  pullPolicy: Always
+  repository: calltelemetry/ct-syslog-ingest
+  tag: latest
+  pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 5514
+  # UDP service for syslog reception
+  udp:
+    type: ClusterIP
+    port: 514
+  # TCP service for health/metrics
+  health:
+    type: ClusterIP
+    port: 5514
 
+# Loki log aggregation endpoint
+loki:
+  endpoint: "http://loki:3100/loki/api/v1/push"
 
-resources: {}
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-# NATS Configuration
+# NATS for critical alert routing (optional)
 nats:
   url: "nats://nats:4222"
-  credentialsBucket: "credentials"
 
+# OpenTelemetry (optional)
+otel:
+  enabled: false
+  endpoint: "http://otel-collector:4318"
+
+# Prometheus ServiceMonitor
+serviceMonitor:
+  enabled: true
+  interval: 15s
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+    add: ["NET_BIND_SERVICE"]
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
