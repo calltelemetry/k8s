@@ -509,6 +509,17 @@ entries:
     version: 1.0.0
   syslog:
   - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-03-28T05:01:00.952261368Z"
+    description: Cisco UC syslog ingestion — UDP 514 receiver, Kvasir parser, Loki
+      storage, NATS alert routing
+    digest: 0bfaf56fac1706b28c64a87d93345b9ed7f620ad9a87d2972fc13bcdd765989f
+    name: syslog
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/syslog-0.3.0/syslog-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 1.1.0
     created: "2025-04-23T12:03:26.903442552Z"
     description: A Helm chart for the Teams Azure Auth Service with dynamic credential
@@ -578,4 +589,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-24T16:17:05.982170686Z"
+generated: "2026-03-28T05:01:01.309129771Z"
