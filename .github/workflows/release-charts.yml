@@ -15,12 +15,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Package and Publish Charts
-        uses: helm/chart-releaser-action@v1.7.0
+        uses: helm/chart-releaser-action@419f3267f205afd4639d2eb12a64e911088a5d3d # v1
         with:
           charts_dir: helm/charts
           config: helm/cr.yaml
