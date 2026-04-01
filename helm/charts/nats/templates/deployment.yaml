@@ -56,18 +56,30 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          # Liveness: is the NATS process alive? (monitoring HTTP endpoint)
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: {{ .Values.config.httpPort }}
             initialDelaySeconds: 10
             periodSeconds: 10
+            failureThreshold: 3
+          # Readiness: can NATS accept client connections AND is JetStream healthy?
+          # TCP check on client port ensures the server accepts connections.
+          # The /healthz endpoint alone doesn't verify JetStream or client connectivity.
           readinessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.config.httpPort }}
+            tcpSocket:
+              port: {{ .Values.config.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
+            failureThreshold: 3
+          # Startup: give NATS time to load JetStream data on boot
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.config.port }}
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            failureThreshold: 30
 
         {{- if .Values.exporter.enabled }}
         # Prometheus NATS Exporter sidecar
@@ -90,12 +102,14 @@ spec:
               port: 7777
             initialDelaySeconds: 10
             periodSeconds: 30
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /metrics
               port: 7777
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 5
         {{- end }}
 
       # Init container validates config is mounted before NATS starts
