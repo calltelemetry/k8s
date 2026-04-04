@@ -13,10 +13,10 @@ nameOverride: ""
 fullnameOverride: "postgresql"
 
 # CloudNativePG official PostgreSQL image
-# For TimescaleDB, build a custom image based on this
+# For TimescaleDB, we use our custom image based on this
 image:
-  repository: ghcr.io/cloudnative-pg/postgresql
-  tag: "17"
+  repository: calltelemetry/postgres
+  tag: "17-cnpg"
   pullPolicy: IfNotPresent
 
 # CloudNativePG Cluster configuration
@@ -36,13 +36,22 @@ cluster:
     username: calltelemetry
     # Password (use existingSecret in production)
     password: calltelemetry_dev_password
+    # Required extensions to preload
+    shared_preload_libraries:
+      - "timescaledb"
+      - "pg_ivm"
     # Additional postgresql.conf parameters
     parameters:
       max_connections: "300"
-      shared_buffers: "256MB"
-      work_mem: "16MB"
-      maintenance_work_mem: "128MB"
-      effective_cache_size: "512MB"
+      shared_buffers: "2GB"
+      work_mem: "64MB"
+      maintenance_work_mem: "512MB"
+      effective_cache_size: "6GB"
+      # TimescaleDB tuning
+      timescaledb.max_background_workers: "8"
+      max_parallel_workers_per_gather: "4"
+      max_parallel_workers: "8"
+      max_worker_processes: "16"
 
   # Storage configuration
   storage:
@@ -53,11 +62,11 @@ cluster:
   # Resource limits
   resources:
     requests:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1Gi
     limits:
-      cpu: 1000m
-      memory: 4Gi
+      cpu: "2"
+      memory: 8Gi
 
   # Startup/liveness/readiness probe timeouts
   startDelay: 30
