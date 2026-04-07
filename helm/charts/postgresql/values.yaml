@@ -133,7 +133,7 @@ monitoring:
   # Enable postgres_exporter sidecar container
   enablePostgresExporter: true
   # postgres_exporter image tag
-  postgresExporterTag: "v0.14.0"
+  postgresExporterTag: "v0.18.1"
   # Resource limits for postgres_exporter sidecar
   postgresExporterResources:
     requests:
