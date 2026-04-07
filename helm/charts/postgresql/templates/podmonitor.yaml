@@ -20,7 +20,7 @@ spec:
   podMetricsEndpoints:
     # postgres_exporter metrics
     - port: metrics
-      interval: 15s
+      interval: 60s
       path: /metrics
       scrapeTimeout: 10s
 {{- end }}

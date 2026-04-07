@@ -108,6 +108,13 @@ spec:
             secretKeyRef:
               name: {{ include "postgresql.secretName" . }}
               key: postgres-exporter-dsn
+        - name: PG_EXPORTER_COLLECTION_TIMEOUT
+          value: "5s"
+      args:
+        - --disable-settings-metrics
+        - --no-collector.stat_user_tables
+        - --no-collector.statio_user_tables
+        - --no-collector.statio_user_indexes
       resources:
         {{- if .Values.monitoring.postgresExporterResources }}
         {{- toYaml .Values.monitoring.postgresExporterResources | nindent 8 }}
@@ -177,7 +184,7 @@ stringData:
   username: {{ .Values.cluster.postgresql.username }}
   password: {{ .Values.cluster.postgresql.password }}
   {{- if .Values.monitoring.enablePostgresExporter }}
-  postgres-exporter-dsn: "postgresql://{{ .Values.cluster.postgresql.username }}:{{ .Values.cluster.postgresql.password }}@localhost:5432/{{ .Values.cluster.postgresql.database }}?sslmode=disable"
+  postgres-exporter-dsn: "postgresql://{{ .Values.cluster.postgresql.username }}:{{ .Values.cluster.postgresql.password }}@localhost:5432/{{ .Values.cluster.postgresql.database }}?sslmode=disable&application_name=postgres_exporter"
   {{- end }}
 {{- end }}
 
