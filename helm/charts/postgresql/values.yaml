@@ -47,11 +47,23 @@ cluster:
       work_mem: "64MB"
       maintenance_work_mem: "512MB"
       effective_cache_size: "6GB"
+      # Concurrency tuning
+      statement_timeout: "30000"  # 30s max query time — prevents runaway queries from blocking pool
+      idle_in_transaction_session_timeout: "60000"  # 60s — kill idle-in-transaction connections
+      tcp_keepalives_idle: "60"   # Detect dead connections faster (default 7200s is too slow)
+      tcp_keepalives_interval: "10"
+      tcp_keepalives_count: "6"
       # TimescaleDB tuning
       timescaledb.max_background_workers: "8"
+      # Enable the background scheduler (default -1 = disabled in CNPG images).
+      # Required for automatic CAAG refresh, compression, and retention policies.
+      timescaledb.bgw_scheduler_restart_time: "60000"
       max_parallel_workers_per_gather: "4"
       max_parallel_workers: "8"
       max_worker_processes: "16"
+      # JIT disabled — fixed aggregation patterns over partitioned time-series
+      # pay 1000ms+ compile overhead per cold query with zero execution benefit
+      jit: "off"
 
   # Storage configuration
   storage:
@@ -62,10 +74,10 @@ cluster:
   # Resource limits
   resources:
     requests:
-      cpu: 500m
-      memory: 1Gi
+      cpu: "1"
+      memory: 3Gi
     limits:
-      cpu: "2"
+      cpu: "4"
       memory: 8Gi
 
   # Startup/liveness/readiness probe timeouts

@@ -15,6 +15,7 @@ cluster:
       # Write-ahead logging for PITR
       wal_level: replica
       archive_mode: "on"
+      jit: "off"
 
   storage:
     size: 100Gi
