@@ -31,6 +31,12 @@ spec:
 
   # PostgreSQL configuration
   postgresql:
+    {{- if .Values.cluster.postgresql.shared_preload_libraries }}
+    shared_preload_libraries:
+      {{- range .Values.cluster.postgresql.shared_preload_libraries }}
+      - {{ . | quote }}
+      {{- end }}
+    {{- end }}
     parameters:
       {{- include "postgresql.parameters" . | nindent 6 }}
 
