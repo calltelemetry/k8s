@@ -18,6 +18,7 @@ cluster:
     parameters:
       max_connections: "100"
       shared_buffers: "256MB"
+      jit: "off"
 
   storage:
     size: 5Gi

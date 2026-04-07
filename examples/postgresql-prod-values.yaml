@@ -23,6 +23,7 @@ cluster:
       wal_level: replica
       archive_mode: "on"
       timescaledb.max_background_workers: "16"
+      jit: "off"
 
   storage:
     size: 100Gi
