@@ -98,50 +98,6 @@ spec:
     {{- toYaml .Values.cluster.tolerations | nindent 4 }}
   {{- end }}
 
-  {{- if .Values.monitoring.enablePostgresExporter }}
-  # postgres_exporter sidecar container for Prometheus metrics
-  additionalContainers:
-    - name: postgres-exporter
-      image: prometheuscommunity/postgres-exporter:{{ .Values.monitoring.postgresExporterTag | default "latest" }}
-      imagePullPolicy: {{ .Values.image.pullPolicy }}
-      ports:
-        - name: metrics
-          containerPort: 9187
-          protocol: TCP
-      env:
-        - name: DATA_SOURCE_NAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "postgresql.secretName" . }}
-              key: postgres-exporter-dsn
-        - name: PG_EXPORTER_COLLECTION_TIMEOUT
-          value: "5s"
-      args:
-        - --disable-settings-metrics
-        - --no-collector.stat_user_tables
-        - --no-collector.statio_user_tables
-        - --no-collector.statio_user_indexes
-      resources:
-        {{- if .Values.monitoring.postgresExporterResources }}
-        {{- toYaml .Values.monitoring.postgresExporterResources | nindent 8 }}
-        {{- else }}
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
-        {{- end }}
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
-  {{- end }}
-
   {{- if .Values.backup.enabled }}
   # Backup configuration
   backup:
@@ -163,13 +119,6 @@ spec:
       data:
         compression: gzip
     retentionPolicy: {{ .Values.backup.retentionPolicy | quote }}
-  {{- end }}
-
-  {{- if .Values.monitoring.enablePodMonitor }}
-  # PodMonitor for Prometheus scraping
-  monitoring:
-    podMonitorLabels:
-      {{- toYaml .Values.monitoring.podMonitorLabels | nindent 6 }}
   {{- end }}
 
 ---
