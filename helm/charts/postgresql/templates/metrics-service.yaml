@@ -1,4 +1,4 @@
-{{- if .Values.monitoring.enablePostgresExporter }}
+{{- if .Values.monitoring.enablePodMonitor }}
 # Service exposing CNPG native metrics port (9187) for Prometheus scraping
 apiVersion: v1
 kind: Service
