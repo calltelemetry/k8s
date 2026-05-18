@@ -120,6 +120,8 @@ spec:
               value: "{{ if .Values.admin.api_worker }}TRUE{{ else }}FALSE{{ end }}"
             - name: ADMIN_NODE
               value: "TRUE"
+            - name: CT_PREVIEW_SEED_LEVEL
+              value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
             - name: HTTP_ADAPTER
               value: "HACKNEY"
             - name: CERT_KEY
