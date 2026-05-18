@@ -36,6 +36,7 @@ config:
 # JetStream configuration
 jetstream:
   enabled: true
+  strict: true
   # Storage directory inside container
   storeDir: /data/jetstream
   # Memory storage limit
