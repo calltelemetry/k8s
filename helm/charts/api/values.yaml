@@ -2,6 +2,8 @@
 # kubectl -n postgres-operator get secret hippo-dev-pguser-calltelemetry -o json  | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences", "managedFields"])'  | kubectl apply -n ct-dev -f -
 hostname: 192.168.123.205
 environment: dev
+preview:
+  seedLevel: "empty"
 resources: {}
 userid: 1001
 # networking:
