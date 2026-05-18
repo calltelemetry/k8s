@@ -11,10 +11,7 @@ spec:
       app: admin-service
   replicas: {{ .Values.admin.replicas }}
   strategy:
-    rollingUpdate:
-      maxSurge: 50%
-      maxUnavailable: 70%
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
@@ -112,7 +109,7 @@ spec:
                   name: {{ if .Values.db.useExistingSecret }}{{ .Values.db.existingSecretName }}{{ else }}{{ .Release.Name }}-db-secret{{ end }}
                   key: port
             - name: DB_SSL_ENABLED
-              value: "true"
+              value: "{{ if hasKey .Values.db.values "db_ssl_enabled" }}{{ .Values.db.values.db_ssl_enabled }}{{ else }}true{{ end }}"
             - name: CDR_ROOT_PATH
               value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL
