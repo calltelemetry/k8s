@@ -4,6 +4,10 @@ hostname: 192.168.123.205
 environment: dev
 preview:
   seedLevel: "empty"
+observability:
+  otel:
+    enabled: false
+    endpoint: ""
 resources: {}
 userid: 1001
 # networking:
