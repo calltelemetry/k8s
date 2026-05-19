@@ -124,6 +124,14 @@ spec:
               value: "TRUE"
             - name: CT_PREVIEW_SEED_LEVEL
               value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
+{{- if ((.Values.observability | default dict).otel | default dict).enabled }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.observability.otel.endpoint | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: "calltelemetry-preview-api"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment={{ .Values.environment }},service.namespace={{ .Release.Namespace }},service.instance.id={{ .Release.Name }}-api"
+{{- end }}
             - name: CERT_KEY
               value: /home/app/cert/appliance_key.pem
             - name: CERT_PUBLIC
