@@ -2,6 +2,14 @@
 # kubectl -n postgres-operator get secret hippo-dev-pguser-calltelemetry -o json  | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences", "managedFields"])'  | kubectl apply -n ct-dev -f -
 hostname: 192.168.123.205
 environment: dev
+preview:
+  seedLevel: "empty"
+observability:
+  otel:
+    enabled: false
+    endpoint: ""
+    adminServiceName: ""
+    apiServiceName: ""
 resources: {}
 userid: 1001
 # networking:
@@ -14,6 +22,8 @@ api:
   imagePullPolicy: Always
   cpus: 2
   replicas: 0
+  updateStrategy:
+    type: Recreate
   logging_level: warning
   container_ports:
     - name: curri-api
@@ -38,6 +48,8 @@ admin:
   tag: 0.8.5-rc19
   imagePullPolicy: Always
   replicas: 1
+  updateStrategy:
+    type: Recreate
   cpus: 2
   logging_level: warning
   container_ports:
