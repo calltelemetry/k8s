@@ -20,6 +20,7 @@ data:
       store_dir: {{ .Values.jetstream.storeDir }}
       max_memory_store: {{ .Values.jetstream.maxMemoryStore }}
       max_file_store: {{ .Values.jetstream.maxFileStore }}
+      strict: {{ .Values.jetstream.strict }}
     }
     {{- end }}
 

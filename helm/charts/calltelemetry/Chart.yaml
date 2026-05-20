@@ -1,0 +1,38 @@
+apiVersion: v2
+name: calltelemetry
+description: Standard CallTelemetry product stack
+type: application
+version: 0.1.0
+appVersion: "0.8.6"
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC
+dependencies:
+  - name: api
+    version: 0.11.12
+    repository: file://../api
+  - name: vue-web
+    version: 1.0.0
+    repository: file://../vue-web
+  - name: jtapi-sidecar
+    version: 1.0.0
+    repository: file://../jtapi-sidecar
+    condition: jtapi-sidecar.enabled
+  - name: jtapi-operator
+    version: 0.1.0
+    repository: file://../jtapi-operator
+    condition: jtapi-operator.enabled
+  - name: ct-media
+    version: 1.0.0
+    repository: file://../ct-media
+    condition: ct-media.enabled
+  - name: syslog
+    version: 0.3.0
+    repository: file://../syslog
+    condition: syslog.enabled
+  - name: traceroute
+    version: 0.1.0
+    repository: file://../traceroute
+    condition: traceroute.enabled
