@@ -12,7 +12,12 @@ spec:
       app: api-worker
   replicas: {{ .Values.api.replicas }}
   strategy:
-    type: Recreate
+    type: {{ (.Values.api.updateStrategy.type | default "Recreate") | quote }}
+{{- if eq (.Values.api.updateStrategy.type | default "Recreate") "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.api.updateStrategy.maxSurge | default 1 }}
+      maxUnavailable: {{ .Values.api.updateStrategy.maxUnavailable | default 0 }}
+{{- end }}
   template:
     metadata:
       labels:
@@ -125,12 +130,13 @@ spec:
             - name: CT_PREVIEW_SEED_LEVEL
               value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
 {{- if ((.Values.observability | default dict).otel | default dict).enabled }}
+{{- $otelEndpoint := required "observability.otel.endpoint must be set when observability.otel.enabled is true" .Values.observability.otel.endpoint }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ .Values.observability.otel.endpoint | quote }}
+              value: {{ $otelEndpoint | quote }}
             - name: OTEL_SERVICE_NAME
-              value: "calltelemetry-preview-api"
+              value: {{ .Values.observability.otel.apiServiceName | default (printf "calltelemetry-%s-api" (.Values.environment | default "unknown")) | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment={{ .Values.environment }},service.namespace={{ .Release.Namespace }},service.instance.id={{ .Release.Name }}-api"
+              value: "deployment.environment={{ .Values.environment | default "unknown" }},service.namespace={{ .Release.Namespace }},service.instance.id={{ .Release.Name }}-api"
 {{- end }}
             - name: CERT_KEY
               value: /home/app/cert/appliance_key.pem

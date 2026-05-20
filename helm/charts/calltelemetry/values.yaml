@@ -1,0 +1,51 @@
+# Standard product-stack values.
+#
+# Preview environments and release environments should override this file rather
+# than forking the chart. Required runtime images are API and vue-web. Optional
+# services stay disabled until explicitly enabled by values.
+
+# API chart overrides. Common keys: api.image/api.tag, admin.image/admin.tag,
+# hostname, environment, db.values, preview.seedLevel. Required subcharts own
+# their default image settings; the stack chart only carries environment
+# overrides.
+api: {}
+
+# SPA chart overrides. Common keys: image.repository/image.tag,
+# ingress.enabled, ingress.hosts, service.port. Required subcharts own their
+# default image settings; the stack chart only carries environment overrides.
+vue-web: {}
+
+jtapi-sidecar:
+  enabled: false
+  image:
+    repository: calltelemetry/jtapi-sidecar
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+jtapi-operator:
+  enabled: false
+  image:
+    repository: calltelemetry/jtapi-operator
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+ct-media:
+  enabled: false
+  image:
+    repository: calltelemetry/ct-media
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+syslog:
+  enabled: false
+  image:
+    repository: calltelemetry/ct-syslog-ingest
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+traceroute:
+  enabled: false
+  image:
+    repository: calltelemetry/traceroute
+    tag: "0.8.3"
+    pullPolicy: IfNotPresent

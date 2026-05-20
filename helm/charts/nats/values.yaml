@@ -14,7 +14,7 @@ fullnameOverride: "nats"
 # NATS server image
 image:
   repository: nats
-  tag: "alpine"
+  tag: "2.12.6-alpine"
   pullPolicy: IfNotPresent
 
 # Number of replicas (1 for dev, 3+ for HA in prod)
@@ -36,6 +36,8 @@ config:
 # JetStream configuration
 jetstream:
   enabled: true
+  # Keep strict mode enabled for explicit JetStream API errors. Set false only
+  # as a temporary compatibility bridge for older malformed client requests.
   strict: true
   # Storage directory inside container
   storeDir: /data/jetstream
