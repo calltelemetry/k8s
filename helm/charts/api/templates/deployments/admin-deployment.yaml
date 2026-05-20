@@ -116,6 +116,8 @@ spec:
               value: {{ .Values.admin.logging_level | quote }}
             - name: TRACEROUTE_SERVICE
               value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
+            - name: TRACER_SERVICE
+              value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
             - name: LOCAL_NATS
               value: {{ .Values.nats_server | quote }}
             - name: WORKER_NODE
