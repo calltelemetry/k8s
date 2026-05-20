@@ -8,6 +8,8 @@ observability:
   otel:
     enabled: false
     endpoint: ""
+traceroute:
+  service: traceroute
 resources: {}
 userid: 1001
 # networking:
