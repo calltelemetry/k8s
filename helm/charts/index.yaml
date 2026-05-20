@@ -160,6 +160,49 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/azure-msal-service-0.1.0/azure-msal-service-0.1.0.tgz
     version: 0.1.0
+  calltelemetry:
+  - apiVersion: v2
+    appVersion: 0.8.6
+    created: "2026-05-20T14:09:12.028400456Z"
+    dependencies:
+    - name: api
+      repository: file://../api
+      version: 0.11.12
+    - name: vue-web
+      repository: file://../vue-web
+      version: 1.0.0
+    - condition: jtapi-sidecar.enabled
+      name: jtapi-sidecar
+      repository: file://../jtapi-sidecar
+      version: 1.0.0
+    - condition: jtapi-operator.enabled
+      name: jtapi-operator
+      repository: file://../jtapi-operator
+      version: 0.1.0
+    - condition: ct-media.enabled
+      name: ct-media
+      repository: file://../ct-media
+      version: 1.0.0
+    - condition: syslog.enabled
+      name: syslog
+      repository: file://../syslog
+      version: 0.3.0
+    - condition: traceroute.enabled
+      name: traceroute
+      repository: file://../traceroute
+      version: 0.1.0
+    description: Standard CallTelemetry product stack
+    digest: c1612e75d0e160a9c78fcda59f20f10fb64778c0cc3d598281d4d809905771a9
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: calltelemetry
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/calltelemetry-0.1.0/calltelemetry-0.1.0.tgz
+    version: 0.1.0
   credential-generator:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -589,4 +632,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-28T05:01:01.309129771Z"
+generated: "2026-05-20T14:09:13.302622963Z"
