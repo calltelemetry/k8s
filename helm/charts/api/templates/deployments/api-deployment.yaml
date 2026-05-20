@@ -87,7 +87,7 @@ spec:
 {{- end }}
           env:
             - name: EXTERNAL_IP
-              value: {{ .Values.hostname }}
+              value: {{ .Values.hostname | quote }}
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -116,13 +116,15 @@ spec:
             - name: DB_SSL_ENABLED
               value: "{{ if hasKey .Values.db.values "db_ssl_enabled" }}{{ .Values.db.values.db_ssl_enabled }}{{ else }}true{{ end }}"
             - name: CDR_ROOT_PATH
-              value: {{ .Values.cdr_root_path }}
+              value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL
-              value: {{ .Values.api.logging_level }}
+              value: {{ .Values.api.logging_level | quote }}
             - name: TRACEROUTE_SERVICE
-              value: traceroute
+              value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
+            - name: TRACER_SERVICE
+              value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
             - name: LOCAL_NATS
-              value: {{ .Values.nats_server }}
+              value: {{ .Values.nats_server | quote }}
             - name: ADMIN_NODE
               value: "FALSE"
             - name: WORKER_NODE
