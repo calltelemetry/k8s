@@ -28,6 +28,13 @@ jobs:
         for chart in helm/charts/*; do
           if [ -d "$chart" ]; then
             echo "Linting chart: $chart"
+            if grep -q '^dependencies:' "$chart/Chart.yaml"; then
+              echo "Building Helm dependencies for $chart"
+              if ! helm dependency build "$chart"; then
+                echo "helm dependency build failed for $chart" >&2
+                exit 1
+              fi
+            fi
             helm lint "$chart"
           fi
         done
@@ -68,6 +75,13 @@ jobs:
         for chart in helm/charts/*; do
           if [ -d "$chart" ]; then
             echo "Testing template rendering for chart: $chart"
+            if grep -q '^dependencies:' "$chart/Chart.yaml"; then
+              echo "Building Helm dependencies for $chart"
+              if ! helm dependency build "$chart"; then
+                echo "helm dependency build failed for $chart" >&2
+                exit 1
+              fi
+            fi
             helm template test-release "$chart" --namespace test
           fi
         done
@@ -106,6 +120,13 @@ jobs:
             if [[ "$chart" == *"ingress"* ]] || [[ "$chart" == *"postgresql"* ]]; then
               echo "Skipping dry-run for $chart (requires CRDs not in kind cluster)"
             else
+              if grep -q '^dependencies:' "$chart/Chart.yaml"; then
+                echo "Building Helm dependencies for $chart"
+                if ! helm dependency build "$chart"; then
+                  echo "helm dependency build failed for $chart" >&2
+                  exit 1
+                fi
+              fi
               helm install test-release "$chart" --namespace test --create-namespace --dry-run
             fi
           fi

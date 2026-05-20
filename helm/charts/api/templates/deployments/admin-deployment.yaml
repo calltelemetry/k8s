@@ -11,7 +11,12 @@ spec:
       app: admin-service
   replicas: {{ .Values.admin.replicas }}
   strategy:
-    type: Recreate
+    type: {{ (.Values.admin.updateStrategy.type | default "Recreate") | quote }}
+{{- if eq (.Values.admin.updateStrategy.type | default "Recreate") "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.admin.updateStrategy.maxSurge | default 1 }}
+      maxUnavailable: {{ .Values.admin.updateStrategy.maxUnavailable | default 0 }}
+{{- end }}
   template:
     metadata:
       labels:
@@ -123,12 +128,13 @@ spec:
             - name: CT_PREVIEW_SEED_LEVEL
               value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
 {{- if ((.Values.observability | default dict).otel | default dict).enabled }}
+{{- $otelEndpoint := required "observability.otel.endpoint must be set when observability.otel.enabled is true" .Values.observability.otel.endpoint }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ .Values.observability.otel.endpoint | quote }}
+              value: {{ $otelEndpoint | quote }}
             - name: OTEL_SERVICE_NAME
-              value: "calltelemetry-preview-admin"
+              value: {{ .Values.observability.otel.adminServiceName | default (printf "calltelemetry-%s-admin" (.Values.environment | default "unknown")) | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment={{ .Values.environment }},service.namespace={{ .Release.Namespace }},service.instance.id={{ .Release.Name }}-admin"
+              value: "deployment.environment={{ .Values.environment | default "unknown" }},service.namespace={{ .Release.Namespace }},service.instance.id={{ .Release.Name }}-admin"
 {{- end }}
             - name: HTTP_ADAPTER
               value: "HACKNEY"

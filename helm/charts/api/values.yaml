@@ -8,6 +8,8 @@ observability:
   otel:
     enabled: false
     endpoint: ""
+    adminServiceName: ""
+    apiServiceName: ""
 resources: {}
 userid: 1001
 # networking:
@@ -20,6 +22,8 @@ api:
   imagePullPolicy: Always
   cpus: 2
   replicas: 0
+  updateStrategy:
+    type: Recreate
   logging_level: warning
   container_ports:
     - name: curri-api
@@ -44,6 +48,8 @@ admin:
   tag: 0.8.5-rc19
   imagePullPolicy: Always
   replicas: 1
+  updateStrategy:
+    type: Recreate
   cpus: 2
   logging_level: warning
   container_ports:
