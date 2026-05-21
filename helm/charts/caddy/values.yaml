@@ -1,11 +1,9 @@
 # Caddy edge gateway values.
 #
 # The gateway is intentionally separate from vue-web. The Caddy image belongs
-# here; the SPA image belongs in the vue-web chart. Release and preview
-# environments can enable this chart to route one public origin to the API and
-# SPA without changing either service chart.
-
-enabled: false
+# here; the SPA image belongs in the vue-web chart. Release, staging, customer,
+# and preview environments use this chart to route one public origin to the API
+# and SPA without changing either service chart.
 
 nameOverride: ""
 fullnameOverride: "gateway"
