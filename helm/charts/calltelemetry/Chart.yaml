@@ -16,6 +16,10 @@ dependencies:
   - name: vue-web
     version: 1.0.0
     repository: file://../vue-web
+  - name: caddy
+    version: 0.1.0
+    repository: file://../caddy
+    condition: caddy.enabled
   - name: jtapi-sidecar
     version: 1.0.0
     repository: file://../jtapi-sidecar
