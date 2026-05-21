@@ -1,0 +1,27 @@
+dependencies:
+- name: api
+  repository: file://../api
+  version: 0.11.12
+- name: vue-web
+  repository: file://../vue-web
+  version: 1.0.0
+- name: caddy
+  repository: file://../caddy
+  version: 0.1.0
+- name: jtapi-sidecar
+  repository: file://../jtapi-sidecar
+  version: 1.0.0
+- name: jtapi-operator
+  repository: file://../jtapi-operator
+  version: 0.1.0
+- name: ct-media
+  repository: file://../ct-media
+  version: 1.0.0
+- name: syslog
+  repository: file://../syslog
+  version: 0.3.0
+- name: traceroute
+  repository: file://../traceroute
+  version: 0.1.0
+digest: sha256:7802be4acae16b0ba6fea4948ec244a0e30dc6904d9679fa104bb109bff017b5
+generated: "2026-05-20T22:26:15.669691-04:00"

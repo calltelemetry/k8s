@@ -1,0 +1,9 @@
+apiVersion: v2
+name: caddy
+description: Caddy edge gateway for the CallTelemetry product stack
+type: application
+version: 0.1.0
+appVersion: "2.11.3"
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC
