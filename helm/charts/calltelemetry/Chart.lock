@@ -23,5 +23,5 @@ dependencies:
 - name: traceroute
   repository: file://../traceroute
   version: 0.1.0
-digest: sha256:7802be4acae16b0ba6fea4948ec244a0e30dc6904d9679fa104bb109bff017b5
-generated: "2026-05-20T22:26:15.669691-04:00"
+digest: sha256:dd98c909af5dcc634fcc65f40ecee69ad3e9c76266cd911fa280fc00f62f020b
+generated: "2026-05-21T13:11:09.784171-04:00"

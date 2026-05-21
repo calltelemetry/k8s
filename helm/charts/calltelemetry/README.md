@@ -36,10 +36,10 @@ helm upgrade --install ct-pr-123 k8s/helm/charts/calltelemetry \
   --values .ct-preview/ct-pr-123/values/stack.yaml
 ```
 
-Required product images are API and SPA. Optional services are enabled only when
-their values set `enabled: true`. Enabling Caddy moves public ingress to the
-`caddy` chart and can disable direct SPA ingress, preserving a single public
-origin without conflating image slots.
+Required product images are API, SPA, and Caddy. Optional backend services are
+enabled only when their values set `enabled: true`. Public ingress should live
+on the `caddy` chart; direct SPA ingress is a legacy fallback, not the standard
+stack contract.
 
 ## Gateway Values
 
@@ -47,7 +47,6 @@ Minimal Caddy gateway override:
 
 ```yaml
 caddy:
-  enabled: true
   image:
     repository: registry.depot.dev/zlcvc29kp9
     tag: caddy-builder-<sha>

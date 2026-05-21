@@ -1,10 +1,10 @@
 # Standard product-stack values.
 #
 # Deployment environments should override this file rather than forking the
-# chart. Required runtime images are API and vue-web. Optional services,
-# including the Caddy gateway, stay disabled until explicitly enabled by
-# values. Keep component images in their component slots: SPA image values go
-# under vue-web, Caddy/gateway image values go under caddy.
+# chart. Required runtime components are API, vue-web, and the Caddy gateway.
+# Optional backend services stay disabled until explicitly enabled by values.
+# Keep component images in their component slots: SPA image values go under
+# vue-web, Caddy/gateway image values go under caddy.
 
 # API chart overrides. Common keys: api.image/api.tag, admin.image/admin.tag,
 # hostname, environment, db.values, preview.seedLevel. Required subcharts own
@@ -17,11 +17,10 @@ api: {}
 # default image settings; the stack chart only carries environment overrides.
 vue-web: {}
 
-# Optional edge gateway. Enable this when the environment wants one public
-# origin for SPA and API traffic. Do not put the SPA image here; caddy.image is
-# only for the Caddy gateway image.
+# Required edge gateway. This is the standard public entrypoint for SPA and API
+# traffic. Do not put the SPA image here; caddy.image is only for the Caddy
+# gateway image.
 caddy:
-  enabled: false
   image:
     repository: calltelemetry/caddy
     tag: "2.11.3"
