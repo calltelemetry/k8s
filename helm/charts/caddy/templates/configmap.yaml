@@ -48,6 +48,6 @@ data:
         }
     }
 
-    :80 {
+    :{{ .Values.service.targetPort | default 8080 }} {
         import calltelemetry_routes
     }
