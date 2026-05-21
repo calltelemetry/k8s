@@ -44,35 +44,118 @@ caddy:
 
 jtapi-sidecar:
   enabled: false
+  replicaCount: 1
   image:
     repository: calltelemetry/jtapi-sidecar
     tag: "1.0.0"
     pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  grpc:
+    port: 50051
+  nats:
+    url: "nats://nats:4222"
+  websocket:
+    enabled: false
+    url: "ws://admin-service:4000/socket/jtapi/websocket"
+  otel:
+    enabled: true
+    endpoint: "http://otel-collector:4318/v1/traces"
+    samplingProbability: "0.1"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
 
 jtapi-operator:
   enabled: false
+  replicaCount: 1
   image:
     repository: calltelemetry/jtapi-operator
     tag: "0.1.0"
     pullPolicy: IfNotPresent
+  nats:
+    url: "nats://nats:4222"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
 
 ct-media:
   enabled: false
+  replicaCount: 1
   image:
     repository: calltelemetry/ct-media
     tag: "0.1.0"
     pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 50053
+  otel:
+    enabled: true
+    endpoint: "http://otel-collector:4317"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
 
 syslog:
   enabled: false
+  replicaCount: 1
   image:
     repository: calltelemetry/ct-syslog-ingest
     tag: "0.1.0"
     pullPolicy: IfNotPresent
+  service:
+    udp:
+      type: ClusterIP
+      port: 514
+    health:
+      type: ClusterIP
+      port: 5514
+  nats:
+    url: "nats://nats:4222"
+  otel:
+    enabled: false
+    endpoint: "http://otel-collector:4318"
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
 
 traceroute:
   enabled: false
+  replicaCount: 1
   image:
     repository: calltelemetry/traceroute
     tag: "0.8.3"
     pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 4100
+    targetPort: 4100
+  nats:
+    server: "nats"
+  resources:
+    requests:
+      cpu: 256m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 256Mi

@@ -38,11 +38,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
+          {{- with .Values.resources }}
           resources:
-            requests:
-              cpu: {{ .Values.resources.requests.cpu }}
-            limits:
-              cpu: {{ .Values.resources.limits.cpu }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: NATS_HOSTNAME
               value: "{{ .Values.nats.server }}"

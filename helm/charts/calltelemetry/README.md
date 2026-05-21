@@ -41,6 +41,66 @@ enabled only when their values set `enabled: true`. Public ingress should live
 on the `caddy` chart; direct SPA ingress is a legacy fallback, not the standard
 stack contract.
 
+## Required, Optional, And Shared Components
+
+The stack has three component classes:
+
+| Class | Components | Deployment rule |
+| --- | --- | --- |
+| Required product shell | API/Admin, SPA, Caddy gateway | Always rendered by the stack chart |
+| Optional workloads | JTAPI sidecar, JTAPI operator, media, syslog, traceroute | Rendered only when `<service>.enabled: true` |
+| Shared platform services | Postgres, NATS, OTel collector, Prometheus, Grafana | Deployed outside each product release and referenced by values |
+
+Optional workloads use the same override pattern:
+
+```yaml
+<service>:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: registry.depot.dev/<project-id>
+    tag: <service>-<sha>
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+```
+
+Service-specific settings stay under the same key. For example, syslog owns its
+UDP/TCP service exposure, JTAPI owns its websocket and NATS settings, and media
+owns its gRPC service and object-storage settings.
+
+OTel is configured as instrumentation for each workload, not as a per-release
+observability stack. Environment values should point enabled workloads at a
+shared collector, for example:
+
+```yaml
+jtapi-sidecar:
+  enabled: true
+  otel:
+    enabled: true
+    endpoint: http://otel-collector.preview-observability.svc.cluster.local:4318/v1/traces
+
+ct-media:
+  enabled: true
+  otel:
+    enabled: true
+    endpoint: http://otel-collector.preview-observability.svc.cluster.local:4317
+
+syslog:
+  enabled: true
+  otel:
+    enabled: true
+    endpoint: http://otel-collector.preview-observability.svc.cluster.local:4318
+```
+
+Do not add per-PR Prometheus, Grafana, or OTel collector releases to this chart.
+Those belong to the cluster/platform layer.
+
 ## Gateway Values
 
 Minimal Caddy gateway override:
