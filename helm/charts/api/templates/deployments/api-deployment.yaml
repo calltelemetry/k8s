@@ -26,6 +26,11 @@ spec:
     spec:
       securityContext:
         runAsUser: {{ .Values.userid }}
+{{- if .Values.tftp.enabled }}
+        runAsGroup: {{ .Values.userid }}
+        fsGroup: {{ .Values.userid }}
+        fsGroupChangePolicy: OnRootMismatch
+{{- end }}
       tolerations:
         - effect: NoExecute
           key: node.kubernetes.io/unreachable
@@ -158,14 +163,26 @@ spec:
               value: {{ .Values.grafana.host | quote }}
             - name: GRAFANA_TOKEN
               value: {{ .Values.grafana.token | quote }}
-{{- if .Values.logs.enabled }}
+{{- if or .Values.logs.enabled .Values.tftp.enabled }}
           volumeMounts:
+{{- if .Values.logs.enabled }}
             - name: api-logs
               mountPath: {{ .Values.logs.path | quote }}
 {{- end }}
-{{- if .Values.logs.enabled }}
+{{- if .Values.tftp.enabled }}
+            - name: tftp-root
+              mountPath: {{ .Values.tftp.path | quote }}
+{{- end }}
+{{- end }}
+{{- if or .Values.logs.enabled .Values.tftp.enabled }}
       volumes:
+{{- if .Values.logs.enabled }}
         - name: api-logs
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-api-logs
+{{- end }}
+{{- if .Values.tftp.enabled }}
+        - name: tftp-root
+          emptyDir: {}
+{{- end }}
 {{- end }}

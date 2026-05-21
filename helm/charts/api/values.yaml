@@ -111,6 +111,10 @@ logs:
   storageClassName: "local-path" # Default K3s storage class; override for other providers
   path: "/var/log"
 
+tftp:
+  enabled: false
+  path: "/var/lib/calltelemetry/tftp"
+
 # Example override snippet:
 # logs:
 #   enabled: true
