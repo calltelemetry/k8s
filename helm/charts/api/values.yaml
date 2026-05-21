@@ -41,6 +41,7 @@ api:
     timeoutSeconds: 1
     failureThreshold: 3
   ingress:
+    enabled: true
     annotations: {}
 
 admin:
@@ -73,6 +74,7 @@ admin:
     timeoutSeconds: 10
     failureThreshold: 3
   ingress:
+    enabled: true
     annotations:
       haproxy.org/load-balance: "roundrobin"
 

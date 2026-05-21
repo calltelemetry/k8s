@@ -1,3 +1,4 @@
+{{- if .Values.admin.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -24,3 +25,4 @@ spec:
                 name: admin-internal-service
                 port:
                   number: {{ range .Values.admin.container_ports }}{{ if eq .name "web-api" }}{{ .port }}{{ end }}{{ end }}  # Reference the web-api port
+{{- end }}
