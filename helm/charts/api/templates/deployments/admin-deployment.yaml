@@ -59,6 +59,12 @@ spec:
         - name: {{ .Release.Name }}-admin
           image: {{ .Values.admin.image }}:{{ .Values.admin.tag }}
           imagePullPolicy: {{ .Values.admin.imagePullPolicy }}
+{{- if and .Values.tftp.enabled .Values.tftp.allowPrivilegedPortBind }}
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+{{- end }}
           ports:
             {{- range .Values.admin.container_ports }}
             - containerPort: {{ .port }}
