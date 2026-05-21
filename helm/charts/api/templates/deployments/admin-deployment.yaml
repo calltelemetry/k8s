@@ -140,6 +140,8 @@ spec:
               value: "{{ if .Values.admin.api_worker }}TRUE{{ else }}FALSE{{ end }}"
             - name: ADMIN_NODE
               value: "TRUE"
+            - name: TFTP_ENABLED
+              value: {{ (.Values.tftp.enabled | default false) | quote }}
             - name: CT_PREVIEW_SEED_LEVEL
               value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
 {{- if ((.Values.observability | default dict).otel | default dict).enabled }}
