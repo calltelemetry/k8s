@@ -160,6 +160,20 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/azure-msal-service-0.1.0/azure-msal-service-0.1.0.tgz
     version: 0.1.0
+  caddy:
+  - apiVersion: v2
+    appVersion: 2.11.3
+    created: "2026-05-21T02:31:56.960746838Z"
+    description: Caddy edge gateway for the CallTelemetry product stack
+    digest: a38c4a2e11a1971129229b1953da87f1a275fc909fc0dfc2224e6a9ecf9d6457
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: caddy
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/caddy-0.1.0/caddy-0.1.0.tgz
+    version: 0.1.0
   calltelemetry:
   - apiVersion: v2
     appVersion: 0.8.6
@@ -632,4 +646,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-20T14:09:13.302622963Z"
+generated: "2026-05-21T02:31:57.560367289Z"
