@@ -1,0 +1,55 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "caddy.fullname" . }}-config
+  labels:
+    {{- include "caddy.labels" . | nindent 4 }}
+data:
+  Caddyfile: |
+    {
+        {{- if .Values.caddy.admin.enabled }}
+        admin {{ .Values.caddy.admin.listen }}
+        {{- else }}
+        admin off
+        {{- end }}
+        {{- if .Values.caddy.metrics.enabled }}
+        servers {
+            metrics
+        }
+        {{- end }}
+        {{- range .Values.caddy.extraGlobalOptions }}
+        {{ . }}
+        {{- end }}
+    }
+
+    (calltelemetry_routes) {
+        {{- range .Values.routes.api.paths }}
+        handle {{ . }} {
+            reverse_proxy {{ $.Values.routes.api.service }}:{{ $.Values.routes.api.port }}
+        }
+        {{- end }}
+
+        handle {{ .Values.routes.health.path }} {
+            respond {{ .Values.routes.health.body | quote }} 200
+        }
+
+        {{- range .Values.caddy.extraRoutes }}
+        {{ . }}
+        {{- end }}
+
+        handle {
+            reverse_proxy {{ .Values.routes.spa.service }}:{{ .Values.routes.spa.port }}
+        }
+
+        log {
+            output stdout
+            format {{ .Values.caddy.log.format }}
+            level {{ .Values.caddy.log.level }}
+        }
+    }
+
+    :80 {
+        import calltelemetry_routes
+    }
+{{- end }}

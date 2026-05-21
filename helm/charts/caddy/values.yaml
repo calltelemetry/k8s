@@ -1,0 +1,79 @@
+# Caddy edge gateway values.
+#
+# The gateway is intentionally separate from vue-web. The Caddy image belongs
+# here; the SPA image belongs in the vue-web chart. Release and preview
+# environments can enable this chart to route one public origin to the API and
+# SPA without changing either service chart.
+
+enabled: false
+
+nameOverride: ""
+fullnameOverride: "gateway"
+
+replicaCount: 1
+
+image:
+  repository: caddy
+  tag: "2.11.3-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  httpsPort: 443
+  metricsPort: 2019
+
+ingress:
+  enabled: false
+  ingressClassName: ""
+  annotations: {}
+  hosts:
+    - host: app.calltelemetry.com
+      paths:
+        - /
+  tls: []
+
+routes:
+  api:
+    service: admin-internal-service
+    port: 4000
+    paths:
+      - /api
+      - /api/*
+      - /live
+      - /live/*
+      - /socket
+      - /socket/*
+  spa:
+    service: ct-vue
+    port: 8080
+  health:
+    path: /health
+    body: OK
+
+caddy:
+  admin:
+    enabled: true
+    listen: ":2019"
+  metrics:
+    enabled: true
+  log:
+    format: console
+    level: INFO
+  extraGlobalOptions: []
+  extraRoutes: []
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+podAnnotations: {}
+podLabels: {}
