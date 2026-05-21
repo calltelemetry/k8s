@@ -114,6 +114,7 @@ logs:
 tftp:
   enabled: false
   path: "/var/lib/calltelemetry/tftp"
+  allowPrivilegedPortBind: false
 
 # Example override snippet:
 # logs:

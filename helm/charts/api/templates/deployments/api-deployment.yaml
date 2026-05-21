@@ -60,6 +60,12 @@ spec:
         - name: primary-api
           image: {{ .Values.api.image }}:{{ .Values.api.tag }}
           imagePullPolicy: {{ .Values.api.imagePullPolicy }}
+{{- if and .Values.tftp.enabled .Values.tftp.allowPrivilegedPortBind }}
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+{{- end }}
           ports:
             {{- range .Values.api.container_ports }}
             - containerPort: {{ .port }}
