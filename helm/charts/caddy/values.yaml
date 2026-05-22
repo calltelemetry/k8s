@@ -39,6 +39,7 @@ routes:
     paths:
       - /api
       - /api/*
+      - /healthz
       - /live
       - /live/*
       - /socket
