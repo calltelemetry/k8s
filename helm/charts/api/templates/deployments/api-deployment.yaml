@@ -169,6 +169,12 @@ spec:
               value: {{ .Values.grafana.host | quote }}
             - name: GRAFANA_TOKEN
               value: {{ .Values.grafana.token | quote }}
+            # Tells Cdrcisco.DeploymentMode this is a Kubernetes pod, not an
+            # OVA/Compose appliance. The backend uses this to refuse host
+            # power actions (reboot/shutdown) — those are meaningless when
+            # multiple pods exist and the platform owns lifecycle.
+            - name: CT_DEPLOYMENT_MODE
+              value: "k8s"
 {{- if or .Values.logs.enabled .Values.tftp.enabled }}
           volumeMounts:
 {{- if .Values.logs.enabled }}
