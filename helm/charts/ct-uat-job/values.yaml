@@ -1,0 +1,54 @@
+# Default values for the ct-uat-job chart.
+#
+# The chart deploys a one-shot K8s Job into a DOKS PR preview namespace
+# (ct-pr-<N>) that runs the ct-uat `preview` suite against the in-cluster
+# CallTelemetry API. The Job entrypoint writes per-scenario JSON to its
+# stdout between fenced markers; the doks-pr-preview workflow reads it
+# via `kubectl logs` and posts to the PR.
+
+# Image — the ct-uat preview-runner container. Tag is normally set per
+# preview deploy (e.g. SHA-tagged image published by ct-uat CI).
+image:
+  repository: ggqb84jd32.registry.depot.dev/calltelemetry/ct-uat
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Pull secret installed by `scripts/ct-preview deploy` into the preview namespace.
+imagePullSecrets:
+  - name: registry-calltelemetry
+
+# Where the Job will hit the app. The deployer sets this to the in-cluster
+# service the gateway routes to (full pod-network access, not the external URL).
+api:
+  base: "http://admin-internal-service:4000"
+  orgId: "1"
+  # Bootstrap test credentials — the same ones the smoke / preview rollout
+  # already provisions. NOT a long-lived secret; per-PR scratch creds only.
+  testUserEmail: "preview@example.invalid"
+  testUserPassword: ""
+
+# Job behavior. backoffLimit=0 means a flake is a real signal — no retry.
+job:
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 600
+  restartPolicy: Never
+
+# Pod spec knobs.
+podLabels: {}
+podAnnotations: {}
+resources:
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: false
