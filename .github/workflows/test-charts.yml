@@ -82,7 +82,14 @@ jobs:
                 exit 1
               fi
             fi
-            helm template test-release "$chart" --namespace test
+            # Charts that use `required` for values only the real deployer
+            # supplies (e.g. per-PR image tags) can drop a stub values file at
+            # `<chart>/ci/test-values.yaml` to satisfy validation in CI.
+            ci_values=""
+            if [ -f "$chart/ci/test-values.yaml" ]; then
+              ci_values="-f $chart/ci/test-values.yaml"
+            fi
+            helm template test-release "$chart" --namespace test $ci_values
           fi
         done
 
