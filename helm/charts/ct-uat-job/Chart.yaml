@@ -1,0 +1,11 @@
+apiVersion: v2
+name: ct-uat-job
+description: One-shot K8s Job that runs the ct-uat `preview` suite against a DOKS PR preview environment and emits per-scenario JSON results on the pod's stdout.
+home: https://calltelemetry.com/
+icon: https://calltelemetry.com/logo.png
+maintainers:
+  - email: support@calltelemetry.com
+    name: Call Telemetry LLC
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

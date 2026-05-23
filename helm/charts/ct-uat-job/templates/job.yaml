@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ct-uat-job.name" . }}
+  labels:
+    {{- include "ct-uat-job.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.job.backoffLimit }}
+  activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ .Values.job.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "ct-uat-job.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: {{ .Values.job.restartPolicy }}
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      containers:
+        - name: ct-uat
+          image: "{{ .Values.image.repository }}:{{ required "image.tag is required — set the per-PR ct-uat runner tag" .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+            capabilities:
+              drop:
+                {{- toYaml .Values.securityContext.capabilities.drop | nindent 16 }}
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+          env:
+            - name: CT_API_BASE
+              value: {{ .Values.api.base | quote }}
+            - name: CT_ORG_ID
+              value: {{ .Values.api.orgId | quote }}
+            - name: CT_TEST_USER_EMAIL
+              value: {{ .Values.api.testUserEmail | quote }}
+            - name: CT_TEST_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.testUserSecret.name | quote }}
+                  key: {{ .Values.api.testUserSecret.passwordKey | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

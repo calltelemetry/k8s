@@ -1,0 +1,5 @@
+# Values used by the chart's template-test CI job. The real deployer (the
+# doks-pr-preview workflow) supplies the per-PR runner tag; this stub just
+# satisfies the `required` validation so `helm template` succeeds in CI.
+image:
+  tag: "ci-test"
