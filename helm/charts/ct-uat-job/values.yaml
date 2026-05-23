@@ -6,11 +6,12 @@
 # stdout between fenced markers; the doks-pr-preview workflow reads it
 # via `kubectl logs` and posts to the PR.
 
-# Image — the ct-uat preview-runner container. Tag is normally set per
-# preview deploy (e.g. SHA-tagged image published by ct-uat CI).
+# Image — the ct-uat preview-runner container. Tag MUST be set per preview
+# deploy (e.g. SHA-tagged image published by ct-uat CI). The template fails
+# fast if `image.tag` is empty so previews never silently float on `latest`.
 image:
   repository: ggqb84jd32.registry.depot.dev/calltelemetry/ct-uat
-  tag: latest
+  tag: ""
   pullPolicy: IfNotPresent
 
 # Pull secret installed by `scripts/ct-preview deploy` into the preview namespace.
@@ -19,13 +20,17 @@ imagePullSecrets:
 
 # Where the Job will hit the app. The deployer sets this to the in-cluster
 # service the gateway routes to (full pod-network access, not the external URL).
+#
+# The test password is NEVER passed as a values literal — the deployer creates
+# a per-namespace Secret and the Job reads CT_TEST_USER_PASSWORD via
+# valueFrom.secretKeyRef. Default name + key below; override per-deploy.
 api:
   base: "http://admin-internal-service:4000"
   orgId: "1"
-  # Bootstrap test credentials — the same ones the smoke / preview rollout
-  # already provisions. NOT a long-lived secret; per-PR scratch creds only.
   testUserEmail: "preview@example.invalid"
-  testUserPassword: ""
+  testUserSecret:
+    name: "ct-uat-preview-creds"
+    passwordKey: "password"
 
 # Job behavior. backoffLimit=0 means a flake is a real signal — no retry.
 job:

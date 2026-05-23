@@ -21,6 +21,7 @@ spec:
       {{- end }}
     spec:
       restartPolicy: {{ .Values.job.restartPolicy }}
+      automountServiceAccountToken: false
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -30,7 +31,7 @@ spec:
         runAsUser: {{ .Values.securityContext.runAsUser }}
       containers:
         - name: ct-uat
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ required "image.tag is required — set the per-PR ct-uat runner tag" .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
@@ -46,6 +47,9 @@ spec:
             - name: CT_TEST_USER_EMAIL
               value: {{ .Values.api.testUserEmail | quote }}
             - name: CT_TEST_USER_PASSWORD
-              value: {{ .Values.api.testUserPassword | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.testUserSecret.name | quote }}
+                  key: {{ .Values.api.testUserSecret.passwordKey | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
