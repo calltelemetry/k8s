@@ -134,7 +134,11 @@ jobs:
                   exit 1
                 fi
               fi
-              helm install test-release "$chart" --namespace test --create-namespace --dry-run
+              ci_values=""
+              if [ -f "$chart/ci/test-values.yaml" ]; then
+                ci_values="-f $chart/ci/test-values.yaml"
+              fi
+              helm install test-release "$chart" --namespace test --create-namespace --dry-run $ci_values
             fi
           fi
         done
