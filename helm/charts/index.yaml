@@ -302,6 +302,23 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/ct-media-1.0.0/ct-media-1.0.0.tgz
     version: 1.0.0
+  ct-uat-job:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-05-23T00:32:02.97656607Z"
+    description: One-shot K8s Job that runs the ct-uat `preview` suite against a DOKS
+      PR preview environment and emits per-scenario JSON results on the pod's stdout.
+    digest: 6c4ba515cf45891fb229264f0e33ee659dd6d54a774bc39b63fe5281c6948306
+    home: https://calltelemetry.com/
+    icon: https://calltelemetry.com/logo.png
+    maintainers:
+    - email: support@calltelemetry.com
+      name: Call Telemetry LLC
+    name: ct-uat-job
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/ct-uat-job-0.1.0/ct-uat-job-0.1.0.tgz
+    version: 0.1.0
   ct-web:
   - apiVersion: v2
     appVersion: 0.8.5-rc19
@@ -646,4 +663,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-21T02:31:57.560367289Z"
+generated: "2026-05-23T00:32:03.157591971Z"
