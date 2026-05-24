@@ -115,6 +115,7 @@ logs:
 
 tftp:
   enabled: false
+  port: 69
   path: "/var/lib/calltelemetry/tftp"
   allowPrivilegedPortBind: false
 
