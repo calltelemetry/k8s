@@ -134,12 +134,6 @@ spec:
               value: "FALSE"
             - name: WORKER_NODE
               value: "TRUE"
-            - name: TFTP_ENABLED
-              value: {{ (.Values.tftp.enabled | default false) | quote }}
-{{- if .Values.tftp.enabled }}
-            - name: TFTP_PORT
-              value: {{ (.Values.tftp.port | default 6969) | quote }}
-{{- end }}
             - name: CT_PREVIEW_SEED_LEVEL
               value: {{ ((.Values.preview | default dict).seedLevel | default "empty") | quote }}
 {{- if ((.Values.observability | default dict).otel | default dict).enabled }}
