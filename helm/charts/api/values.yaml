@@ -21,6 +21,13 @@ api:
   tag: 0.8.5-rc19
   imagePullPolicy: Always
   cpus: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "1024Mi"
+      cpu: 2
   replicas: 0
   updateStrategy:
     type: Recreate
@@ -52,6 +59,12 @@ admin:
   updateStrategy:
     type: Recreate
   cpus: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      cpu: 2
   logging_level: warning
   container_ports:
     - name: web-api

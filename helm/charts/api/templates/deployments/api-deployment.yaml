@@ -66,12 +66,7 @@ spec:
               name: {{ .name }}
             {{- end }}
           resources:
-            requests:
-              memory: "256Mi"
-              cpu: "200m"
-            limits:
-              memory: "1024Mi"
-              cpu: {{ .Values.api.cpus }}
+{{- toYaml (.Values.api.resources | default dict) | nindent 12 }}
 {{- if .Values.api.probesEnabled }}
           livenessProbe:
             httpGet:
