@@ -41,6 +41,11 @@ enabled only when their values set `enabled: true`. Public ingress should live
 on the `caddy` chart; direct SPA ingress is a legacy fallback, not the standard
 stack contract.
 
+Resource sizing is also an environment override. The API chart exposes
+`api.api.resources` and `api.admin.resources`; previews should size the admin
+pod for release startup work such as migrations and partition checks instead
+of patching Kubernetes resources after Helm renders the chart.
+
 ## Required, Optional, And Shared Components
 
 The stack has three component classes:
