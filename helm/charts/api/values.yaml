@@ -115,6 +115,7 @@ logs:
 
 tftp:
   enabled: false
+  port: 69
   path: "/var/lib/calltelemetry/tftp"
   # Non-privileged UDP port so the TFTP server runs as the non-root app
   # user without NET_BIND_SERVICE (which is dropped on execve for non-root

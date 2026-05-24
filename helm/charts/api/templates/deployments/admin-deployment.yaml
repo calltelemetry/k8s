@@ -161,6 +161,12 @@ spec:
               value: {{ .Values.teams_auth_service | quote }}
             - name: LOG_PATH
               value: {{ .Values.logs.path | quote }}
+            - name: TFTP_ENABLED
+              value: {{ ternary "true" "false" .Values.tftp.enabled | quote }}
+            - name: TFTP_PORT
+              value: {{ (.Values.tftp.port | default 69) | quote }}
+            - name: TFTP_ROOT_DIR
+              value: {{ .Values.tftp.path | quote }}
 {{- if .Values.jtapiOperator.enabled }}
             - name: JTAPI_OPERATOR_ENABLED
               value: "true"
