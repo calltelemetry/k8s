@@ -32,7 +32,7 @@ dependencies:
     repository: file://../ct-media
     condition: ct-media.enabled
   - name: syslog
-    version: 0.3.0
+    version: 0.3.1
     repository: file://../syslog
     condition: syslog.enabled
   - name: traceroute

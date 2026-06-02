@@ -35,21 +35,29 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: syslog
-              containerPort: 514
+            - name: syslog-udp
+              containerPort: {{ .Values.ports.udp }}
               protocol: UDP
+            - name: syslog-tcp
+              containerPort: {{ .Values.ports.tcp }}
+              protocol: TCP
             - name: health
-              containerPort: 5514
+              containerPort: {{ .Values.ports.health }}
               protocol: TCP
           env:
             - name: LOKI_URL
               value: {{ .Values.loki.endpoint | quote }}
             - name: NATS_URL
               value: {{ .Values.nats.url | quote }}
+            # Ports are values-driven so previews can bind unprivileged ports.
+            # 514 needs CAP_NET_BIND_SERVICE, which is dropped on exec for
+            # non-root pods (no ambient set) — the Service still maps 514.
             - name: UDP_PORT
-              value: "514"
+              value: {{ .Values.ports.udp | quote }}
+            - name: TCP_PORT
+              value: {{ .Values.ports.tcp | quote }}
             - name: HEALTH_PORT
-              value: "5514"
+              value: {{ .Values.ports.health | quote }}
             {{- if .Values.otel.enabled }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: {{ .Values.otel.endpoint | quote }}

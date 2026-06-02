@@ -19,9 +19,9 @@ dependencies:
   version: 1.0.0
 - name: syslog
   repository: file://../syslog
-  version: 0.3.0
+  version: 0.3.1
 - name: traceroute
   repository: file://../traceroute
   version: 0.1.0
-digest: sha256:dd98c909af5dcc634fcc65f40ecee69ad3e9c76266cd911fa280fc00f62f020b
-generated: "2026-05-21T13:11:09.784171-04:00"
+digest: sha256:dd05f37601f11936e85b342dd8f1ed0ab84aa2acd2bc89c2562c555bba7143a6
+generated: "2026-06-02T11:14:30.359688-05:00"

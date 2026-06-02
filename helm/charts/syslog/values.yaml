@@ -5,6 +5,15 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+# Container listen ports. Defaults bind the privileged syslog port 514 (prod
+# runs where CAP_NET_BIND_SERVICE is effective). Previews override udp/tcp to an
+# unprivileged port (e.g. 1514) because the capability is dropped on exec for
+# non-root pods; the Service below still presents 514 and maps to these.
+ports:
+  udp: 514
+  tcp: 514
+  health: 5514
+
 service:
   # UDP service for syslog reception
   udp:
