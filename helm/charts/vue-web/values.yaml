@@ -59,3 +59,25 @@ healthCheck:
     path: /
     initialDelaySeconds: 5
     periodSeconds: 5
+
+# HMR / live recompiling mode (design §14). When enabled, the deployment runs a
+# `quasar dev` Vite dev server fed by an in-place git fetch+reset loop instead of
+# the static Caddy image. Set by ct-preview from a plan's `hmr: { branch }` form.
+hmr:
+  enabled: false
+  repo: "https://github.com/calltelemetry/ct-quasar"
+  branch: ""
+  port: 9200
+  devImage: "node:24"
+  gitImage: "alpine/git:latest"
+  # Secret (key: token) holding a GitHub token for cloning the private repo.
+  # optional: a public repo needs none. ct-preview creates it from the runner token.
+  gitSecret: "ct-quasar-hmr-git"
+  pullPeriodSeconds: 15
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2"
+      memory: "3Gi"
