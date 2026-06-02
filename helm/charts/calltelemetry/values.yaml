@@ -23,7 +23,13 @@ vue-web: {}
 caddy:
   image:
     repository: calltelemetry/caddy
-    tag: "2.11.3"
+    # Verified-published public tag on Docker Hub (calltelemetry/caddy is a
+    # security-hardened Caddy rebuild via xcaddy: bumped quic-go +
+    # smallstep/certificates, config-interchangeable with vanilla caddy). Pinned
+    # to the hardened-build short SHA, which matches the caddy-builder submodule
+    # gitlink. The previous "2.11.3" had no leading "v" and 404'd on pull — Docker
+    # Hub publishes "v2.11.3"/"v2.11.2"/short-SHAs, never a bare "2.11.3".
+    tag: "7a7c1b3"
     pullPolicy: IfNotPresent
   ingress:
     enabled: false
