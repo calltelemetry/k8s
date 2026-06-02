@@ -584,6 +584,17 @@ entries:
   syslog:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-06-02T17:41:21.540418586Z"
+    description: Cisco UC syslog ingestion — UDP 514 receiver, Kvasir parser, Loki
+      storage, NATS alert routing
+    digest: ce49cd8f99e8e85bd893a79c4ba9b5a81f94c6e599522ff9d72512edbd9476ce
+    name: syslog
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/syslog-0.3.1/syslog-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2026-03-28T05:01:00.952261368Z"
     description: Cisco UC syslog ingestion — UDP 514 receiver, Kvasir parser, Loki
       storage, NATS alert routing
@@ -663,4 +674,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-23T00:32:03.157591971Z"
+generated: "2026-06-02T17:41:21.540485311Z"
