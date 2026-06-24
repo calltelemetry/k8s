@@ -109,7 +109,7 @@ releases:
         args:
           [
             "-c",
-            'NAMESPACE={{ .Environment.Values.env.namespace }} && kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - && cat examples/haproxy-namespace-template.yaml | sed "s/NAMESPACE_PLACEHOLDER/$NAMESPACE/g" | kubectl apply -f -',
+            'NAMESPACE={{ .Environment.Values.env.namespace }} && ../scripts/ct-k8s-namespace-ttl.sh apply "$NAMESPACE" && cat examples/haproxy-namespace-template.yaml | sed "s/NAMESPACE_PLACEHOLDER/$NAMESPACE/g" | kubectl apply -f -',
           ]
 
   # CT Ingress Configs
