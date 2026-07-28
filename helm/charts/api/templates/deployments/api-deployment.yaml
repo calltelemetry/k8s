@@ -125,6 +125,11 @@ spec:
               value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
             - name: LOCAL_NATS
               value: {{ .Values.nats_server | quote }}
+            # Pin NATS_PORT to the plain port so the app never sees the
+            # K8s-injected "tcp://host:port" URI that older images crash on
+            # (String.to_integer("tcp://...") raises ArgumentError at boot).
+            - name: NATS_PORT
+              value: "4222"
             - name: ADMIN_NODE
               value: "FALSE"
             - name: WORKER_NODE
