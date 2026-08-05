@@ -321,7 +321,7 @@ data:
               description: 'A dashboard background queue has more than 100 available jobs for ten minutes.'
 
           - alert: DashboardObanDiscardedJobs
-            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
+            expr: sum by (queue) (dash_api_oban_discarded_jobs_last_24h{job="dashboard"}) > 0
             for: 5m
             labels:
               severity: warning
@@ -329,7 +329,7 @@ data:
               workload: dashapi-dash-api
             annotations:
               summary: 'Dashboard Oban has discarded jobs'
-              description: 'A dashboard background queue has discarded jobs for five minutes.'
+              description: 'A dashboard background queue has discarded jobs from the last 24 hours for five minutes.'
 
       - name: observability_health
         rules:
