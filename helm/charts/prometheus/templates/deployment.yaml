@@ -14,6 +14,7 @@ spec:
   # opening the same TSDB during a config rollout and failing on the lock.
   strategy:
     type: Recreate
+    rollingUpdate: null
   selector:
     matchLabels:
       {{- include "prometheus.selectorLabels" . | nindent 6 }}
