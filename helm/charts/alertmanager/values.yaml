@@ -85,6 +85,12 @@ resources:
     cpu: 250m
     memory: 256Mi
 
+# Alertmanager runs as nobody and needs group write access to its persistent
+# notification log and silence database.
+securityContext:
+  fsGroup: 65534
+  fsGroupChangePolicy: OnRootMismatch
+
 nodeSelector: {}
 tolerations: []
 affinity: {}
