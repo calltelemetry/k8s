@@ -10,6 +10,10 @@ metadata:
     {{- include "prometheus.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  # Prometheus uses a single RWO PVC. Recreate prevents two pods from
+  # opening the same TSDB during a config rollout and failing on the lock.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "prometheus.selectorLabels" . | nindent 6 }}
