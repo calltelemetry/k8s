@@ -1,0 +1,6 @@
+apiVersion: v2
+name: node-exporter
+description: Node metrics exporter for CallTelemetry observability
+type: application
+version: 1.0.0
+appVersion: "1.11.1"

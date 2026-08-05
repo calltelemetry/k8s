@@ -5,7 +5,7 @@ fullnameOverride: "prometheus"
 
 image:
   repository: prom/prometheus
-  tag: latest
+  tag: v3.11.0
   pullPolicy: IfNotPresent
 
 # Prometheus configuration
@@ -13,6 +13,7 @@ config:
   # Global settings
   scrapeInterval: 15s
   evaluationInterval: 15s
+  retention: 15d
 
 # Scrape targets - enabled services will be added to prometheus.yml
 # Targets are auto-configured with namespace
@@ -60,6 +61,36 @@ scrapeTargets:
     port: 4080
     metricsPath: /metrics
 
+  # Dashboard PromEx endpoint in the production dashboard namespace
+  dashboard:
+    enabled: false
+    service: dashapi-dash-api
+    namespace: dashboard
+    port: 4021
+    metricsPath: /metrics
+
+  # Managed kube-state-metrics endpoint in the observability namespace
+  kubeStateMetrics:
+    enabled: false
+    service: kube-state-metrics
+    namespace: observability
+    port: 8080
+
+  # Node exporter pods are discovered through Kubernetes API endpoint discovery
+  nodeExporter:
+    enabled: false
+    namespace: observability
+    service: node-exporter
+    port: 9100
+
+  # Public dashboard check through blackbox-exporter
+  dashboardPublic:
+    enabled: false
+    service: blackbox-exporter
+    namespace: observability
+    port: 9115
+    target: https://dash.calltelemetry.com/health/ready
+
 # AlertManager integration
 alerting:
   enabled: true
@@ -73,17 +104,17 @@ service:
 # Persistent storage
 persistence:
   enabled: true
-  size: 2Gi
+  size: 10Gi
   storageClass: ""
 
 # Resource limits
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 250m
+    memory: 512Mi
   limits:
-    cpu: 500m
-    memory: 1Gi
+    cpu: "1"
+    memory: 2Gi
 
 # Security context
 securityContext:

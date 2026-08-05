@@ -40,7 +40,7 @@ postgresql:
 
 # NATS configuration
 nats:
-  values_file: examples/nats-ct-dev-values.yaml
+  values_file: examples/nats-dev-values.yaml
 
 # MetalLB IP addresses
 metallb:

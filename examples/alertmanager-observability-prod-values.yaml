@@ -1,0 +1,36 @@
+fullnameOverride: alertmanager
+
+config:
+  emailTo: jason.barbee@gmail.com
+  receivers:
+    - name: dashboard-email
+      emailConfigs:
+        - to: jason.barbee@gmail.com
+          sendResolved: true
+    - name: calltelemetry-webhook
+      webhookConfigs:
+        - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
+          sendResolved: true
+    - name: critical-direct
+      webhookConfigs:
+        - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
+          sendResolved: true
+  smtp:
+    enabled: true
+    smarthost: smtp.mailgun.org:587
+    from: alerts@calltelemetry.com
+    authUsername: postmaster@calltelemetry.com
+    existingSecret: alertmanager-mailgun
+    passwordKey: smtp_password
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+persistence:
+  enabled: true
+  size: 1Gi

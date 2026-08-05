@@ -5,4 +5,4 @@ name: prometheus
 description: Prometheus metrics server for CallTelemetry observability
 type: application
 version: 1.0.0
-appVersion: "latest"
+appVersion: "3.11.0"

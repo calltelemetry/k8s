@@ -87,6 +87,53 @@ releases:
       - crds:
           enabled: true
 
+  # Production-only observability platform. This is intentionally separate
+  # from the ci-analytics monitoring installation and from product releases.
+  - name: prometheus
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/prometheus
+    values:
+      - examples/prometheus-observability-prod-values.yaml
+
+  - name: alertmanager
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/alertmanager
+    values:
+      - examples/alertmanager-observability-prod-values.yaml
+
+  - name: kube-state-metrics
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/kube-state-metrics
+
+  - name: node-exporter
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/node-exporter
+
+  - name: blackbox-exporter
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/blackbox-exporter
+
+  - name: grafana
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: ./helm/charts/grafana
+    values:
+      - examples/grafana-observability-prod-values.yaml
+    needs:
+      - "{{ .Environment.Values.observability.namespace }}/prometheus"
+      - "{{ .Environment.Values.observability.namespace }}/alertmanager"
+
   # HAProxy Ingress Controller
   - name: haproxy-ingress
     namespace: "{{ .Environment.Values.env.namespace }}"
