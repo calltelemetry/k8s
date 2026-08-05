@@ -248,6 +248,34 @@ data:
               summary: 'Dashboard memory is near its limit'
               description: 'A dashboard pod has used more than 85% of its memory limit for ten minutes.'
 
+          - alert: DashboardCPUThrottling
+            expr: |
+              sum by (pod) (rate(container_cpu_cfs_throttled_periods_total{namespace="dashboard", container="dash-api"}[5m]))
+                /
+              sum by (pod) (rate(container_cpu_cfs_periods_total{namespace="dashboard", container="dash-api"}[5m])) > 0.25
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard CPU is being throttled'
+              description: 'A dashboard pod has had more than 25% of CPU periods throttled for ten minutes.'
+
+          - alert: DashboardCPUHigh
+            expr: |
+              sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="dashboard", container="dash-api"}[5m]))
+                /
+              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", container="dash-api", resource="cpu", unit="core"}) > 0.8
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard CPU usage is high'
+              description: 'A dashboard pod has used more than 80% of its CPU limit for ten minutes.'
+
           - alert: DashboardHTTP5xx
             expr: sum(rate(dash_api_prom_ex_phoenix_http_requests_total{job="dashboard", status=~"5.."}[5m])) > 0
             for: 5m
@@ -359,6 +387,39 @@ data:
             annotations:
               summary: 'Node root filesystem space is low'
               description: 'A DOKS worker node has less than 15% free root filesystem space.'
+
+          - alert: KubernetesNodeDiskPressure
+            expr: kube_node_status_condition{condition="DiskPressure", status="true"} == 1
+            for: 5m
+            labels:
+              severity: warning
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Kubernetes node has disk pressure'
+              description: 'A DOKS worker node has reported disk pressure for five minutes.'
+
+          - alert: KubernetesNodeMemoryLow
+            expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.15
+            for: 10m
+            labels:
+              severity: warning
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Node available memory is low'
+              description: 'A DOKS worker node has less than 15% available memory for ten minutes.'
+
+          - alert: KubernetesNodeCPUHigh
+            expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 85
+            for: 10m
+            labels:
+              severity: warning
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Node CPU usage is high'
+              description: 'A DOKS worker node has used more than 85% CPU for ten minutes.'
 
       - name: system_health
         rules:

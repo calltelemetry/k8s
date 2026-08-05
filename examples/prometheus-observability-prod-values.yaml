@@ -11,18 +11,25 @@ config:
 
 scrapeTargets:
   otelCollector:
+    enabled: false
     namespace: ct-prod
   nats:
+    enabled: false
     namespace: ct-prod
   seaweedfs:
+    enabled: false
     namespace: ct-prod
   postgresql:
+    enabled: false
     namespace: ct-prod
   caddy:
+    enabled: false
     namespace: ct-prod
   jtapiSidecar:
+    enabled: false
     namespace: ct-prod
   calltelemetry:
+    enabled: false
     namespace: ct-prod
   dashboard:
     enabled: true
