@@ -14,7 +14,7 @@ production Helmfile. Never put their values in a values file or ConfigMap.
 Namespace: `dashboard`
 Name: `dashboard-runtime`
 
-Required keys:
+Core and database keys:
 
 - `secret_key_base`
 - `jwt_secret`
@@ -24,6 +24,14 @@ Required keys:
 - `health_check_token`
 - `db_user`
 - `db_password`
+
+### Dashboard integrations Secret
+
+Namespace: `dashboard`
+Name: `dashboard-integrations`
+
+Required integration keys:
+
 - `mailgun_api`
 - `webex_teams_token`
 - `smtp_user`

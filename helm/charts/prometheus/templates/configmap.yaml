@@ -191,6 +191,7 @@ data:
 
           - alert: DashboardOOMKilled
             expr: kube_pod_container_status_last_terminated_reason{namespace="dashboard", container="dash-api", reason="OOMKilled"} == 1
+              and on(namespace, pod, container) changes(kube_pod_container_status_restarts_total{namespace="dashboard", container="dash-api"}[10m]) > 0
             for: 2m
             labels:
               severity: critical
@@ -198,7 +199,7 @@ data:
               workload: dashapi-dash-api
             annotations:
               summary: 'Dashboard container was OOMKilled'
-              description: 'A dashboard container was terminated for exceeding its memory limit.'
+              description: 'A dashboard container was OOMKilled within the last ten minutes.'
 
           - alert: DashboardCrashLoopBackOff
             expr: kube_pod_container_status_waiting_reason{namespace="dashboard", container="dash-api", reason="CrashLoopBackOff"} == 1

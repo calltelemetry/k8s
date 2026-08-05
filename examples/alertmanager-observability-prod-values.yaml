@@ -12,6 +12,9 @@ config:
         - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
           sendResolved: true
     - name: critical-direct
+      emailConfigs:
+        - to: jason.barbee@gmail.com
+          sendResolved: true
       webhookConfigs:
         - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
           sendResolved: true
