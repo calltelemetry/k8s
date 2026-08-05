@@ -160,6 +160,17 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/azure-msal-service-0.1.0/azure-msal-service-0.1.0.tgz
     version: 0.1.0
+  blackbox-exporter:
+  - apiVersion: v2
+    appVersion: 0.28.0
+    created: "2026-08-05T04:05:52.02072287Z"
+    description: HTTP probe exporter for CallTelemetry observability
+    digest: 7017daddc30334fe60fd7f69c7ba3e92d81d36a78d89a0a6aa79a0243a69cf45
+    name: blackbox-exporter
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/blackbox-exporter-1.0.0/blackbox-exporter-1.0.0.tgz
+    version: 1.0.0
   caddy:
   - apiVersion: v2
     appVersion: 2.11.3
@@ -494,6 +505,17 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/jtapi-sidecar-1.0.0/jtapi-sidecar-1.0.0.tgz
     version: 1.0.0
+  kube-state-metrics:
+  - apiVersion: v2
+    appVersion: 2.18.0
+    created: "2026-08-05T04:05:52.559611316Z"
+    description: Kubernetes object-state metrics for CallTelemetry observability
+    digest: c0bcd5a837d81e94238875b018a4e366b53cb3d5ba0b6288ce03f99bcd490412
+    name: kube-state-metrics
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/kube-state-metrics-1.0.0/kube-state-metrics-1.0.0.tgz
+    version: 1.0.0
   loki:
   - apiVersion: v2
     appVersion: 3.3.2
@@ -515,6 +537,17 @@ entries:
     type: application
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/nats-1.0.0/nats-1.0.0.tgz
+    version: 1.0.0
+  node-exporter:
+  - apiVersion: v2
+    appVersion: 1.11.1
+    created: "2026-08-05T04:05:52.7364883Z"
+    description: Node metrics exporter for CallTelemetry observability
+    digest: c0d1b76545b8e57344635b866a102891c992c8d13b8bacd22f7e1c7770a3398f
+    name: node-exporter
+    type: application
+    urls:
+    - https://github.com/calltelemetry/k8s/releases/download/node-exporter-1.0.0/node-exporter-1.0.0.tgz
     version: 1.0.0
   otel-collector:
   - apiVersion: v2
@@ -674,4 +707,4 @@ entries:
     urls:
     - https://github.com/calltelemetry/k8s/releases/download/vue-web-1.0.0/vue-web-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-02T17:41:21.540485311Z"
+generated: "2026-08-05T04:05:52.879213947Z"
