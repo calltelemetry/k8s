@@ -362,6 +362,17 @@ data:
               summary: 'Dashboard Oban has discarded jobs'
               description: 'A dashboard background queue has discarded jobs from the last 24 hours for five minutes.'
 
+          - alert: DashboardObanDiscardedQueue
+            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard Oban has persisted discarded jobs'
+              description: 'Dashboard Oban has discarded jobs remaining in the database for the {{`{{ $labels.queue }}`}} queue; investigate before replaying them.'
+
       - name: observability_health
         rules:
           - alert: PrometheusTargetDown
