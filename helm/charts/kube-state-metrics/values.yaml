@@ -7,6 +7,38 @@ service:
   port: 8080
   telemetryPort: 8081
 
+# Keep the exporter focused on object state required by the operations
+# dashboard. In particular, do not grant it access to Secret objects.
+collectors:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  - certificatesigningrequests
+  - configmaps
+  - endpoints
+  - limitranges
+  - namespaces
+  - nodes
+  - persistentvolumeclaims
+  - persistentvolumes
+  - pods
+  - replicationcontrollers
+  - resourcequotas
+  - services
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  - cronjobs
+  - jobs
+  - endpointslices
+  - horizontalpodautoscalers
+  - ingresses
+  - networkpolicies
+  - poddisruptionbudgets
+  - storageclasses
+  - volumeattachments
+  - leases
+
 resources:
   requests:
     cpu: 50m

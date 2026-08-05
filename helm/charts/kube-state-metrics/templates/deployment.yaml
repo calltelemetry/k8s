@@ -36,6 +36,7 @@ spec:
           args:
             - --port={{ .Values.service.port }}
             - --telemetry-port={{ .Values.service.telemetryPort }}
+            - --resources={{ join "," .Values.collectors }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
