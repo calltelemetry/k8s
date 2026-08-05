@@ -373,6 +373,50 @@ data:
               summary: 'Dashboard Oban has persisted discarded jobs'
               description: 'Dashboard Oban has discarded jobs remaining in the database for the {{`{{ $labels.queue }}`}} queue; investigate before replaying them.'
 
+          - alert: DashboardProductlaneRateLimited
+            expr: sum by (operation) (increase(dash_api_productlane_rate_limited_total{job="dashboard"}[10m])) > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Productlane writes are rate limited'
+              description: 'Productlane returned a rate-limit response for the {{`{{ $labels.operation }}`}} operation in the last ten minutes.'
+
+          - alert: DashboardProductlaneWriteSnoozed
+            expr: sum by (operation) (increase(dash_api_productlane_write_total{job="dashboard", outcome="snoozed"}[10m])) > 5
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Productlane writes are being snoozed'
+              description: 'More than five Productlane writes were snoozed for the {{`{{ $labels.operation }}`}} operation in ten minutes.'
+
+          - alert: DashboardProductlaneWriteFailed
+            expr: sum by (operation) (increase(dash_api_productlane_write_total{job="dashboard", outcome="failed"}[10m])) > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Productlane writes are failing'
+              description: 'A Productlane write failed for the {{`{{ $labels.operation }}`}} operation in the last ten minutes.'
+
+          - alert: DashboardProductlaneDeduplicatedWrites
+            expr: sum by (operation) (increase(dash_api_productlane_write_total{job="dashboard", outcome="deduplicated"}[1h])) > 10
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Productlane deduplication volume is elevated'
+              description: 'More than ten Productlane writes were deduplicated for the {{`{{ $labels.operation }}`}} operation in the last hour.'
+
       - name: observability_health
         rules:
           - alert: PrometheusTargetDown
