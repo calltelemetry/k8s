@@ -486,6 +486,7 @@ data:
 
       - name: application_health
         rules:
+          {{- if .Values.scrapeTargets.calltelemetry.enabled }}
           - alert: AppDown
             expr: up{job="calltelemetry"} == 0
             for: 30s
@@ -495,7 +496,9 @@ data:
               summary: 'Call Telemetry API is DOWN'
               description: 'The Call Telemetry API has been unreachable for 30 seconds.'
               generator_url: '/grafana/d/ct-system-resources/system-resources?viewPanel=5&from=now-1h&to=now'
+          {{- end }}
 
+          {{- if .Values.scrapeTargets.nats.enabled }}
           - alert: NATSDisconnected
             expr: ct_nats_connection_status == 0
             for: 30s
@@ -505,6 +508,7 @@ data:
               summary: 'NATS connection lost'
               description: 'The NATS message broker connection has been down for 30 seconds.'
               generator_url: '/grafana/d/ct-system-health/system-health?viewPanel=4&from=now-30m&to=now'
+          {{- end }}
 
           - alert: HighProcessCount
             expr: ct_beam_process_count > 50000
