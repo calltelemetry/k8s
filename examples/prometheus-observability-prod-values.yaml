@@ -47,6 +47,8 @@ scrapeTargets:
     namespace: observability
     service: node-exporter
     port: 9100
+  kubeletCadvisor:
+    enabled: true
   dashboardPublic:
     enabled: true
     service: blackbox-exporter

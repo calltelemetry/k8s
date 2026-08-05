@@ -83,6 +83,10 @@ scrapeTargets:
     service: node-exporter
     port: 9100
 
+  # Kubelet cAdvisor metrics for container resource alerts
+  kubeletCadvisor:
+    enabled: false
+
   # Public dashboard check through blackbox-exporter
   dashboardPublic:
     enabled: false

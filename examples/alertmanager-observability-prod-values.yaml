@@ -2,21 +2,24 @@ fullnameOverride: alertmanager
 
 config:
   emailTo: jason.barbee@gmail.com
+  route:
+    receiver: dashboard-email
+    groupBy: ['alertname', 'namespace', 'workload']
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 4h
+    routes:
+      - match:
+          severity: critical
+        receiver: critical-direct
   receivers:
     - name: dashboard-email
       emailConfigs:
         - to: jason.barbee@gmail.com
           sendResolved: true
-    - name: calltelemetry-webhook
-      webhookConfigs:
-        - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
-          sendResolved: true
     - name: critical-direct
       emailConfigs:
         - to: jason.barbee@gmail.com
-          sendResolved: true
-      webhookConfigs:
-        - url: http://admin-service.ct-prod.svc.cluster.local:4000/api/internal/alertmanager-webhook
           sendResolved: true
   smtp:
     enabled: true
