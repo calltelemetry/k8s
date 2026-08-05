@@ -12,8 +12,8 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{- end }}
 
 {{/*
-Cluster-scoped RBAC names include the namespace so the managed replacement can
-coexist with the legacy kube-system kube-state-metrics installation.
+Cluster-scoped RBAC names include the namespace so each managed release has an
+explicit, collision-resistant identity.
 */}}
 {{- define "ksm.clusterRoleName" -}}
 {{- printf "%s-%s" .Release.Namespace (include "ksm.fullname" .) | trunc 63 | trimSuffix "-" -}}

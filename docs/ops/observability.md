@@ -91,3 +91,13 @@ Confirm the Prometheus targets for `dashboard`, `kube-state-metrics`,
 `node-exporter`, and `dashboard-public` are healthy. Use a synthetic alert to
 verify both firing and resolved Mailgun notifications before relying on the
 stack for production incident response.
+
+The legacy unmanaged `kube-system/kube-state-metrics` installation was retired
+after the managed `observability/kube-state-metrics` replacement was verified
+healthy and confirmed as the only Prometheus target. Do not recreate the legacy
+deployment or its ClusterRole; the Helm-managed observability release owns the
+cluster-state metrics path.
+
+For the initial observation window, record dashboard pod memory, restarts,
+OOMKilled events, scrape health, active alerts, Alertmanager email failures,
+and node pressure daily. Tune thresholds only from observed production data.
