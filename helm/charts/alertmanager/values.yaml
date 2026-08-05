@@ -22,17 +22,18 @@ config:
       # Dashboard availability and application alerts go directly to email.
       - match:
           namespace: dashboard
+          severity: warning
         receiver: dashboard-email
         continue: true
       - match:
           namespace: observability
+          severity: warning
         receiver: dashboard-email
         continue: true
-      # Critical: email direct + webhook
+      # Critical: one email plus the preserved webhook.
       - match:
           severity: critical
         receiver: critical-direct
-        continue: true
       # All: webhook to API
       - receiver: calltelemetry-webhook
 
