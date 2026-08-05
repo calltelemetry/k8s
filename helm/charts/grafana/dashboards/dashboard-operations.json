@@ -67,7 +67,7 @@
       "id": 7,
       "title": "Oban available backlog",
       "type": "timeseries",
-      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"available\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+      "targets": [{"expr": "max by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"available\"})", "legendFormat": "{{queue}}", "refId": "A"}]
     },
     {
       "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
@@ -76,7 +76,7 @@
       "id": 8,
       "title": "Oban retryable jobs",
       "type": "timeseries",
-      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"retryable\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+      "targets": [{"expr": "max by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"retryable\"})", "legendFormat": "{{queue}}", "refId": "A"}]
     },
     {
       "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
@@ -85,7 +85,7 @@
       "id": 9,
       "title": "Oban retained discarded jobs",
       "type": "timeseries",
-      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"discarded\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+      "targets": [{"expr": "max by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"discarded\"})", "legendFormat": "{{queue}}", "refId": "A"}]
     },
     {
       "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
@@ -94,7 +94,7 @@
       "id": 11,
       "title": "Oban discarded jobs in last 24 hours",
       "type": "timeseries",
-      "targets": [{"expr": "sum by (queue) (dash_api_oban_discarded_jobs_last_24h{job=\"dashboard\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+      "targets": [{"expr": "max by (queue) (dash_api_oban_discarded_jobs_last_24h{job=\"dashboard\"})", "legendFormat": "{{queue}}", "refId": "A"}]
     },
     {
       "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
