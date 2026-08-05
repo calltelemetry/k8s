@@ -330,7 +330,7 @@ data:
               description: 'The dashboard HTTP request p95 has exceeded one second for ten minutes.'
 
           - alert: DashboardObanRetryableJobs
-            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="retryable"}) > 5
+            expr: max by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="retryable"}) > 5
             for: 5m
             labels:
               severity: warning
@@ -341,7 +341,7 @@ data:
               description: 'A dashboard background queue has more than five retryable jobs.'
 
           - alert: DashboardObanAvailableBacklog
-            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="available"}) > 100
+            expr: max by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="available"}) > 100
             for: 10m
             labels:
               severity: warning
@@ -352,7 +352,7 @@ data:
               description: 'A dashboard background queue has more than 100 available jobs for ten minutes.'
 
           - alert: DashboardObanDiscardedJobs
-            expr: sum by (queue) (dash_api_oban_discarded_jobs_last_24h{job="dashboard"}) > 0
+            expr: max by (queue) (dash_api_oban_discarded_jobs_last_24h{job="dashboard"}) > 0
             for: 5m
             labels:
               severity: warning
@@ -363,7 +363,7 @@ data:
               description: 'A dashboard background queue has discarded jobs from the last 24 hours for five minutes.'
 
           - alert: DashboardObanDiscardedQueue
-            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
+            expr: max by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
             for: 5m
             labels:
               severity: warning
