@@ -4,29 +4,45 @@ fullnameOverride: "alertmanager"
 
 image:
   repository: prom/alertmanager
-  tag: v0.28.1
+  tag: v0.32.1
   pullPolicy: IfNotPresent
 
 # AlertManager routing and receiver configuration
 config:
   resolveTimeout: 5m
+  emailTo: ""
 
   route:
     receiver: calltelemetry-webhook
-    groupBy: ['alertname']
+    groupBy: ['alertname', 'namespace', 'workload']
     groupWait: 30s
     groupInterval: 5m
     repeatInterval: 4h
     routes:
-      # Critical: email direct + webhook
+      # Dashboard availability and application alerts go directly to email.
+      - match:
+          namespace: dashboard
+          severity: warning
+        receiver: dashboard-email
+        continue: true
+      - match:
+          namespace: observability
+          severity: warning
+        receiver: dashboard-email
+        continue: true
+      # Critical: one email plus the preserved webhook.
       - match:
           severity: critical
         receiver: critical-direct
-        continue: true
       # All: webhook to API
       - receiver: calltelemetry-webhook
 
   receivers:
+    - name: dashboard-email
+      emailConfigs:
+        - to: ""
+          sendResolved: true
+
     - name: calltelemetry-webhook
       webhookConfigs:
         - url: 'http://admin-service:4000/api/internal/alertmanager-webhook'
@@ -36,7 +52,14 @@ config:
       webhookConfigs:
         - url: 'http://admin-service:4000/api/internal/alertmanager-webhook'
           sendResolved: true
-      # Email config added dynamically when SMTP is synced from app
+
+  smtp:
+    enabled: false
+    smarthost: smtp.mailgun.org:587
+    from: alerts@calltelemetry.com
+    authUsername: postmaster@calltelemetry.com
+    existingSecret: alertmanager-mailgun
+    passwordKey: smtp_password
 
 # Alert rules (mounted into Prometheus, not AlertManager)
 alertRules:
@@ -50,17 +73,17 @@ service:
 # Persistent storage for silences and notification state
 persistence:
   enabled: true
-  size: 256Mi
+  size: 1Gi
   storageClass: ""
 
 # Resources
 resources:
   requests:
-    cpu: 25m
-    memory: 64Mi
-  limits:
-    cpu: 100m
+    cpu: 50m
     memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
 
 nodeSelector: {}
 tolerations: []

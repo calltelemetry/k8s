@@ -58,3 +58,11 @@ Service target with namespace
 {{- $namespace := index . 2 -}}
 {{- printf "%s.%s.svc.cluster.local:%d" $service $namespace (int $port) }}
 {{- end }}
+
+{{/*
+Cluster-scoped RBAC names include the namespace so observability can coexist
+with another Prometheus release in a different namespace.
+*/}}
+{{- define "prometheus.clusterRoleName" -}}
+{{- printf "%s-%s" .Release.Namespace (include "prometheus.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end }}

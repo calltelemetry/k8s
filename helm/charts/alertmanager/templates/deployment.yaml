@@ -40,6 +40,11 @@ spec:
               subPath: alertmanager.yml
             - name: data
               mountPath: /alertmanager
+            {{- if .Values.config.smtp.enabled }}
+            - name: smtp-secret
+              mountPath: /etc/alertmanager/secrets
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:
@@ -58,6 +63,11 @@ spec:
         - name: config
           configMap:
             name: {{ .Values.fullnameOverride }}-config
+        {{- if .Values.config.smtp.enabled }}
+        - name: smtp-secret
+          secret:
+            secretName: {{ .Values.config.smtp.existingSecret }}
+        {{- end }}
         {{- if .Values.persistence.enabled }}
         - name: data
           persistentVolumeClaim:

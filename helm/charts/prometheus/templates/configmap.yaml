@@ -18,7 +18,7 @@ data:
       {{- if .Values.scrapeTargets.otelCollector.enabled }}
       - job_name: 'otel-collector'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "otel-collector" .Values.scrapeTargets.otelCollector.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "otel-collector" .Values.scrapeTargets.otelCollector.port (.Values.scrapeTargets.otelCollector.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.prometheus.enabled }}
@@ -31,7 +31,7 @@ data:
       # NATS metrics via prometheus-nats-exporter sidecar
       - job_name: 'nats'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "nats" .Values.scrapeTargets.nats.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "nats" .Values.scrapeTargets.nats.port (.Values.scrapeTargets.nats.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.seaweedfs.enabled }}
@@ -40,21 +40,21 @@ data:
         metrics_path: {{ .Values.scrapeTargets.seaweedfs.metricsPath }}
         scheme: http
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "seaweedfs" .Values.scrapeTargets.seaweedfs.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "seaweedfs" .Values.scrapeTargets.seaweedfs.port (.Values.scrapeTargets.seaweedfs.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.postgresql.enabled }}
       # PostgreSQL metrics via CNPG native exporter (port 9187 on pod)
       - job_name: 'postgresql'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "postgresql-metrics" .Values.scrapeTargets.postgresql.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "postgresql-metrics" .Values.scrapeTargets.postgresql.port (.Values.scrapeTargets.postgresql.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.caddy.enabled }}
       # Caddy gateway metrics via admin API
       - job_name: 'caddy'
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "gateway" .Values.scrapeTargets.caddy.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "gateway" .Values.scrapeTargets.caddy.port (.Values.scrapeTargets.caddy.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.jtapiSidecar.enabled }}
@@ -62,7 +62,7 @@ data:
       - job_name: 'jtapi-sidecar'
         metrics_path: {{ .Values.scrapeTargets.jtapiSidecar.metricsPath }}
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "jtapi-sidecar" .Values.scrapeTargets.jtapiSidecar.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "jtapi-sidecar" .Values.scrapeTargets.jtapiSidecar.port (.Values.scrapeTargets.jtapiSidecar.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
       {{- if .Values.scrapeTargets.calltelemetry.enabled }}
@@ -71,10 +71,65 @@ data:
         scrape_interval: 30s
         metrics_path: {{ .Values.scrapeTargets.calltelemetry.metricsPath | default "/metrics" }}
         static_configs:
-          - targets: ['{{ include "prometheus.target" (list "admin-service" .Values.scrapeTargets.calltelemetry.port .Release.Namespace) }}']
+          - targets: ['{{ include "prometheus.target" (list "admin-service" .Values.scrapeTargets.calltelemetry.port (.Values.scrapeTargets.calltelemetry.namespace | default .Release.Namespace)) }}']
       {{- end }}
 
-    {{- if .Values.alerting.enabled }}
+      {{- if .Values.scrapeTargets.dashboard.enabled }}
+      # Dashboard PromEx metrics from the production dashboard namespace
+      - job_name: 'dashboard'
+        scrape_interval: 30s
+        metrics_path: {{ .Values.scrapeTargets.dashboard.metricsPath | default "/metrics" }}
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list .Values.scrapeTargets.dashboard.service .Values.scrapeTargets.dashboard.port .Values.scrapeTargets.dashboard.namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.kubeStateMetrics.enabled }}
+      # Kubernetes object state
+      - job_name: 'kube-state-metrics'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list .Values.scrapeTargets.kubeStateMetrics.service .Values.scrapeTargets.kubeStateMetrics.port .Values.scrapeTargets.kubeStateMetrics.namespace) }}']
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.nodeExporter.enabled }}
+      # Node exporter DaemonSet endpoints discovered through Kubernetes
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - {{ .Values.scrapeTargets.nodeExporter.namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: {{ .Values.scrapeTargets.nodeExporter.service }}
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.dashboardPublic.enabled }}
+      # Independent public readiness check through blackbox-exporter
+      - job_name: 'dashboard-public'
+        metrics_path: /probe
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - {{ .Values.scrapeTargets.dashboardPublic.target | quote }}
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: '{{ include "prometheus.target" (list .Values.scrapeTargets.dashboardPublic.service .Values.scrapeTargets.dashboardPublic.port .Values.scrapeTargets.dashboardPublic.namespace) }}'
+      {{- end }}
+
+      {{- if .Values.alerting.enabled }}
+      - job_name: 'alertmanager'
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list "alertmanager" .Values.alerting.alertmanagerPort .Release.Namespace) }}']
+
     # AlertManager integration
     alerting:
       alertmanagers:
@@ -88,6 +143,223 @@ data:
   {{- if .Values.alerting.enabled }}
   alert_rules.yml: |
     groups:
+      - name: dashboard_availability
+        rules:
+          - alert: DashboardPublicProbeFailed
+            expr: probe_success{job="dashboard-public"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Public dashboard readiness check failed'
+              description: 'dash.calltelemetry.com/health/ready has failed through the independent blackbox probe for two minutes.'
+
+          - alert: DashboardMetricsTargetDown
+            expr: up{job="dashboard"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard metrics target is down'
+              description: 'Prometheus cannot scrape the dashboard PromEx endpoint for two minutes.'
+
+          - alert: DashboardNoReadyReplicas
+            expr: kube_deployment_status_replicas_available{namespace="dashboard", deployment="dashapi-dash-api"} < 1
+            for: 1m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard has no ready replicas'
+              description: 'The dashboard Deployment has no available pod serving traffic.'
+
+          - alert: DashboardUnavailableReplicas
+            expr: kube_deployment_status_replicas_unavailable{namespace="dashboard", deployment="dashapi-dash-api"} > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard has unavailable replicas'
+              description: 'At least one desired dashboard replica has been unavailable for five minutes.'
+
+          - alert: DashboardOOMKilled
+            expr: kube_pod_container_status_last_terminated_reason{namespace="dashboard", container="dash-api", reason="OOMKilled"} == 1
+              and on(namespace, pod, container) changes(kube_pod_container_status_restarts_total{namespace="dashboard", container="dash-api"}[10m]) > 0
+            for: 2m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard container was OOMKilled'
+              description: 'A dashboard container was OOMKilled within the last ten minutes.'
+
+          - alert: DashboardCrashLoopBackOff
+            expr: kube_pod_container_status_waiting_reason{namespace="dashboard", container="dash-api", reason="CrashLoopBackOff"} == 1
+            for: 2m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard is in CrashLoopBackOff'
+              description: 'A dashboard container has been unable to start for two minutes.'
+
+          - alert: DashboardRestartStorm
+            expr: increase(kube_pod_container_status_restarts_total{namespace="dashboard", container="dash-api"}[10m]) > 3
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard restart storm detected'
+              description: 'A dashboard container restarted more than three times in ten minutes.'
+
+          - alert: DashboardRolloutStalled
+            expr: kube_deployment_status_condition{namespace="dashboard", deployment="dashapi-dash-api", condition="Progressing", status="false", reason="ProgressDeadlineExceeded"} == 1
+            for: 5m
+            labels:
+              severity: critical
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard rollout is stalled'
+              description: 'The dashboard Deployment has exceeded its progress deadline.'
+
+          - alert: DashboardMemoryNearLimit
+            expr: |
+              sum by (pod) (container_memory_working_set_bytes{namespace="dashboard", container="dash-api"})
+                /
+              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", container="dash-api", resource="memory", unit="byte"}) > 0.85
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard memory is near its limit'
+              description: 'A dashboard pod has used more than 85% of its memory limit for ten minutes.'
+
+          - alert: DashboardHTTP5xx
+            expr: sum(rate(dash_api_prom_ex_phoenix_http_requests_total{job="dashboard", status=~"5.."}[5m])) > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard is returning HTTP 5xx responses'
+              description: 'The dashboard has returned server errors continuously for five minutes.'
+
+          - alert: DashboardHTTPHighLatency
+            expr: histogram_quantile(0.95, sum by (le) (rate(dash_api_prom_ex_phoenix_http_request_duration_milliseconds_bucket{job="dashboard"}[5m]))) > 1000
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard p95 latency is above one second'
+              description: 'The dashboard HTTP request p95 has exceeded one second for ten minutes.'
+
+          - alert: DashboardObanRetryableJobs
+            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="retryable"}) > 5
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard Oban queue has retryable jobs'
+              description: 'A dashboard background queue has more than five retryable jobs.'
+
+          - alert: DashboardObanAvailableBacklog
+            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="available"}) > 100
+            for: 10m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard Oban queue backlog is growing'
+              description: 'A dashboard background queue has more than 100 available jobs for ten minutes.'
+
+          - alert: DashboardObanDiscardedJobs
+            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
+            for: 5m
+            labels:
+              severity: warning
+              namespace: dashboard
+              workload: dashapi-dash-api
+            annotations:
+              summary: 'Dashboard Oban has discarded jobs'
+              description: 'A dashboard background queue has discarded jobs for five minutes.'
+
+      - name: observability_health
+        rules:
+          - alert: PrometheusTargetDown
+            expr: up{job="prometheus"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              namespace: observability
+              workload: prometheus
+            annotations:
+              summary: 'Prometheus self-monitoring target is down'
+              description: 'Prometheus cannot scrape its own health endpoint.'
+
+          - alert: AlertmanagerTargetDown
+            expr: up{job="alertmanager"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              namespace: observability
+              workload: alertmanager
+            annotations:
+              summary: 'Alertmanager target is down'
+              description: 'Prometheus cannot reach Alertmanager for two minutes.'
+
+          - alert: KubernetesNodeNotReady
+            expr: kube_node_status_condition{condition="Ready", status="true"} == 0
+            for: 5m
+            labels:
+              severity: critical
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Kubernetes node is not Ready'
+              description: 'A DOKS worker node has been NotReady for five minutes.'
+
+          - alert: KubernetesNodeMemoryPressure
+            expr: kube_node_status_condition{condition="MemoryPressure", status="true"} == 1
+            for: 5m
+            labels:
+              severity: warning
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Kubernetes node has memory pressure'
+              description: 'A DOKS worker node has reported memory pressure for five minutes.'
+
+          - alert: NodeFilesystemSpaceLow
+            expr: (node_filesystem_avail_bytes{mountpoint="/", fstype!=""} / node_filesystem_size_bytes{mountpoint="/", fstype!=""}) < 0.15
+            for: 10m
+            labels:
+              severity: warning
+              namespace: observability
+              workload: kubernetes-node
+            annotations:
+              summary: 'Node root filesystem space is low'
+              description: 'A DOKS worker node has less than 15% free root filesystem space.'
+
       - name: system_health
         rules:
           - alert: HighDiskUsage

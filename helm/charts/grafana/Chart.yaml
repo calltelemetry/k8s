@@ -5,4 +5,4 @@ name: grafana
 description: Grafana dashboard for CallTelemetry observability
 type: application
 version: 1.0.0
-appVersion: "latest"
+appVersion: "13.1.0"

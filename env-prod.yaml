@@ -40,10 +40,14 @@ postgresql:
 
 # NATS configuration
 nats:
-  values_file: examples/nats-ct-prod-values.yaml
+  values_file: examples/nats-prod-values.yaml
 
 # MetalLB IP addresses
 metallb:
   primary_ip: "192.168.123.225"
   secondary_ip: "192.168.123.226"
   admin_ip: "192.168.123.227"
+
+observability:
+  enabled: true
+  namespace: observability

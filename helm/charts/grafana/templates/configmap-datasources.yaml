@@ -14,7 +14,7 @@ data:
     datasources:
       {{- if .Values.datasources.prometheus.enabled }}
       - name: Prometheus
-        uid: calltelemetry-prometheus
+        uid: {{ .Values.datasources.prometheus.uid | quote }}
         type: prometheus
         access: proxy
         url: {{ include "grafana.prometheusUrl" . }}
@@ -23,7 +23,7 @@ data:
       {{- end }}
       {{- if .Values.datasources.alertmanager.enabled }}
       - name: AlertManager
-        uid: calltelemetry-alertmanager
+        uid: {{ .Values.datasources.alertmanager.uid | quote }}
         type: alertmanager
         access: proxy
         url: {{ include "grafana.alertmanagerUrl" . }}

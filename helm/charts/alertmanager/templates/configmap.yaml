@@ -9,6 +9,13 @@ data:
   alertmanager.yml: |
     global:
       resolve_timeout: {{ .Values.config.resolveTimeout }}
+      {{- if .Values.config.smtp.enabled }}
+      smtp_smarthost: {{ .Values.config.smtp.smarthost | quote }}
+      smtp_from: {{ .Values.config.smtp.from | quote }}
+      smtp_auth_username: {{ .Values.config.smtp.authUsername | quote }}
+      smtp_auth_password_file: /etc/alertmanager/secrets/{{ .Values.config.smtp.passwordKey }}
+      smtp_require_tls: true
+      {{- end }}
 
     route:
       receiver: {{ .Values.config.route.receiver }}
@@ -44,7 +51,7 @@ data:
         {{- if .emailConfigs }}
         email_configs:
           {{- range .emailConfigs }}
-          - to: {{ .to | quote }}
+          - to: {{ .to | default $.Values.config.emailTo | quote }}
             send_resolved: {{ .sendResolved | default true }}
           {{- end }}
         {{- end }}

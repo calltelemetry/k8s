@@ -16,3 +16,9 @@ helm_defaults:
 # NATS configuration (shared between environments)
 nats:
   values_file: examples/nats-values.yaml
+
+# Production-only shared observability platform. Non-production environments
+# keep these releases disabled unless explicitly overridden.
+observability:
+  enabled: false
+  namespace: observability

@@ -5,7 +5,7 @@ fullnameOverride: "grafana"
 
 image:
   repository: grafana/grafana
-  tag: latest
+  tag: 13.1.0
   pullPolicy: IfNotPresent
 
 # Admin credentials (use existingSecret in production)
@@ -31,11 +31,13 @@ datasources:
   # Prometheus datasource (auto-configured)
   prometheus:
     enabled: true
+    uid: calltelemetry-prometheus
     # URL will be templated with namespace
     url: ""  # Leave empty to auto-detect: http://prometheus.NAMESPACE.svc.cluster.local:9090
   # AlertManager datasource (alert state + silences in Grafana Alerting tab)
   alertmanager:
     enabled: true
+    uid: calltelemetry-alertmanager
     url: ""  # Leave empty to auto-detect: http://alertmanager.NAMESPACE.svc.cluster.local:9093
   # Tempo datasource (traces)
   tempo:

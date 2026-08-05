@@ -1,0 +1,110 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "bool"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 0},
+      "id": 1,
+      "title": "Public readiness probe",
+      "type": "stat",
+      "targets": [{"expr": "probe_success{job=\"dashboard-public\"}", "legendFormat": "public", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 0},
+      "id": 2,
+      "title": "Dashboard HTTP 5xx rate",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(rate(dash_api_prom_ex_phoenix_http_requests_total{job=\"dashboard\",status=~\"5..\"}[5m]))", "legendFormat": "5xx/sec", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 0},
+      "id": 3,
+      "title": "Dashboard p95 latency",
+      "type": "timeseries",
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(dash_api_prom_ex_phoenix_http_request_duration_milliseconds_bucket{job=\"dashboard\"}[5m]))) / 1000", "legendFormat": "p95", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 6},
+      "id": 4,
+      "title": "Available replicas",
+      "type": "timeseries",
+      "targets": [{"expr": "kube_deployment_status_replicas_available{namespace=\"dashboard\",deployment=\"dashapi-dash-api\"}", "legendFormat": "available", "refId": "A"}, {"expr": "kube_deployment_spec_replicas{namespace=\"dashboard\",deployment=\"dashapi-dash-api\"}", "legendFormat": "desired", "refId": "B"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "percent"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 6},
+      "id": 5,
+      "title": "Pod memory versus limit",
+      "type": "timeseries",
+      "targets": [{"expr": "100 * sum by (pod) (container_memory_working_set_bytes{namespace=\"dashboard\",container=\"dash-api\"}) / sum by (pod) (kube_pod_container_resource_limits{namespace=\"dashboard\",container=\"dash-api\",resource=\"memory\",unit=\"byte\"})", "legendFormat": "{{pod}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 6},
+      "id": 6,
+      "title": "Pod restarts",
+      "type": "timeseries",
+      "targets": [{"expr": "increase(kube_pod_container_status_restarts_total{namespace=\"dashboard\",container=\"dash-api\"}[10m])", "legendFormat": "{{pod}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 12},
+      "id": 7,
+      "title": "Oban available backlog",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"available\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 12},
+      "id": 8,
+      "title": "Oban retryable jobs",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"retryable\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 12},
+      "id": 9,
+      "title": "Oban discarded jobs",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job=\"dashboard\",state=\"discarded\"})", "legendFormat": "{{queue}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 18},
+      "id": 10,
+      "title": "Active dashboard alerts",
+      "type": "timeseries",
+      "targets": [{"expr": "count(ALERTS{namespace=\"dashboard\",alertstate=\"firing\"})", "legendFormat": "firing", "refId": "A"}]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["calltelemetry", "dashboard", "operations"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Dashboard Operations",
+  "uid": "dashboard-operations",
+  "version": 1
+}

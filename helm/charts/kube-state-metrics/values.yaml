@@ -1,0 +1,52 @@
+image:
+  repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
+  tag: v2.18.0
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8080
+  telemetryPort: 8081
+
+# Keep the exporter focused on object state required by the operations
+# dashboard. In particular, do not grant it access to Secret objects.
+collectors:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  - certificatesigningrequests
+  - configmaps
+  - endpoints
+  - limitranges
+  - namespaces
+  - nodes
+  - persistentvolumeclaims
+  - persistentvolumes
+  - pods
+  - replicationcontrollers
+  - resourcequotas
+  - services
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  - cronjobs
+  - jobs
+  - endpointslices
+  - horizontalpodautoscalers
+  - ingresses
+  - networkpolicies
+  - poddisruptionbudgets
+  - storageclasses
+  - volumeattachments
+  - leases
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

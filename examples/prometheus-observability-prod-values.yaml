@@ -1,0 +1,64 @@
+fullnameOverride: prometheus
+
+image:
+  repository: prom/prometheus
+  tag: v3.11.0
+
+config:
+  scrapeInterval: 15s
+  evaluationInterval: 15s
+  retention: 15d
+
+scrapeTargets:
+  otelCollector:
+    namespace: ct-prod
+  nats:
+    namespace: ct-prod
+  seaweedfs:
+    namespace: ct-prod
+  postgresql:
+    namespace: ct-prod
+  caddy:
+    namespace: ct-prod
+  jtapiSidecar:
+    namespace: ct-prod
+  calltelemetry:
+    namespace: ct-prod
+  dashboard:
+    enabled: true
+    service: dashapi-dash-api
+    namespace: dashboard
+    port: 4021
+    metricsPath: /metrics
+  kubeStateMetrics:
+    enabled: true
+    service: kube-state-metrics
+    namespace: observability
+    port: 8080
+  nodeExporter:
+    enabled: true
+    namespace: observability
+    service: node-exporter
+    port: 9100
+  dashboardPublic:
+    enabled: true
+    service: blackbox-exporter
+    namespace: observability
+    port: 9115
+    target: https://dash.calltelemetry.com/health/ready
+
+alerting:
+  enabled: true
+  alertmanagerPort: 9093
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 2Gi
