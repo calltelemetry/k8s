@@ -46,8 +46,8 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:
-              path: /readyz
-              port: telemetry
+              path: /livez
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:

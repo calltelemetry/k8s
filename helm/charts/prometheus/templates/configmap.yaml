@@ -79,8 +79,18 @@ data:
       - job_name: 'dashboard'
         scrape_interval: 30s
         metrics_path: {{ .Values.scrapeTargets.dashboard.metricsPath | default "/metrics" }}
-        static_configs:
-          - targets: ['{{ include "prometheus.target" (list .Values.scrapeTargets.dashboard.service .Values.scrapeTargets.dashboard.port .Values.scrapeTargets.dashboard.namespace) }}']
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - {{ .Values.scrapeTargets.dashboard.namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: {{ .Values.scrapeTargets.dashboard.service }}
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
       {{- end }}
 
       {{- if .Values.scrapeTargets.kubeStateMetrics.enabled }}
@@ -105,6 +115,27 @@ data:
           - source_labels: [__meta_kubernetes_endpoint_port_name]
             action: keep
             regex: metrics
+      {{- end }}
+
+      {{- if .Values.scrapeTargets.kubeletCadvisor.enabled }}
+      # Kubelet cAdvisor metrics for container memory, CPU, and throttling alerts
+      - job_name: 'kubelet-cadvisor'
+        scheme: https
+        metrics_path: /metrics/cadvisor
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_node_name]
+            target_label: node
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            target_label: __metrics_path__
+            regex: (.+)
+            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
       {{- end }}
 
       {{- if .Values.scrapeTargets.dashboardPublic.enabled }}
@@ -236,9 +267,9 @@ data:
 
           - alert: DashboardMemoryNearLimit
             expr: |
-              sum by (pod) (container_memory_working_set_bytes{namespace="dashboard", container="dash-api"})
+              sum by (pod) (container_memory_working_set_bytes{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api"})
                 /
-              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", container="dash-api", resource="memory", unit="byte"}) > 0.85
+              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api", resource="memory", unit="byte"}) > 0.85
             for: 10m
             labels:
               severity: warning
@@ -250,9 +281,9 @@ data:
 
           - alert: DashboardCPUThrottling
             expr: |
-              sum by (pod) (rate(container_cpu_cfs_throttled_periods_total{namespace="dashboard", container="dash-api"}[5m]))
+              sum by (pod) (rate(container_cpu_cfs_throttled_periods_total{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api"}[5m]))
                 /
-              sum by (pod) (rate(container_cpu_cfs_periods_total{namespace="dashboard", container="dash-api"}[5m])) > 0.25
+              sum by (pod) (rate(container_cpu_cfs_periods_total{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api"}[5m])) > 0.25
             for: 10m
             labels:
               severity: warning
@@ -264,9 +295,9 @@ data:
 
           - alert: DashboardCPUHigh
             expr: |
-              sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="dashboard", container="dash-api"}[5m]))
+              sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api"}[5m]))
                 /
-              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", container="dash-api", resource="cpu", unit="core"}) > 0.8
+              sum by (pod) (kube_pod_container_resource_limits{namespace="dashboard", pod=~"dashapi-dash-api-.*", container="dash-api", resource="cpu", unit="core"}) > 0.8
             for: 10m
             labels:
               severity: warning
@@ -321,7 +352,7 @@ data:
               description: 'A dashboard background queue has more than 100 available jobs for ten minutes.'
 
           - alert: DashboardObanDiscardedJobs
-            expr: sum by (queue) (dash_api_prom_ex_oban_queue_length_count{job="dashboard", state="discarded"}) > 0
+            expr: sum by (queue) (dash_api_oban_discarded_jobs_last_24h{job="dashboard"}) > 0
             for: 5m
             labels:
               severity: warning
@@ -329,7 +360,7 @@ data:
               workload: dashapi-dash-api
             annotations:
               summary: 'Dashboard Oban has discarded jobs'
-              description: 'A dashboard background queue has discarded jobs for five minutes.'
+              description: 'A dashboard background queue has discarded jobs from the last 24 hours for five minutes.'
 
       - name: observability_health
         rules:
@@ -455,6 +486,7 @@ data:
 
       - name: application_health
         rules:
+          {{- if .Values.scrapeTargets.calltelemetry.enabled }}
           - alert: AppDown
             expr: up{job="calltelemetry"} == 0
             for: 30s
@@ -464,7 +496,9 @@ data:
               summary: 'Call Telemetry API is DOWN'
               description: 'The Call Telemetry API has been unreachable for 30 seconds.'
               generator_url: '/grafana/d/ct-system-resources/system-resources?viewPanel=5&from=now-1h&to=now'
+          {{- end }}
 
+          {{- if .Values.scrapeTargets.nats.enabled }}
           - alert: NATSDisconnected
             expr: ct_nats_connection_status == 0
             for: 30s
@@ -474,6 +508,7 @@ data:
               summary: 'NATS connection lost'
               description: 'The NATS message broker connection has been down for 30 seconds.'
               generator_url: '/grafana/d/ct-system-health/system-health?viewPanel=4&from=now-30m&to=now'
+          {{- end }}
 
           - alert: HighProcessCount
             expr: ct_beam_process_count > 50000
