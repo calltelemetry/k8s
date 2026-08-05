@@ -104,6 +104,42 @@
       "title": "Active dashboard alerts",
       "type": "timeseries",
       "targets": [{"expr": "count(ALERTS{namespace=\"dashboard\",alertstate=\"firing\"})", "legendFormat": "firing", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 24},
+      "id": 12,
+      "title": "Productlane writes by outcome",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (outcome) (rate(dash_api_productlane_write_total{job=\"dashboard\"}[10m]))", "legendFormat": "{{outcome}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 24},
+      "id": 13,
+      "title": "Productlane rate limits",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (operation) (increase(dash_api_productlane_rate_limited_total{job=\"dashboard\"}[1h]))", "legendFormat": "{{operation}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 24},
+      "id": 14,
+      "title": "Productlane failed writes",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (operation) (increase(dash_api_productlane_write_total{job=\"dashboard\",outcome=\"failed\"}[1h]))", "legendFormat": "{{operation}}", "refId": "A"}]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "calltelemetry-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 30},
+      "id": 15,
+      "title": "Productlane deduplicated writes",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (operation) (increase(dash_api_productlane_write_total{job=\"dashboard\",outcome=\"deduplicated\"}[1h]))", "legendFormat": "{{operation}}", "refId": "A"}]
     }
   ],
   "refresh": "30s",
