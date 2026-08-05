@@ -98,6 +98,7 @@ healthy and confirmed as the only Prometheus target. Do not recreate the legacy
 deployment or its ClusterRole; the Helm-managed observability release owns the
 cluster-state metrics path.
 
-For the initial observation window, record dashboard pod memory, restarts,
-OOMKilled events, scrape health, active alerts, Alertmanager email failures,
-and node pressure daily. Tune thresholds only from observed production data.
+This stack is now in continuous operations. Track dashboard pod memory,
+restarts, OOMKilled events, scrape health, active alerts, Alertmanager email
+failures, and node pressure as part of normal incident response; tune thresholds
+when production behavior or alert quality requires it.
