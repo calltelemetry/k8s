@@ -118,6 +118,18 @@ logging_level: debug
 nats_server: "nats"
 teams_auth_service: "teams-auth-service"
 
+# TrueSpam credential encryption is disabled unless an operator supplies an
+# existing Kubernetes Secret. The encryption key must never be stored in this
+# values file or a ConfigMap.
+truespam:
+  enabled: false
+  existingSecretName: ""
+  existingSecretKey: encryption-key
+  retainedKeys: []
+  configMapName: ""
+  keyVersion: v1
+  demoLimitsLegalConfirmed: false
+
 logs:
   enabled: true # Set to false only if a log volume is provided externally
   size: 1Gi # Example: "5Gi" for larger clusters

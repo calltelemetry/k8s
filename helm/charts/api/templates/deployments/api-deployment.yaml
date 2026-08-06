@@ -175,6 +175,30 @@ spec:
             # multiple pods exist and the platform owns lifecycle.
             - name: CT_DEPLOYMENT_MODE
               value: "k8s"
+{{- if .Values.truespam.enabled }}
+            - name: TRUESPAM_CREDENTIAL_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "truespam.existingSecretName must reference an existing Kubernetes Secret when truespam.enabled is true" .Values.truespam.existingSecretName }}
+                  key: {{ .Values.truespam.existingSecretKey | quote }}
+{{- range .Values.truespam.retainedKeys }}
+            - name: {{ printf "TRUESPAM_CREDENTIAL_ENCRYPTION_KEY_%s" .version | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "truespam.existingSecretName must reference an existing Kubernetes Secret when truespam.enabled is true" $.Values.truespam.existingSecretName }}
+                  key: {{ .secretKey | quote }}
+{{- end }}
+            - name: TRUESPAM_CREDENTIAL_ENCRYPTION_KEY_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ default (printf "%s-truespam-config" .Release.Name) .Values.truespam.configMapName | trunc 63 | trimSuffix "-" }}
+                  key: TRUESPAM_CREDENTIAL_ENCRYPTION_KEY_VERSION
+            - name: TRUESPAM_DEMO_LIMITS_LEGAL_CONFIRMED
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ default (printf "%s-truespam-config" .Release.Name) .Values.truespam.configMapName | trunc 63 | trimSuffix "-" }}
+                  key: TRUESPAM_DEMO_LIMITS_LEGAL_CONFIRMED
+{{- end }}
 {{- if or .Values.logs.enabled .Values.tftp.enabled }}
           volumeMounts:
 {{- if .Values.logs.enabled }}
