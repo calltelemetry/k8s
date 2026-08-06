@@ -11,7 +11,7 @@ maintainers:
     name: Call Telemetry LLC
 dependencies:
   - name: api
-    version: 0.11.12
+    version: 0.11.13
     repository: file://../api
   - name: vue-web
     version: 1.0.0
