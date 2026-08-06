@@ -176,6 +176,9 @@ spec:
             - name: CT_DEPLOYMENT_MODE
               value: "k8s"
 {{- if .Values.truespam.enabled }}
+{{- if not (regexMatch "^[A-Za-z0-9._-]+$" .Values.truespam.existingSecretKey) }}
+{{- fail "truespam.existingSecretKey must contain only letters, numbers, dots, underscores, and hyphens" }}
+{{- end }}
             - name: TRUESPAM_CREDENTIAL_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
@@ -184,6 +187,9 @@ spec:
 {{- range .Values.truespam.retainedKeys }}
 {{- if not (regexMatch "^[A-Za-z0-9_]+$" .version) }}
 {{- fail "truespam.retainedKeys.version must contain only letters, numbers, and underscores" }}
+{{- end }}
+{{- if not (regexMatch "^[A-Za-z0-9._-]+$" .secretKey) }}
+{{- fail "truespam.retainedKeys.secretKey must contain only letters, numbers, dots, underscores, and hyphens" }}
 {{- end }}
             - name: {{ printf "TRUESPAM_CREDENTIAL_ENCRYPTION_KEY_%s" .version | quote }}
               valueFrom:
