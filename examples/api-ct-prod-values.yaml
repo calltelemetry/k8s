@@ -6,6 +6,17 @@ db:
   useExistingSecret: true  # Set to true to use an existing secret
   existingSecretName: hippo-pguser-calltelemetry # Name of the secret containing DB credentials
 
+# TrueSpam remains disabled until the operator creates the referenced Secret
+# and Legal confirms the Demo daily limit. The key itself is never placed in
+# this values file or a ConfigMap.
+truespam:
+  enabled: false
+  existingSecretName: truespam-credential-encryption
+  existingSecretKey: encryption-key
+  retainedKeys: []
+  keyVersion: v1
+  demoLimitsLegalConfirmed: false
+
 # API Config
 api:
   hostname: prod.calltelemetry.com
