@@ -182,6 +182,9 @@ spec:
                   name: {{ required "truespam.existingSecretName must reference an existing Kubernetes Secret when truespam.enabled is true" .Values.truespam.existingSecretName }}
                   key: {{ .Values.truespam.existingSecretKey | quote }}
 {{- range .Values.truespam.retainedKeys }}
+{{- if not (regexMatch "^[A-Za-z0-9_]+$" .version) }}
+{{- fail "truespam.retainedKeys.version must contain only letters, numbers, and underscores" }}
+{{- end }}
             - name: {{ printf "TRUESPAM_CREDENTIAL_ENCRYPTION_KEY_%s" .version | quote }}
               valueFrom:
                 secretKeyRef:
