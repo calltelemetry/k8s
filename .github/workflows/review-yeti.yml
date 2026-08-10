@@ -1,0 +1,68 @@
+name: ReviewYeti
+
+on:
+  pull_request:
+    branches: [main]
+    # synchronize is required so the protected check is evaluated for every
+    # current PR head, not only for the commit that opened the PR.
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to review
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: review-yeti-${{ github.repository }}-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: ReviewYeti
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Require Review Yeti provider credential
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${OPENROUTER_API_KEY:-}" || {
+            echo "::error::OPENROUTER_API_KEY is not configured for this repository or its organization." >&2
+            exit 1
+          }
+
+      - name: Run Review Yeti
+        id: review
+        # v1.0.0, pinned to the immutable release commit.
+        uses: review-yeti-ai/review-yeti-bot@6fcab1ea6a169811a445483cf171a7631ed1805f
+        with:
+          llm-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          linear-api-key: ${{ secrets.LINEAR_API_KEY }}
+          pr-number: ${{ inputs.pr_number || github.event.pull_request.number }}
+
+      - name: Enforce Review Yeti gate
+        env:
+          REVIEW_STATUS: ${{ steps.review.outputs.review-status }}
+          P0_COUNT: ${{ steps.review.outputs.p0-count }}
+          P1_COUNT: ${{ steps.review.outputs.p1-count }}
+          FILES_OMITTED: ${{ steps.review.outputs.files-omitted }}
+        run: |
+          set -euo pipefail
+          [[ "$REVIEW_STATUS" == "SHIP" ]] || {
+            echo "::error::Review Yeti status is $REVIEW_STATUS; merge is blocked." >&2
+            exit 1
+          }
+          [[ "$P0_COUNT" == "0" && "$P1_COUNT" == "0" ]] || {
+            echo "::error::Review Yeti reported P0=$P0_COUNT P1=$P1_COUNT; merge is blocked." >&2
+            exit 1
+          }
+          [[ "$FILES_OMITTED" == "0" ]] || {
+            echo "::error::Review Yeti omitted $FILES_OMITTED changed files; merge is blocked." >&2
+            exit 1
+          }

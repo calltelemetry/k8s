@@ -1,5 +1,5 @@
 # Automated CodeRabbit review is intentionally disabled.
-# TaskYeti is the replacement review integration for main-targeted PRs.
+# Review Yeti is the replacement review integration for main-targeted PRs.
 
 reviews:
   review_status: false
