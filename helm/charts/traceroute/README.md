@@ -39,6 +39,7 @@ The following table lists the configurable parameters of the Traceroute chart an
 | `replicaCount`                   | Number of replicas                               | `1`                         |
 | `image.repository`               | Image repository                                 | `calltelemetry/traceroute`  |
 | `image.tag`                      | Image tag                                        | `0.8.3`                     |
+| `image.digest`                   | Optional immutable image digest                  | `""`                       |
 | `image.pullPolicy`               | Image pull policy                                | `IfNotPresent`              |
 | `resources.requests.cpu`         | CPU resource requests                            | `256m`                      |
 | `resources.limits.cpu`           | CPU resource limits                              | `1`                         |
@@ -47,6 +48,8 @@ The following table lists the configurable parameters of the Traceroute chart an
 | `service.port`                   | Service port                                     | `4100`                      |
 | `service.targetPort`             | Service target port                              | `4100`                      |
 | `securityContext.runAsUser`      | User ID to run the container                     | `0`                         |
+| `securityContext.runAsNonRoot`   | Require a non-root user                         | `false`                     |
+| `containerSecurityContext`       | Container privilege/capability controls          | `{}`                        |
 | `terminationGracePeriodSeconds`  | Pod termination grace period                     | `5`                         |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.

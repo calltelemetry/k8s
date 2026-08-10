@@ -1,0 +1,36 @@
+fullnameOverride: nats
+
+image:
+  repository: nats
+  tag: "2.12.6-alpine"
+  pullPolicy: IfNotPresent
+
+replicas: 1
+
+jetstream:
+  enabled: true
+  strict: true
+  storeDir: /data/jetstream
+  maxMemoryStore: 256MB
+  maxFileStore: 1GB
+
+storage:
+  type: pvc
+  size: 5Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+exporter:
+  enabled: false
+
+monitoring:
+  enableServiceMonitor: false
+
+jetstreamSetup:
+  enabled: true

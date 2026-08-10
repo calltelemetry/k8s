@@ -4,6 +4,7 @@ replicaCount: 1
 image:
   repository: calltelemetry/traceroute
   tag: 0.8.3-1
+  digest: ""
   pullPolicy: Always
 
 resources:
@@ -25,6 +26,12 @@ service:
 # Security context
 securityContext:
   runAsUser: 0
+  runAsNonRoot: false
+  seccompProfile: {}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: true
+  capabilities: {}
 
 # Tolerations for the pods
 tolerations:

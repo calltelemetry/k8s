@@ -1,0 +1,6 @@
+channel:
+  name: stable
+  namespace: ct-stable
+  host: stable.do.calltelemetry.com
+  ingress_class: haproxy-ct-dev
+  tls_secret: stable-do-calltelemetry-com-tls

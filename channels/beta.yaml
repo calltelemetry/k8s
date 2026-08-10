@@ -1,0 +1,6 @@
+channel:
+  name: beta
+  namespace: ct-beta
+  host: beta.do.calltelemetry.com
+  ingress_class: haproxy-ct-dev
+  tls_secret: beta-do-calltelemetry-com-tls

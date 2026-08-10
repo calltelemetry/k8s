@@ -1,0 +1,93 @@
+ingressClassName: {{ .Values.channel.ingress_class | quote }}
+
+api:
+  image: {{ requiredEnv "CT_WEB_IMAGE_REPOSITORY" | quote }}
+  tag: {{ requiredEnv "CT_WEB_IMAGE_TAG" | quote }}
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+    maxSurge: 1
+    maxUnavailable: 0
+  cpus: 2
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+    limits:
+      memory: 1024Mi
+      cpu: 2
+  logging_level: warning
+  hostname: {{ .Values.channel.host | quote }}
+  probesEnabled: true
+  ingress:
+    enabled: true
+    annotations:
+      haproxy.org/load-balance: leastconn
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      haproxy.org/ssl-redirect: "true"
+  tls:
+    - secretName: {{ .Values.channel.tls_secret | quote }}
+      hosts:
+        - {{ .Values.channel.host | quote }}
+
+admin:
+  image: {{ requiredEnv "CT_WEB_IMAGE_REPOSITORY" | quote }}
+  tag: {{ requiredEnv "CT_WEB_IMAGE_TAG" | quote }}
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+    maxSurge: 1
+    maxUnavailable: 0
+  cpus: 2
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1024Mi
+      cpu: 2
+  hostname: {{ .Values.channel.host | quote }}
+  api_worker: false
+  probesEnabled: true
+  ingress:
+    enabled: true
+    annotations:
+      haproxy.org/load-balance: roundrobin
+      haproxy.org/ssl-redirect: "true"
+  tls:
+    - secretName: {{ .Values.channel.tls_secret | quote }}
+      hosts:
+        - {{ .Values.channel.host | quote }}
+
+# SFTP and syslog remain disabled until their images are included in the
+# immutable release-manifest contract.
+sftp:
+  enabled: false
+syslog:
+  enabled: false
+
+db:
+  useExistingSecret: true
+  existingSecretName: api-db-secret
+  values:
+    db_ssl_enabled: true
+
+logging_level: warning
+nats_server: nats
+teams_auth_service: teams-auth-service
+
+truespam:
+  enabled: false
+
+logs:
+  enabled: false
+
+grafana:
+  uploadDashboards: "false"
+  host: ""
+  token: ""
+
+preview:
+  seedLevel: empty

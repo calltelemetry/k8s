@@ -1,0 +1,37 @@
+replicaCount: 1
+
+image:
+  repository: calltelemetry/traceroute
+  tag: "0.8.3-1"
+  digest: "sha256:888048b3df677fd2ca0ecb65d63f0924051dcba72a46cde4c6682fa8918b598e"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nats:
+  server: nats
+
+service:
+  type: ClusterIP
+  port: 4100
+  targetPort: 4100
+
+securityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+    add: [NET_RAW]
+
+tolerations: []

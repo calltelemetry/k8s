@@ -1,0 +1,73 @@
+# Namespaced application releases for the DigitalOcean stable and beta lanes.
+#
+# This file deliberately excludes cluster-scoped operators, PostgreSQL, HAProxy,
+# MetalLB, cert-manager, and observability. Those are shared infrastructure and
+# are bootstrapped separately.
+
+repositories:
+  - name: nats
+    url: https://nats-io.github.io/k8s/helm/charts
+  - name: calltelemetry
+    url: https://calltelemetry.github.io/k8s/helm/charts
+
+helmDefaults:
+  wait: true
+  waitForJobs: true
+  timeout: 900
+  atomic: true
+  cleanupOnFail: true
+
+environments:
+  stable:
+    values:
+      - channels/stable.yaml
+  beta:
+    values:
+      - channels/beta.yaml
+
+---
+
+releases:
+  - name: nats
+    namespace: "{{ .Environment.Values.channel.namespace }}"
+    chart: ./helm/charts/nats
+    values:
+      - channels/nats-values.yaml
+
+  - name: api
+    namespace: "{{ .Environment.Values.channel.namespace }}"
+    chart: calltelemetry/api
+    version: 0.11.12
+    values:
+      - channels/api-values.yaml.gotmpl
+    postRenderer: bash
+    postRendererArgs:
+      - '{{ requiredEnv "K8S_REPOSITORY_ROOT" }}/scripts/remove-api-db-secret.sh'
+      - --remove-api-db-secret
+    needs:
+      - "{{ .Environment.Values.channel.namespace }}/nats"
+
+  - name: ct-web
+    namespace: "{{ .Environment.Values.channel.namespace }}"
+    chart: calltelemetry/ct-web
+    version: 0.1.6
+    values:
+      - channels/ct-web-values.yaml.gotmpl
+    postRenderer: bash
+    postRendererArgs:
+      - '{{ requiredEnv "K8S_REPOSITORY_ROOT" }}/scripts/remove-api-db-secret.sh'
+      - --strip-cert-manager
+    needs:
+      - "{{ .Environment.Values.channel.namespace }}/api"
+
+  # This is the local chart and its image is intentionally pinned in the
+  # channel values. The release manifest currently carries web/vue identity;
+  # traceroute is kept at the reviewed platform pin until it is promoted into
+  # that manifest contract.
+  - name: traceroute
+    namespace: "{{ .Environment.Values.channel.namespace }}"
+    chart: ./helm/charts/traceroute
+    values:
+      - channels/traceroute-values.yaml.gotmpl
+    needs:
+      - "{{ .Environment.Values.channel.namespace }}/nats"
