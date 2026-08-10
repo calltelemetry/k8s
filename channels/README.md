@@ -23,5 +23,8 @@ The overlay uses a Helm 3 post-renderer to omit the API chart's default
 database Secret object, strip the web chart's duplicate cert-manager
 annotation, and enforce image digests; the workflow pins Helm 3.16.4.
 
+Review automation for main-targeted changes is owned by the external TaskYeti
+integration; this repository does not require CodeRabbit or Copilot checks.
+
 Traceroute runs as UID 1000 with `runAsNonRoot`, RuntimeDefault seccomp,
 privilege escalation disabled, and only `NET_RAW` added for diagnostics.
