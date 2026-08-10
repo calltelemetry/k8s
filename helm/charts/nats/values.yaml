@@ -15,6 +15,7 @@ fullnameOverride: "nats"
 image:
   repository: nats
   tag: "2.12.6-alpine"
+  # Set digest for immutable channel deployments; tag remains the local default.
   digest: ""
   pullPolicy: IfNotPresent
 
