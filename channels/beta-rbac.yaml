@@ -16,6 +16,7 @@ rules:
       - events
       - pods
       - persistentvolumeclaims
+      - secrets
       - services
     verbs: [get, list, watch, create, update, patch, delete]
   - apiGroups: [""]

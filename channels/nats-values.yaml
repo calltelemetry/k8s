@@ -3,6 +3,7 @@ fullnameOverride: nats
 image:
   repository: nats
   tag: "2.12.6-alpine"
+  digest: "sha256:1cfc36e2e5e638243d8c722f72c954cd0ec4b15ee82fadbc718ce12e2b3c1652"
   pullPolicy: IfNotPresent
 
 replicas: 1
@@ -34,3 +35,4 @@ monitoring:
 
 jetstreamSetup:
   enabled: true
+  image: "natsio/nats-box@sha256:0784ab710aefaf6ef037ed797ee7dcde613c6ad208c4dbff1945fc7c1b5b5375"

@@ -15,6 +15,7 @@ fullnameOverride: "nats"
 image:
   repository: nats
   tag: "2.12.6-alpine"
+  digest: ""
   pullPolicy: IfNotPresent
 
 # Number of replicas (1 for dev, 3+ for HA in prod)
