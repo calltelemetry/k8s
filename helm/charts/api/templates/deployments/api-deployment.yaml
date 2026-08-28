@@ -119,6 +119,11 @@ spec:
               value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL
               value: {{ .Values.api.logging_level | quote }}
+            # REL-196: node-local remote-control sessions are not eligible in Kubernetes.
+            - name: REMOTE_CONTROL_IDENTITY_VERIFICATION_ENABLED
+              value: "false"
+            - name: REMOTE_CONTROL_SINGLE_NODE_SESSIONS
+              value: "false"
             - name: TRACEROUTE_SERVICE
               value: {{ ((.Values.traceroute | default dict).service | default "traceroute") | quote }}
             - name: TRACER_SERVICE

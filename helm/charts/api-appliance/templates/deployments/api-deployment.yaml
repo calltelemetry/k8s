@@ -114,6 +114,11 @@ spec:
               value: {{ .Values.cdr_root_path }}
             - name: LOGGING_LEVEL
               value: {{ .Values.api.logging_level }}
+            # REL-196: this Helm deployment is still Kubernetes, not an eligible OVA path.
+            - name: REMOTE_CONTROL_IDENTITY_VERIFICATION_ENABLED
+              value: "false"
+            - name: REMOTE_CONTROL_SINGLE_NODE_SESSIONS
+              value: "false"
             - name: TRACEROUTE_SERVICE
               value: traceroute
             - name: LOCAL_NATS
