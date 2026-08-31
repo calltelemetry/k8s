@@ -10,6 +10,10 @@ metadata:
     {{- include "grafana.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  # The production chart uses a ReadWriteOnce PVC. Recreate prevents a rolling
+  # replacement from waiting on a multi-attach failure.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "grafana.selectorLabels" . | nindent 6 }}
