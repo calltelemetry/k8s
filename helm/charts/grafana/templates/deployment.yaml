@@ -10,6 +10,10 @@ metadata:
     {{- include "grafana.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  strategy:
+    # Recreate prevents a PVC-backed replacement from waiting on a
+    # Multi-Attach failure; emptyDir installs retain rolling updates.
+    type: {{ if .Values.persistence.enabled }}Recreate{{ else }}RollingUpdate{{ end }}
   selector:
     matchLabels:
       {{- include "grafana.selectorLabels" . | nindent 6 }}

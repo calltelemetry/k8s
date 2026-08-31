@@ -31,7 +31,7 @@ config:
 
 resources:
   requests:
-    cpu: 50m
+    cpu: 25m
     memory: 128Mi
   limits:
     cpu: 250m
