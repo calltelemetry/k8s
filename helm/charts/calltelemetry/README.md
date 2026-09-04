@@ -63,7 +63,7 @@ Optional workloads use the same override pattern:
   enabled: true
   replicaCount: 1
   image:
-    repository: registry.depot.dev/<project-id>
+    repository: <your-registry>/<project-or-namespace>
     tag: <service>-<sha>
     pullPolicy: Always
   resources:
@@ -113,7 +113,7 @@ Minimal Caddy gateway override:
 ```yaml
 caddy:
   image:
-    repository: registry.depot.dev/zlcvc29kp9
+    repository: <your-registry>/<project-or-namespace>
     tag: caddy-builder-<sha>
     pullPolicy: Always
   ingress:
