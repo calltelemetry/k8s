@@ -62,10 +62,8 @@ spec:
               mountPath: /etc/prometheus
             - name: data
               mountPath: /prometheus
-            {{- if and .Values.scrapeTargets.bifrost.enabled .Values.scrapeTargets.bifrost.basicAuth.enabled }}
-            - name: bifrost-metrics-auth
-              mountPath: /etc/prometheus/secrets/bifrost
-              readOnly: true
+            {{- with .Values.extraSecretMounts }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           livenessProbe:
             httpGet:
@@ -90,13 +88,6 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        {{- if and .Values.scrapeTargets.bifrost.enabled .Values.scrapeTargets.bifrost.basicAuth.enabled }}
-        - name: bifrost-metrics-auth
-          secret:
-            secretName: {{ .Values.scrapeTargets.bifrost.basicAuth.secretName }}
-            items:
-              - key: {{ .Values.scrapeTargets.bifrost.basicAuth.usernameKey }}
-                path: {{ .Values.scrapeTargets.bifrost.basicAuth.usernameKey }}
-              - key: {{ .Values.scrapeTargets.bifrost.basicAuth.passwordKey }}
-                path: {{ .Values.scrapeTargets.bifrost.basicAuth.passwordKey }}
+        {{- with .Values.extraSecretVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
