@@ -95,10 +95,26 @@ scrapeTargets:
     port: 9115
     target: https://dash.calltelemetry.com/health/ready
 
+  # Optional authenticated Bifrost LLM gateway scrape. Private deployments
+  # provide the target and Secret through an environment overlay.
+  bifrost:
+    enabled: false
+    service: bifrost
+    namespace: default
+    port: 8080
+    metricsPath: /metrics
+    scrapeInterval: 15s
+    basicAuth:
+      enabled: false
+      secretName: bifrost-metrics-auth
+      usernameKey: username
+      passwordKey: password
+
 # AlertManager integration
 alerting:
   enabled: true
   alertmanagerPort: 9093
+  extraRules: []
 
 # Service configuration
 service:
