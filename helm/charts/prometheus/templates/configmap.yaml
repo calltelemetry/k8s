@@ -156,6 +156,21 @@ data:
             replacement: '{{ include "prometheus.target" (list .Values.scrapeTargets.dashboardPublic.service .Values.scrapeTargets.dashboardPublic.port .Values.scrapeTargets.dashboardPublic.namespace) }}'
       {{- end }}
 
+      {{- if .Values.scrapeTargets.bifrost.enabled }}
+      # Bifrost LLM gateway metrics. Authentication is enabled for the
+      # gateway, so production overlays must provide a mounted Secret.
+      - job_name: 'ct-llm-gateway'
+        scrape_interval: {{ .Values.scrapeTargets.bifrost.scrapeInterval | default "15s" }}
+        metrics_path: {{ .Values.scrapeTargets.bifrost.metricsPath | default "/metrics" }}
+        static_configs:
+          - targets: ['{{ include "prometheus.target" (list .Values.scrapeTargets.bifrost.service .Values.scrapeTargets.bifrost.port .Values.scrapeTargets.bifrost.namespace) }}']
+        {{- if .Values.scrapeTargets.bifrost.basicAuth.enabled }}
+        basic_auth:
+          username_file: /etc/prometheus/secrets/bifrost/{{ .Values.scrapeTargets.bifrost.basicAuth.usernameKey }}
+          password_file: /etc/prometheus/secrets/bifrost/{{ .Values.scrapeTargets.bifrost.basicAuth.passwordKey }}
+        {{- end }}
+      {{- end }}
+
       {{- if .Values.alerting.enabled }}
       - job_name: 'alertmanager'
         static_configs:
@@ -757,4 +772,7 @@ data:
             annotations:
               summary: 'Over half of monitored tables are stale ({{`{{ $value }}`}}) for org {{`{{ $labels.org_id }}`}}'
               description: 'More than 50% of tables have not been purged in 48 hours. Purge system may be completely broken.'
+{{- with .Values.alerting.extraRules }}
+{{ toYaml . | nindent 6 }}
+{{- end }}
   {{- end }}
