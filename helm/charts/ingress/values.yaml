@@ -64,6 +64,15 @@ loadBalancer:
 # Primary API Load Balancer
 primary_api:
   createLoadBalancer: false
+  # Kubernetes Service externalTrafficPolicy for this LB. "Cluster" (the
+  # default) SNATs at the node hop regardless of what the cloud LB itself
+  # preserves. "Local" is required to see real client source IPs on a
+  # DigitalOcean REGIONAL_NETWORK (Network) LB, but only routes to nodes
+  # that run a ready controller pod — verify pod placement/replica count
+  # covers every node the LB health-checks before setting this to Local.
+  # See ct-meta ADR 0613 (DOKS REGIONAL_NETWORK default) and ADR 0629
+  # (single-LB consolidation, REL-948).
+  externalTrafficPolicy: Cluster
   advertiseL2MetalLb: false
   metal_ip_address: "192.168.123.205"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/primary_ip.yaml
@@ -82,6 +91,8 @@ primary_api:
 # Secondary API Load Balancer
 secondary_api:
   createLoadBalancer: false
+  # See primary_api.externalTrafficPolicy above for the full explanation.
+  externalTrafficPolicy: Cluster
   advertiseL2MetalLb: false
   metal_ip_address: "192.168.123.206"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/secondary_ip.yaml
@@ -96,6 +107,12 @@ secondary_api:
 # Admin API Load Balancer
 admin_api:
   createLoadBalancer: true
+  # See primary_api.externalTrafficPolicy above for the full explanation.
+  # This is the LB every doks-nyc1 caller in ct-infrastructure currently
+  # renders through (ingress-haproxy-admin-lb) — do not flip this to Local
+  # without the migration sequence in
+  # ct-infrastructure/docs/gitops/REL-948-single-lb-consolidation.md.
+  externalTrafficPolicy: Cluster
   advertiseL2MetalLb: false
   metal_ip_address: "192.168.123.207"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/admin_ip.yaml

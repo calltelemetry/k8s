@@ -18,7 +18,10 @@ metadata:
     {{- end }}
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Cluster
+  # ct-meta ADR 0613/0629 (REL-948): default stays Cluster (no-op for existing
+  # releases); override via primary_api.externalTrafficPolicy if this LB
+  # ever needs real client source IPs. See admin-load-balancer.yaml.
+  externalTrafficPolicy: {{ .Values.primary_api.externalTrafficPolicy | default "Cluster" }}
   selector:
     {{- include "ingress.controllerSelector" . | nindent 4 }}
   ports:

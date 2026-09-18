@@ -18,7 +18,13 @@ metadata:
     {{- end }}
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Cluster
+  # ct-meta ADR 0613 (REL-948): Cluster is the historical default and stays the
+  # default here so every existing release is a byte-identical no-op.
+  # Local is required (alongside a REGIONAL_NETWORK LB) to preserve real
+  # client source IPs without PROXY protocol; set
+  # admin_api.externalTrafficPolicy: Local only after confirming a
+  # controller pod runs on every node the DO Network LB health-checks.
+  externalTrafficPolicy: {{ .Values.admin_api.externalTrafficPolicy | default "Cluster" }}
   selector:
     {{- include "ingress.controllerSelector" . | nindent 4 }}
   ports:
