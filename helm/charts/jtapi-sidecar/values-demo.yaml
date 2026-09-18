@@ -1,11 +1,11 @@
 # Demo CUCM configuration for jtapi-sidecar
 # Use with: helm install jtapi-sidecar ./k8s/helm/charts/jtapi-sidecar -f k8s/helm/charts/jtapi-sidecar/values-demo.yaml
 #
-# This connects to the CallTelemetry demo lab CUCM at 192.168.125.10
+# Replace the host/user/password below with your own demo CUCM cluster.
 # CUCM Version: 15.0
 #
-# CRITICAL: Integration tests MUST run with these credentials set.
-# Tests should NOT be skipped due to missing credentials.
+# Store real credentials in a Kubernetes Secret (see the commented
+# existingSecret block below) rather than inline values.
 
 replicaCount: 1
 
@@ -14,11 +14,11 @@ image:
   tag: latest
   pullPolicy: Always
 
-# Demo CUCM connection - CallTelemetry lab
+# Demo CUCM connection — replace with your own lab cluster.
 cucm:
-  host: "192.168.125.10"
+  host: "203.0.113.10"
   ctiPort: 2748
-  user: "ct-jtapi-user"
+  user: "jtapi-demo-user"
   password: ""
   # Recommended: store credentials in a Kubernetes Secret and reference it here.
   # existingSecret: "jtapi-demo-credentials"

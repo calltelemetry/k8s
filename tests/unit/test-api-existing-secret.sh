@@ -6,7 +6,7 @@ rendered="$(mktemp)"
 trap 'rm -f "$rendered"' EXIT
 
 helm template api "$chart_dir" \
-  --namespace ct-dev \
+  --namespace test-namespace \
   --set db.useExistingSecret=true \
   --set db.existingSecretName=api-db-secret \
   --set admin.replicas=1 \

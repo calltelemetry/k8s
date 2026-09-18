@@ -1,0 +1,25 @@
+# Example values for the upstream haproxy-ingress/haproxy-ingress chart,
+# exposed via a LoadBalancer service (e.g. MetalLB, or a cloud LB).
+#
+# For a cluster without an L2/cloud load balancer (e.g. a local OrbStack or
+# kind cluster), use examples/haproxy-nodeport-example-values.yaml instead,
+# or set controller.service.type to ClusterIP.
+
+rbac:
+  create: false
+
+serviceAccount:
+  create: false
+  name: "haproxy-ingress"
+
+controller:
+  ingressClassResource:
+    name: haproxy
+  ingressClass: haproxy
+  extraArgs:
+    tcp-services-configmap: your-namespace/haproxy-tcp-services
+  service:
+    type: LoadBalancer
+    annotations: {}
+    loadBalancerIP: null
+    externalTrafficPolicy: Cluster

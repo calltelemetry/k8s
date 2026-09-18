@@ -17,8 +17,8 @@ helm_defaults:
 nats:
   values_file: examples/nats-values.yaml
 
-# Production-only shared observability platform. Non-production environments
-# keep these releases disabled unless explicitly overridden.
+# Optional VictoriaMetrics observability stack. Disabled by default; enable
+# per environment with observability.enabled: true.
 observability:
   enabled: false
   namespace: observability

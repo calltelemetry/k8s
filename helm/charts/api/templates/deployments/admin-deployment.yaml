@@ -120,7 +120,7 @@ spec:
               value: {{ .Values.cdr_root_path | quote }}
             - name: LOGGING_LEVEL
               value: {{ .Values.admin.logging_level | quote }}
-            # REL-196: node-local remote-control sessions are not eligible in Kubernetes.
+            # Node-local remote-control sessions are not eligible in Kubernetes.
             - name: REMOTE_CONTROL_IDENTITY_VERIFICATION_ENABLED
               value: "false"
             - name: REMOTE_CONTROL_SINGLE_NODE_SESSIONS

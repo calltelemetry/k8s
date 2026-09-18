@@ -1,0 +1,42 @@
+# Example values for the ct-media chart.
+# Scale replicas/resources/logging up for a production-sized deployment.
+
+replicaCount: 1
+
+image:
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50053
+
+# S3/SeaweedFS configuration
+s3:
+  endpoint: "seaweedfs:8333"
+  # Reference the S3 credentials secret
+  existingSecret: "seaweedfs-credentials"
+  bucket: "ct-audio"
+  secure: false
+
+logging:
+  rustLog: "info,ct_media=debug"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# Uncomment for multi-node scheduling on a larger cluster:
+# tolerations:
+#   - effect: NoExecute
+#     key: node.kubernetes.io/unreachable
+#     operator: Exists
+#     tolerationSeconds: 30
+#   - effect: NoExecute
+#     key: node.kubernetes.io/not-ready
+#     operator: Exists
+#     tolerationSeconds: 30

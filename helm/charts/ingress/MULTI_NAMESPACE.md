@@ -49,7 +49,7 @@ loadBalancer:
 primary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.205"
+  ip: "192.0.2.205"
   port: 80
   https_port: 443
   addressPool: "primary-api-ip-dev"
@@ -61,7 +61,7 @@ primary_api:
 secondary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.206"
+  ip: "192.0.2.206"
   port: 80
   https_port: 443
   addressPool: "secondary-api-ip-dev"
@@ -70,7 +70,7 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.207"
+  ip: "192.0.2.207"
   port: 80
   https_port: 443
   addressPool: "admin-ip-dev"
@@ -101,7 +101,7 @@ ingress-nginx:
 Install in the dev namespace:
 
 ```bash
-helm install -n ct-dev ingress calltelemetry/ct-ingress -f dev-ingress.yaml
+helm install -n dev-example ingress calltelemetry/ct-ingress -f dev-ingress.yaml
 ```
 
 ### Step 2: Deploy in Second Namespace (e.g., Production)
@@ -132,7 +132,7 @@ loadBalancer:
 primary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.215"
+  ip: "192.0.2.215"
   port: 80
   https_port: 443
   addressPool: "primary-api-ip-prod"
@@ -144,7 +144,7 @@ primary_api:
 secondary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.216"
+  ip: "192.0.2.216"
   port: 80
   https_port: 443
   addressPool: "secondary-api-ip-prod"
@@ -153,7 +153,7 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  ip: "192.168.123.217"
+  ip: "192.0.2.217"
   port: 80
   https_port: 443
   addressPool: "admin-ip-prod"
@@ -184,15 +184,15 @@ ingress-nginx:
 Install in the prod namespace:
 
 ```bash
-helm install -n ct-prod ingress calltelemetry/ct-ingress -f prod-ingress.yaml
+helm install -n prod-example ingress calltelemetry/ct-ingress -f prod-ingress.yaml
 ```
 
 ## How It Works
 
 The chart now automatically includes the namespace in the names of all cluster-wide resources:
 
-1. **MetalLB IPAddressPool**: Names now include the namespace (e.g., `admin-ip-ct-dev`, `admin-ip-ct-prod`)
-2. **MetalLB L2Advertisement**: Names now include the namespace (e.g., `admin-l2-advert-ct-dev`, `admin-l2-advert-ct-prod`)
+1. **MetalLB IPAddressPool**: Names now include the namespace (e.g., `admin-ip-dev-example`, `admin-ip-prod-example`)
+2. **MetalLB L2Advertisement**: Names now include the namespace (e.g., `admin-l2-advert-dev-example`, `admin-l2-advert-prod-example`)
 
 Additionally, the values file allows you to specify:
 
@@ -305,7 +305,7 @@ There are several ways to handle this:
      namespace: metallb-system
    spec:
      addresses:
-     - 192.168.123.205/32
+     - 192.0.2.205/32
      autoAssign: false
    ---
    apiVersion: metallb.io/v1beta1
@@ -385,7 +385,7 @@ The chart creates LoadBalancer services that use the MetalLB resources:
 When installing the chart in a cluster where the CRDs are already owned by another release, you may encounter the following error:
 
 ```
-Error: INSTALLATION FAILED: Unable to continue with install: CustomResourceDefinition "bfdprofiles.metallb.io" in namespace "" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-name" must equal "ingress": current value is "metallb"; annotation validation error: key "meta.helm.sh/release-namespace" must equal "ct-dev": current value is "metallb-system"
+Error: INSTALLATION FAILED: Unable to continue with install: CustomResourceDefinition "bfdprofiles.metallb.io" in namespace "" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-name" must equal "ingress": current value is "metallb"; annotation validation error: key "meta.helm.sh/release-namespace" must equal "dev-example": current value is "metallb-system"
 ```
 
 This happens because Helm tracks ownership of CRDs, and a CRD can only be owned by one release at a time. There are several ways to handle this:
@@ -393,7 +393,7 @@ This happens because Helm tracks ownership of CRDs, and a CRD can only be owned 
 1. **Skip CRD Installation**: Use the `--skip-crds` flag when installing the chart:
 
    ```bash
-   helm install -n ct-dev ingress ./helm/charts/ingress -f ./prod-ingress.yaml --skip-crds
+   helm install -n dev-example ingress ./helm/charts/ingress -f ./prod-ingress.yaml --skip-crds
    ```
 
 2. **Disable MetalLB**: If you already have MetalLB installed in the cluster, you can disable it in the chart:
@@ -414,7 +414,7 @@ This happens because Helm tracks ownership of CRDs, and a CRD can only be owned 
 
    ```bash
    kubectl delete crd bfdprofiles.metallb.io bgpadvertisements.metallb.io bgppeers.metallb.io ipaddresspools.metallb.io l2advertisements.metallb.io communities.metallb.io
-   helm install -n ct-dev ingress ./helm/charts/ingress -f ./prod-ingress.yaml
+   helm install -n dev-example ingress ./helm/charts/ingress -f ./prod-ingress.yaml
    ```
 
 For production deployments, option 1 or 2 is recommended.

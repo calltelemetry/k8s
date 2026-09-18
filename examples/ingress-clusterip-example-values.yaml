@@ -1,0 +1,28 @@
+# Example values for the ct-ingress chart on a cluster without MetalLB
+# (e.g. local OrbStack or kind). No LoadBalancer IPs are advertised; the
+# ingress controller Service (see examples/haproxy-nodeport-example-values.yaml)
+# handles routing instead.
+
+ingress-controller:
+  type: haproxy
+  class: haproxy
+  selector:
+    name: "haproxy-ingress"
+
+primary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+secondary_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+admin_api:
+  createLoadBalancer: false
+  advertiseL2MetalLb: false
+
+ports:
+  http: 80
+  https: 443
+
+tcpServices: {}

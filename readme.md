@@ -9,14 +9,10 @@ Kubernetes helm charts and support tools.
 ├── helm/
 │   ├── charts/
 │   │   ├── api/             # API service chart
-│   │   ├── echo/            # Echo server chart
 │   │   ├── ingress/         # Ingress controller chart
-│   │   ├── teams-auth/      # Teams authentication chart
 │   │   └── vue-web/         # Vue web frontend chart
 ├── index.yaml               # Helm repository index file
 ├── update-helm-repo.sh      # Script to update the Helm repository
-├── architecture-diagram.md  # High-level architecture diagram
-├── detailed-architecture-diagram.md  # Detailed architecture diagram
 ├── kubernetes-resources-diagram.md   # Kubernetes resources diagram
 ├── helm-chart-tdd.md        # Test-Driven Development approach for Helm charts
 └── tests/                   # Test scripts for Helm charts
@@ -54,8 +50,6 @@ The architecture consists of:
    - Vue-Web Pods
 
 For more detailed diagrams, see:
-- [Architecture Diagram](architecture-diagram.md)
-- [Detailed Architecture Diagram](detailed-architecture-diagram.md)
 - [Kubernetes Resources Diagram](kubernetes-resources-diagram.md)
 - [Helm Chart TDD](helm-chart-tdd.md)
 
@@ -78,8 +72,6 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.8/confi
 # Install the ingress chart with the --skip-crds flag
 helm install -n your-namespace ingress ./helm/charts/ingress -f ./your-values.yaml --skip-crds
 ```
-
-For more details, see the [Detailed Architecture Diagram](detailed-architecture-diagram.md).
 
 ## Test-Driven Development
 
@@ -202,9 +194,7 @@ If you prefer to manually update the repository:
 
 ```bash
 helm package helm/charts/api -d .
-helm package helm/charts/echo -d .
 helm package helm/charts/ingress -d .
-helm package helm/charts/teams-auth -d .
 helm package helm/charts/vue-web -d .
 ```
 

@@ -1,6 +1,6 @@
 # CallTelemetry Helmfile Deployment
 # This helmfile deploys the entire CallTelemetry environment based on the namespace value
-# Usage: helmfile --environment ct-dev sync
+# Usage: helmfile --environment dev sync
 
 repositories:
   - name: haproxy-ingress
@@ -15,6 +15,8 @@ repositories:
     url: https://calltelemetry.github.io/k8s/helm/charts
   - name: jetstack
     url: https://charts.jetstack.io
+  - name: victoriametrics
+    url: https://victoriametrics.github.io/helm-charts/
 
 # Global values that can be referenced in releases
 helmDefaults:
@@ -28,11 +30,11 @@ environments:
     values:
       - env-common.yaml
       - env-dev.yaml
-  ct-dev:
+  dev:
     values:
       - env-common.yaml
       - env-dev.yaml
-  ct-prod:
+  prod:
     values:
       - env-common.yaml
       - env-prod.yaml
@@ -87,52 +89,39 @@ releases:
       - crds:
           enabled: true
 
-  # Production-only observability platform. This is intentionally separate
-  # from the ci-analytics monitoring installation and from product releases.
-  - name: prometheus
+  # Optional observability stack (VictoriaMetrics). Disabled by default;
+  # enable per environment with observability.enabled: true. This is
+  # intentionally separate from product releases — the product itself
+  # ships its own compose-based VictoriaMetrics stack.
+  - name: victoria-metrics-single
     namespace: "{{ .Environment.Values.observability.namespace }}"
     createNamespace: true
     condition: observability.enabled
-    chart: ./helm/charts/prometheus
+    chart: victoriametrics/victoria-metrics-single
+    version: 0.46.0
+
+  - name: victoria-logs-single
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: victoriametrics/victoria-logs-single
+    version: 0.13.9
+
+  - name: victoria-logs-collector
+    namespace: "{{ .Environment.Values.observability.namespace }}"
+    createNamespace: true
+    condition: observability.enabled
+    chart: victoriametrics/victoria-logs-collector
+    version: 0.3.7
     values:
-      - examples/prometheus-observability-prod-values.yaml
-
-  - name: alertmanager
-    namespace: "{{ .Environment.Values.observability.namespace }}"
-    createNamespace: true
-    condition: observability.enabled
-    chart: ./helm/charts/alertmanager
-    values:
-      - examples/alertmanager-observability-prod-values.yaml
-
-  - name: kube-state-metrics
-    namespace: "{{ .Environment.Values.observability.namespace }}"
-    createNamespace: true
-    condition: observability.enabled
-    chart: ./helm/charts/kube-state-metrics
-
-  - name: node-exporter
-    namespace: "{{ .Environment.Values.observability.namespace }}"
-    createNamespace: true
-    condition: observability.enabled
-    chart: ./helm/charts/node-exporter
-
-  - name: blackbox-exporter
-    namespace: "{{ .Environment.Values.observability.namespace }}"
-    createNamespace: true
-    condition: observability.enabled
-    chart: ./helm/charts/blackbox-exporter
-
-  - name: grafana
-    namespace: "{{ .Environment.Values.observability.namespace }}"
-    createNamespace: true
-    condition: observability.enabled
-    chart: ./helm/charts/grafana
-    values:
-      - examples/grafana-observability-prod-values.yaml
+      # No URL path: vlagent defaults to the /insert/native endpoint. The
+      # observability namespace is fixed (see env-common.yaml); not templated
+      # here because this chart re-evaluates remoteWrite.url with Helm's own
+      # `tpl` in its own (non-helmfile) context.
+      - remoteWrite:
+          - url: "http://victoria-logs-single-victoria-logs-single-server.observability.svc.cluster.local:9428"
     needs:
-      - "{{ .Environment.Values.observability.namespace }}/prometheus"
-      - "{{ .Environment.Values.observability.namespace }}/alertmanager"
+      - "{{ .Environment.Values.observability.namespace }}/victoria-logs-single"
 
   # HAProxy Ingress Controller
   - name: haproxy-ingress
@@ -201,16 +190,6 @@ releases:
       - "{{ .Environment.Values.env.namespace }}/api"
       - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
 
-  # # Microsoft Teams Authentication Service
-  # - name: teams-auth
-  #   namespace: "{{ .Environment.Values.env.namespace }}"
-  #   chart: calltelemetry/teams-auth
-  #   version: 1.0.0 # Pinned version for stability
-  #   values:
-  #     - "{{ .Environment.Values.teams_auth.values_file }}"
-  #   needs:
-  #     - "{{ .Environment.Values.env.namespace }}/api"
-
   # Traceroute Service
   - name: traceroute
     namespace: "{{ .Environment.Values.env.namespace }}"
@@ -220,13 +199,3 @@ releases:
     needs:
       - "{{ .Environment.Values.env.namespace }}/nats"
       - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
-
-  # Echo Service
-  # - name: echo
-  # namespace: "{{ .Environment.Values.env.namespace }}"
-  # chart: calltelemetry/echo
-  # values:
-  # - "{{ .Environment.Values.echo.values_file }}"
-  # needs:
-  # - "{{ .Environment.Values.env.namespace }}/ingress-haproxy"
-  # - "{{ .Environment.Values.env.namespace }}/haproxy-ingress"
