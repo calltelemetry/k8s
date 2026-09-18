@@ -1,0 +1,51 @@
+# Example values for the syslog chart.
+# Receives UDP 514 syslog from Cisco CUCM, CUBE, CMS, Expressway, Unity, IM&P.
+
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+service:
+  udp:
+    type: ClusterIP
+    port: 514
+  health:
+    type: ClusterIP
+    port: 5514
+
+# Point at your own Loki/log-aggregation endpoint.
+loki:
+  endpoint: "http://loki:3100/loki/api/v1/push"
+
+nats:
+  url: "nats://nats:4222"
+
+otel:
+  enabled: true
+  endpoint: "http://otel-collector:4318"
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - syslog
+          topologyKey: kubernetes.io/hostname

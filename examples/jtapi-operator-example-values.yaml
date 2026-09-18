@@ -1,0 +1,46 @@
+# Example values for the JTAPI operator chart.
+# Usage: helm install jtapi-operator ./helm/charts/jtapi-operator -f examples/jtapi-operator-example-values.yaml
+
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: jtapi-operator
+
+# Enable leader election once you run more than one replica.
+leaderElection:
+  enabled: true
+
+# NATS connection for operator coordination
+nats:
+  url: "nats://nats:4222"
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+# Spread replicas across nodes once you run more than one.
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - jtapi-operator
+        topologyKey: kubernetes.io/hostname
+
+nodeSelector: {}
+tolerations: []
+
+# A single-replica dev install can drop leaderElection and podAntiAffinity
+# above and reduce resources to requests: {cpu: 100m, memory: 128Mi}.

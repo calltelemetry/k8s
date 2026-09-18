@@ -104,6 +104,6 @@ When upgrading from a previous version, make sure to check the release notes for
 | `ingress-nginx.controller.serviceAccount.name` | Name of the service account | `nginx-ingress-serviceaccount` |
 | `primary_api.createLoadBalancer` | Create primary API load balancer | `false` |
 | `primary_api.advertiseL2MetalLb` | Advertise primary API load balancer via MetalLB L2 | `false` |
-| `primary_api.ip` | IP address for primary API load balancer | `192.168.123.205` |
+| `primary_api.ip` | IP address for primary API load balancer | `192.0.2.205` |
 | `secondary_api.createLoadBalancer` | Create secondary API load balancer | `false` |
 | `admin_api.createLoadBalancer` | Create admin load balancer | `true` |

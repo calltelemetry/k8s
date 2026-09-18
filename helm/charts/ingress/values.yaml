@@ -1,7 +1,7 @@
 # kubectl delete -A ValidatingWebhookConfiguration ingress-ingress-nginx-admission
 metallb:
   enabled: false
-ingressClassName: haproxy-ct-dev
+ingressClassName: haproxy
 # Ingress Controller Configuration
 ingress-controller:
   # Type of ingress controller to use
@@ -65,7 +65,7 @@ loadBalancer:
 primary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.205"
+  metal_ip_address: "192.0.2.205"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/primary_ip.yaml
   addressPool: "primary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
@@ -83,7 +83,7 @@ primary_api:
 secondary_api:
   createLoadBalancer: false
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.206"
+  metal_ip_address: "192.0.2.206"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/secondary_ip.yaml
   addressPool: "secondary-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)
@@ -97,7 +97,7 @@ secondary_api:
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: false
-  metal_ip_address: "192.168.123.207"
+  metal_ip_address: "192.0.2.207"
   # Address pool name used in MetalLB configuration - must match the pattern in templates/metallb/admin_ip.yaml
   addressPool: "admin-ip-{{ .Release.Namespace }}"
   # Custom annotations for this load balancer (will be merged with loadBalancer.annotations)

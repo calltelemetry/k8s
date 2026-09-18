@@ -12,7 +12,7 @@ The Traceroute service is responsible for performing network diagnostics and tra
 - Helm 3.0+
 - NATS Chart deployed
 
-For a complete installation guide of the entire CallTelemetry platform, please refer to the [HAProxy CallTelemetry Installation Guide](../../haproxy-calltelemetry-installation-guide.md).
+For a complete installation guide of the entire CallTelemetry platform, please refer to the [Helmfile deployment guide](../../../helmfile-readme.md).
 
 ## Installation
 
@@ -26,8 +26,7 @@ helm repo add calltelemetry https://calltelemetry.github.io/k8s/helm/charts
 helm repo update
 
 # Install the chart with the release name "traceroute"
-helm install traceroute calltelemetry/traceroute -n ct-dev
-helm install traceroute calltelemetry/traceroute -n ct-prod
+helm install traceroute calltelemetry/traceroute -n your-namespace
 ```
 
 ## Configuration
@@ -60,16 +59,14 @@ helm install traceroute calltelemetry/traceroute
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```bash
-helm install traceroute calltelemetry/traceroute -n ct-dev -f examples/traceroute-ct-dev-values.yaml
-helm install traceroute calltelemetry/traceroute -n ct-prod -f examples/traceroute-ct-prod-values.yaml
+helm install traceroute calltelemetry/traceroute -n your-namespace -f examples/traceroute-example-values.yaml
 ```
 
 ## Example Values Files
 
-Example values files for development and production environments are provided in the `examples` directory:
+An example values file is provided in the `examples` directory:
 
-- `examples/traceroute-ct-dev-values.yaml`: Development environment configuration
-- `examples/traceroute-ct-prod-values.yaml`: Production environment configuration
+- `examples/traceroute-example-values.yaml`: baseline configuration; adjust `replicaCount` and `resources` for your environment.
 
 ## Integration with CallTelemetry Platform
 
@@ -79,14 +76,10 @@ To configure the API service to use this Traceroute service, set the `TRACEROUTE
 
 ### Installing as Part of CallTelemetry Platform
 
-To install the Traceroute chart as part of the complete CallTelemetry platform, follow the instructions in the [HAProxy CallTelemetry Installation Guide](../../haproxy-calltelemetry-installation-guide.md).
+To install the Traceroute chart as part of the complete CallTelemetry platform, follow the instructions in the [Helmfile deployment guide](../../../helmfile-readme.md).
 
 ```bash
-# Install in ct-dev namespace
-helm install traceroute calltelemetry/traceroute -n ct-dev -f examples/traceroute-ct-dev-values.yaml
-
-# Install in ct-prod namespace
-helm install traceroute calltelemetry/traceroute -n ct-prod -f examples/traceroute-ct-prod-values.yaml
+helm install traceroute calltelemetry/traceroute -n your-namespace -f examples/traceroute-example-values.yaml
 ```
 
 ## Uninstalling the Chart
@@ -94,6 +87,5 @@ helm install traceroute calltelemetry/traceroute -n ct-prod -f examples/tracerou
 To uninstall/delete the `traceroute` deployment:
 
 ```bash
-helm uninstall traceroute -n ct-dev
-helm uninstall traceroute -n ct-prod
+helm uninstall traceroute -n your-namespace
 ```

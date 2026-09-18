@@ -1,6 +1,6 @@
 # Dev Password export
-# kubectl -n postgres-operator get secret hippo-dev-pguser-calltelemetry -o json  | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences", "managedFields"])'  | kubectl apply -n ct-dev -f -
-hostname: 192.168.123.205
+# kubectl -n postgres-operator get secret <cluster>-pguser-calltelemetry -o json | jq 'del(.metadata["namespace","creationTimestamp","resourceVersion","selfLink","uid","ownerReferences", "managedFields"])' | kubectl apply -n your-namespace -f -
+hostname: 192.0.2.10
 environment: dev
 preview:
   seedLevel: "empty"

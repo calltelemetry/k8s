@@ -1,0 +1,55 @@
+# Example values for the API chart with an HAProxy ingress.
+# Copy and adapt for your environment; do not use these host/secret names
+# verbatim in a real deployment.
+
+ingressClassName: haproxy
+
+# Database configuration — reference a Secret created out of band, or
+# switch to inline `db.values` for a quick local install.
+db:
+  useExistingSecret: true
+  existingSecretName: postgresql-pguser-calltelemetry
+
+# Enable only in a namespace with the referenced Secret provisioned.
+# See helm/charts/api/README.md for the TrueSpam credential-encryption
+# Secret contract before setting enabled: true.
+truespam:
+  enabled: false
+  existingSecretName: truespam-credential-encryption
+  existingSecretKey: encryption-key
+  retainedKeys: []
+  keyVersion: v1
+  demoLimitsLegalConfirmed: false
+
+# API Config
+api:
+  hostname: api.example.com
+  imagePullPolicy: IfNotPresent
+  replicas: 2
+  ingress:
+    annotations:
+      haproxy.org/load-balance: "leastconn"
+      # Production-style TLS termination via cert-manager:
+      # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      # haproxy.org/ssl-redirect: "true"
+  # tls:
+  #   - secretName: api-example-com-tls
+  #     hosts:
+  #       - api.example.com
+
+# Admin configuration
+admin:
+  api_worker: true
+  hostname: admin.example.com
+  imagePullPolicy: IfNotPresent
+  ingress:
+    annotations:
+      haproxy.org/load-balance: "roundrobin"
+
+# SFTP Configuration
+sftp:
+  enabled: true
+
+# Syslog Configuration
+syslog:
+  enabled: true

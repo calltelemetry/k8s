@@ -2,34 +2,26 @@
 
 # Environment information
 env:
-  namespace: ct-dev
+  namespace: dev
   environment: dev
-  domain: ct-dev.k8s.orb.local
+  domain: dev.k8s.orb.local
 
-# HAProxy configuration
+# HAProxy configuration (NodePort — OrbStack has no MetalLB/L2 support)
 haproxy:
-  values_file: examples/haproxy-ct-dev-loadbalancer-values.yaml
+  values_file: examples/haproxy-nodeport-example-values.yaml
 
-# Ingress configuration
+# Ingress configuration (no LoadBalancer IPs advertised)
 ingress:
-  values_file: examples/ingress-ct-dev-orbstack-values.yaml
+  values_file: examples/ingress-clusterip-example-values.yaml
 
 # API configuration
 api:
-  values_file: examples/api-ct-dev-values.yaml
+  values_file: examples/api-example-values.yaml
 
 # Vue Web configuration
 vue_web:
-  values_file: examples/vue-web-ct-dev-values.yaml
-
-# Teams Auth configuration
-teams_auth:
-  values_file: examples/teams-auth-ct-dev-values.yaml
+  values_file: examples/vue-web-example-values.yaml
 
 # Traceroute configuration
 traceroute:
-  values_file: examples/traceroute-ct-dev-values.yaml
-
-# Echo configuration
-echo:
-  values_file: examples/echo-haproxy-ct-dev-values.yaml
+  values_file: examples/traceroute-example-values.yaml

@@ -9,7 +9,7 @@ assert_false_defaults() {
   local chart="$1"
   local release="$2"
 
-  helm template "$release" "$chart" --namespace ct-dev >"$rendered"
+  helm template "$release" "$chart" --namespace test-namespace >"$rendered"
 
   for flag in REMOTE_CONTROL_IDENTITY_VERIFICATION_ENABLED REMOTE_CONTROL_SINGLE_NODE_SESSIONS; do
     values="$(awk -v flag="$flag" '

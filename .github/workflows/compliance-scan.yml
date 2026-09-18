@@ -1,0 +1,19 @@
+name: Compliance Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan diff for internal identifiers
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          ./scripts/ct-compliance-scan.sh --diff "origin/${{ github.base_ref }}"

@@ -120,7 +120,7 @@ caddy:
     enabled: true
     ingressClassName: nginx
     hosts:
-      - host: ct-pr-123.preview.do.calltelemetry.com
+      - host: ct-pr-123.example.com
         paths:
           - /
   routes:

@@ -1,0 +1,30 @@
+# Example values for the traceroute chart.
+
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "256m"
+  limits:
+    cpu: 1
+
+nats:
+  server: "nats"
+
+service:
+  type: ClusterIP
+  port: 4100
+  targetPort: 4100
+
+securityContext:
+  runAsUser: 0
+
+terminationGracePeriodSeconds: 5
+
+# Verbose logging for local development:
+# env:
+#   - name: LOGGING_LEVEL
+#     value: "debug"

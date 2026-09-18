@@ -30,21 +30,21 @@ loadBalancer:
 primary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  metal_ip_address: "192.168.123.205"
+  metal_ip_address: "192.0.2.205"
   addressPool: "primary-ip-test-namespace"
   annotations: {}
 
 secondary_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  metal_ip_address: "192.168.123.206"
+  metal_ip_address: "192.0.2.206"
   addressPool: "secondary-ip-test-namespace"
   annotations: {}
 
 admin_api:
   createLoadBalancer: true
   advertiseL2MetalLb: true
-  metal_ip_address: "192.168.123.207"
+  metal_ip_address: "192.0.2.207"
   addressPool: "admin-ip-test-namespace"
   annotations: {}
 

@@ -8,7 +8,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Default values
-NAMESPACE="ct-dev"
+NAMESPACE="default"
 OUTPUT_FORMAT="text"
 VERBOSE=false
 COMMAND="check-all"
@@ -31,7 +31,7 @@ print_usage() {
   echo "  check-logs      Analyze logs for errors and warnings"
   echo ""
   echo "Options:"
-  echo "  -n, --namespace NAMESPACE  Namespace to check (default: ct-dev)"
+  echo "  -n, --namespace NAMESPACE  Namespace to check (default: default)"
   echo "  -o, --output FORMAT        Output format: text, json, yaml (default: text)"
   echo "  -v, --verbose              Enable verbose output"
   echo "  -h, --help                 Show this help message"

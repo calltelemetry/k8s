@@ -1,0 +1,76 @@
+# Example values for the JTAPI sidecar chart.
+# Usage: helm install jtapi-sidecar ./helm/charts/jtapi-sidecar -f examples/jtapi-sidecar-example-values.yaml
+
+replicaCount: 1
+
+image:
+  tag: "1.0.0" # pin to a specific version for anything beyond a quick test
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+jtapi:
+  port: 8080
+  jarPath: /app/jars
+  watchJars: true
+  restartDelaySeconds: 5
+  logLevel: INFO
+
+# CUCM connection — store credentials in a Kubernetes Secret and reference
+# it here rather than putting them inline.
+cucm:
+  existingSecret: "jtapi-cucm-credentials"
+  ctiPort: 2748
+  secretKeys:
+    host: CUCM_HOST
+    user: CUCM_JTAPI_USER
+    password: CUCM_JTAPI_PASSWORD
+
+# WebSocket connection to the CallTelemetry API
+websocket:
+  enabled: true
+  url: "ws://api:4000/socket/jtapi/websocket"
+  serverId: "jtapi-1"
+  existingSecret: "jtapi-websocket-credentials"
+  secretKey: WEBSOCKET_AUTH_TOKEN
+  autoReconnect: true
+  reconnectDelay: 1000
+  maxReconnectAttempts: 0 # unlimited retries
+
+connectionPool:
+  maxConnections: 5
+  connectionTimeout: 30000
+  callTimeout: 60000
+  maxConcurrentCalls: 20
+
+persistence:
+  jars:
+    enabled: true
+    size: 100Mi
+  audio:
+    enabled: true
+    size: 500Mi
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# Production-style scheduling: prefer spreading away from API pods.
+# affinity:
+#   podAntiAffinity:
+#     preferredDuringSchedulingIgnoredDuringExecution:
+#       - weight: 50
+#         podAffinityTerm:
+#           labelSelector:
+#             matchExpressions:
+#               - key: app.kubernetes.io/name
+#                 operator: In
+#                 values:
+#                   - api
+#           topologyKey: kubernetes.io/hostname
